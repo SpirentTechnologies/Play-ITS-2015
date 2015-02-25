@@ -1,0 +1,4 @@
+module Car2X_ModuleParameters {
+	
+	const charstring c_modePrefix_01 := "01";
+}
