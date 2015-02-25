@@ -38,6 +38,7 @@ The data-table has follwing entries:
 
 ## Instruction
 
-<code>1.a.) Start the OpenXC Simulator
-<code>1.b.) Connect the Hardware
-<code>2.) run file.jar</code>
+<code>
+1.a.) Start the OpenXC Simulator
+1.b.) Connect the Hardware
+2.) run file.jar</code>
