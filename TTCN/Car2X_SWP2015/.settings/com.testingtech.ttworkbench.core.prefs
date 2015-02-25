@@ -1,0 +1,16 @@
+eclipse.preferences.version=1
+environment.append=true
+environment.variables=
+tt3-plugins-path=//PROJECT_NAME//tt3plugins
+ttcn3.continue_on_fail=false
+ttcn3.gen_debug_code_record_init=false
+ttcn3.generate_mlf=false
+ttcn3.main_module=Car2X_Main
+ttcn3.mlf_class=
+ttcn3.mlf_jar=
+ttcn3.output_folder=//PROJECT_NAME//ttcn3build
+ttcn3.output_same_as_src=true
+ttcn3.save_log_automatically=false
+ttcn3.source_folders=//PROJECT_NAME//ttcn3
+ttcn3.tlz.output_folder=/home/sascha/TTworkbenchProfessional
+ttcn3.use_bigint=false
