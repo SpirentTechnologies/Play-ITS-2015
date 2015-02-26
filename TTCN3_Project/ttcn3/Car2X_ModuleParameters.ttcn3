@@ -1,4 +1,26 @@
 module Car2X_ModuleParameters {
 	
+	//CAN MODE 01
 	const charstring c_modePrefix_01 := "01";
+	
+	//keys for data table
+	const charstring c_steering_wheel_angle := "steering_wheel_angle";
+	const charstring c_torque_at_transmission := "torque_at_transmission";
+	const charstring c_engine_speed := "engine_speed";
+	const charstring c_vehicle_speed := "vehicle_speed";
+	const charstring c_accelerator_pedal_position := "accelerator_pedal_position";
+	const charstring c_parking_brake_status := "parking_brake_status";
+	const charstring c_brake_pedal_status := "brake_pedal_status";
+	const charstring c_transmission_gear_position := "transmission_gear_position";
+	const charstring c_gear_lever_position := "gear_lever_position";
+	const charstring c_odometer := "odometer";
+	const charstring c_ignition_status := "ignition_status";
+	const charstring c_fuel_level := "fuel_level";
+	const charstring c_fuel_consumed_since_restar := "fuel_consumed_since_restar";
+	const charstring c_door_status := "door_status";
+	const charstring c_headlamp_status := "headlamp_status";
+	const charstring c_high_beam_status := "high_beam_status";
+	const charstring c_windshield_wiper_status := "windshield_wiper_status";
+	const charstring c_latitude := "latitude";
+	const charstring c_longitude := "longitude";
 }
