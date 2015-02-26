@@ -1,14 +1,22 @@
 module Car2X_Templates {
-	import from Car2X_ModuleParameters all;
-	import from Car2X_Types {type ElmRequest, ElmResponse;}
+	import from Car2X_ModuleParameters all; 
+	import from Car2X_Types all;
 	
-	template ElmRequest m_vehicleSpeed() := {
+	template ElmRequest m_Elm_vehicleSpeed() := {
 	  modePrefix := c_modePrefix_01,
 	  parameterID := "0D"
 	}
 	
 
-	template ElmResponse mw_vehicleSpeed() := {
+	template ElmResponse mw_Elm_vehicleSpeed() := {
+	  response := ?
+	}
+	
+	template CanRequest m_Can_vehicleSpeed() := {
+	  request := c_vehicle_speed
+	}
+	
+	template CanResponse mw_Can_vehicleSpeed() := {
 	  response := ?
 	}
 

@@ -10,11 +10,11 @@ module Car2X_Types {
 		charstring response
 	}
 	
-	type record CANRequest {
+	type record CanRequest {
 		charstring request
 	}
 	
-	type record CANResponse {
+	type record CanResponse {
 		charstring response
 	}
 	
