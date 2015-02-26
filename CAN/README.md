@@ -26,6 +26,14 @@ The data-table has follwing entries:
 - latitude
 - longitude
 
+And looks like this:
+
+| OpenXC-Key    | OBD2-Key                 | ValueA | ValueB | Timestamp  |
+|---------------|--------------------------|--------|--------|------------|
+| vehicle_speed | 0D                       |        |        | 1424944430 |
+| engine_speed  | 0C                       | 3267   |        | 1424942430 |
+| door_status   | (depends on manufacturer | driver | true   | 1424945123 |
+
 ## Used Software
 - [OpenXC Simulator] (https://github.com/openxc/openxc-vehicle-simulator)
 - [OpenXC message Format] (https://github.com/openxc/openxc-message-format)
