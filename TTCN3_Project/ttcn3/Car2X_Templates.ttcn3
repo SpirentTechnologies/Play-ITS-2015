@@ -12,11 +12,11 @@ module Car2X_Templates {
 	  response := ?
 	}
 	
-	template CanRequest m_Can_vehicleSpeed() := {
+	template FiltererRequest m_Filterer_vehicleSpeed() := {
 	  request := c_vehicle_speed
 	}
 	
-	template CanResponse mw_Can_vehicleSpeed() := {
+	template FiltererResponse mw_Filterer_vehicleSpeed() := {
 	  response := ?
 	}
 

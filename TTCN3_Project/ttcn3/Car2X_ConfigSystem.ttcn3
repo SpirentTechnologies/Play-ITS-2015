@@ -7,18 +7,18 @@ module Car2X_ConfigSystem {
 		out ElmRequest;
 	}
 	
-	type port CanPortType message {
-		in CanResponse;
-		out CanRequest;
+	type port FiltererPortType message {
+		in FiltererResponse;
+		out FiltererRequest;
 	}
 	
 	type component TesterComponentType {
 		port ElmPortType elmPort;
-		port CanPortType canPort;
+		port FiltererPortType filtererPort;
 	}
 	
 	type component SystemComponentType {
 		port ElmPortType elmPort;
-		port CanPortType canPort;
+		port FiltererPortType filtererPort;
 	}
 }
