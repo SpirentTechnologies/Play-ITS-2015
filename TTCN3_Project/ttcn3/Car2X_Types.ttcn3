@@ -1,0 +1,13 @@
+module Car2X_Types {
+	// add types here
+	
+	type record ElmRequest {
+		charstring modePrefix length(2),
+		charstring parameterID length(2)
+	}
+	
+	type record ElmResponse {
+		charstring response
+	}
+	
+}
