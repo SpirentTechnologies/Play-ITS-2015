@@ -1,3 +1,4 @@
 eclipse.preferences.version=1
+tt3-plugins-path=//PROJECT_NAME//tt3plugins
 ttcn3.main_module=Car2X_Main
 ttcn3.source_folders=//PROJECT_NAME//ttcn3
