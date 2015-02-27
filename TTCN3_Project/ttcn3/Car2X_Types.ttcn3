@@ -18,4 +18,6 @@ module Car2X_Types {
 		charstring response
 	}
 	
+	type component EmptyComponentType{}
+	
 }

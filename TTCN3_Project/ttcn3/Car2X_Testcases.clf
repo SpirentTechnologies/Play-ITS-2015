@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE campaignloader PUBLIC "-//TESTING TECH//DTD MLF//2.0" "mlf.dtd">
+<campaignloader>
+  <campaign Name="Car2X_Testcases" Control="false">
+    <testadapter Name="com.testingtech.ttcn.tri.PluginTestAdapter" File="">
+      <description></description>
+    </testadapter>
+    <module Name="Car2X_Testcases" File="ttcn3/Car2X_Testcases.jar" Package="generated_ttcn"/>
+    <testcase Name="TC_vehicleSpeed_over50" Alias="" Module="Car2X_Testcases" Retries="0" Runs="1" ActionOnFail="continue" Selection="false" Status="stopped" Verdict="fail">
+      <description></description>
+    </testcase>
+  </campaign>
+</campaignloader>

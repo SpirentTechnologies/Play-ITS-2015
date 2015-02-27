@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testadapter>
+  <port>
+    <plugin id="com.testingtech.tt3rt.rs232.rs232RuntimePlugin">
+      <parameter id="class" value="com.testingtech.ttworkbench.tt3rt.rs232.port.RS232PortPluginProvider"/>
+    </plugin>
+    <parameter id="taParams">
+      <parameter id="SerialPortName">
+        <value>
+          <Values:charstring xmlns:Values="Values.xsd" type="charstring">
+            <Values:value>COM6</Values:value>
+          </Values:charstring>
+        </value>
+      </parameter>
+      <parameter id="BaudRate">
+        <value>
+          <Values:integer name="" type="integer">
+            <Values:value>9600</Values:value>
+          </Values:integer>
+        </value>
+      </parameter>
+      <parameter id="DataBits">
+        <value>
+          <Values:integer name="" type="integer">
+            <Values:value>8</Values:value>
+          </Values:integer>
+        </value>
+      </parameter>
+      <parameter id="StopBits">
+        <value>
+          <Values:integer name="" type="integer">
+            <Values:value>1</Values:value>
+          </Values:integer>
+        </value>
+      </parameter>
+      <parameter id="Parity">
+        <value>
+          <Values:integer name="" type="integer">
+            <Values:value>0</Values:value>
+          </Values:integer>
+        </value>
+      </parameter>
+      <parameter id="FlowControl">
+        <value>
+          <Values:charstring name="" type="charstring">
+            <Values:value>1,2</Values:value>
+          </Values:charstring>
+        </value>
+      </parameter>
+      <parameter id="CheckDSR">
+        <value>
+          <Values:boolean xmlns:Values="Values.xsd" type="boolean">
+            <Values:value>true</Values:value>
+          </Values:boolean>
+        </value>
+      </parameter>
+      <parameter id="portFilters">
+        <parameter id="CAN_Filter"/>
+      </parameter>
+    </parameter>
+    <parameter id="portType" value="Car2X_ConfigSystem.FiltererPortType"/>
+    <parameter id="portFilters">
+      <parameter id="portFilter">
+        <parameter id="pluginId" value="CAN_Filter"/>
+        <parameter id="class" value="CANPortFilter.CANPortFilterProvider"/>
+      </parameter>
+    </parameter>
+  </port>
+</testadapter>

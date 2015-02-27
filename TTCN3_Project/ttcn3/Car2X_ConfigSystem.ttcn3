@@ -7,12 +7,13 @@ module Car2X_ConfigSystem {
 		out ElmRequest;
 	}
 	
-	type port FiltererPortType message {
+	type port FiltererPortType message {		
 		in FiltererResponse;
 		out FiltererRequest;
 	}
 	
 	type component TesterComponentType {
+		timer t_TC := 5.0;
 		port ElmPortType elmPort;
 		port FiltererPortType filtererPort;
 	}

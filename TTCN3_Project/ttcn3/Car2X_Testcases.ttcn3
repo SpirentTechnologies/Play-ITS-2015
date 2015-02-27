@@ -1,2 +1,35 @@
 module Car2X_Testcases {
+	
+	import from Car2X_ConfigSystem all;
+
+	import from Car2X_Types all;
+	import from Car2X_Templates all;
+
+	testcase TC_vehicleSpeed_over50 ()
+		runs on TesterComponentType
+		system SystemComponentType
+	{
+		var TesterComponentType Tester;		
+		Tester := TesterComponentType.create;
+		
+		map(mtc:filtererPort,system:filtererPort);
+		filtererPort.send(m_Filterer_vehicleSpeed);
+		t_TC.start;
+		alt{
+			[] filtererPort.receive(mw_Filterer_vehicleSpeed){
+				setverdict(pass);
+				t_TC.stop;
+			}
+			[] filtererPort.receive{
+				setverdict(fail);
+				t_TC.stop;
+			}
+			[] t_TC.timeout{
+				setverdict(inconc);
+			}
+		}			
+	unmap(mtc:filtererPort,system:filtererPort);
+	}
+	
+	
 }
