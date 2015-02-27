@@ -3,5 +3,6 @@
 	<classpathentry kind="con" path="com.testingtech.ttworkbench.core.TTWB_LIBRARY"/>
 	<classpathentry kind="src" path="javasrc"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="javasrc/canfilter/libs/java-json.jar"/>
 	<classpathentry kind="output" path="build"/>
 </classpath>
