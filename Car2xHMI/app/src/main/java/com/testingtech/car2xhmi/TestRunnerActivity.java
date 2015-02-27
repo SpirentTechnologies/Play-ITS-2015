@@ -81,6 +81,12 @@ public class TestRunnerActivity extends ActionBarActivity {
         TextView commands = (TextView) findViewById(R.id.commands);
         commands.setText("");
         logoAnimation.stop();
+        // TODO remove
+     /*   TextView textview1 = (TextView) findViewById(R.id.results);
+        new RestPostClient(textview1).execute();
+        TextView textview2 = (TextView) findViewById(R.id.commands);
+        new RestGetClient(textview2).execute();
+     */
     }
 
     @Override
