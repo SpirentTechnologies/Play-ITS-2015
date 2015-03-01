@@ -11,7 +11,7 @@ import org.etsi.ttcn.tri.TriMessage;
 import org.etsi.ttcn.tri.TriPortId;
 import org.etsi.ttcn.tri.TriStatus;
 
-import sun.misc.IOUtils;
+//import sun.misc.IOUtils;
 
 import com.testingtech.ttcn.tri.PortFilter;
 import com.testingtech.util.HexViewer;
@@ -21,12 +21,17 @@ public class CANPortFilter extends PortFilter {
 	File speed = new File("../../resource/Speed");
 	FileInputStream fis = null;
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -3492721938799363917L;
 
-	public void triEnqueueMsg(TriPortId tsiPortId, TriAddress sutAddress,
+	/**
+	 * 
+	 * @param tsiPortId Identifies the system port.
+	 * @param SUTAddress Indicates an internal address of the SUT.
+	 * @param componentId Identifies the target component.
+	 * @param receivedMessage Contains the encoded value that is processed by the
+	 *        by the receive statement.
+	 */
+	public void triEnqueueMsg(TriPortId tsiPortId, TriAddress SUTAddress,
 			TriComponentId componentId, TriMessage receivedMessage) {
 		
 
@@ -35,14 +40,14 @@ public class CANPortFilter extends PortFilter {
 		try {
 			fis = new FileInputStream(speed);
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
+			System.err.println("Error! File " + speed.getAbsoluteFile() + " not found.");
 			e.printStackTrace();
 		}
 		
 		try {
 			fis.read(filecontent);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			System.err.println("Error while reading file.");
 			e.printStackTrace();
 		}
 		
@@ -55,12 +60,21 @@ public class CANPortFilter extends PortFilter {
 		if (receivedMessage.getEncodedMessage().length > 0) { // do not enqueue
 																// zero length
 																// messages
-			super.triEnqueueMsg(tsiPortId, sutAddress, componentId,
+			super.triEnqueueMsg(tsiPortId, SUTAddress, componentId,
 					receivedMessage);
 		}
 
 	}
 
+	/**
+	 * This method is called when the test case executes a send statement. 
+	 * 
+	 * @param componentId Identifies the sending component.
+	 * @param tsiPortId Identifies the system port.
+	 * @param address Target of the send statement.
+	 * @param sendMessage The message to be send.
+	 * 
+	 */
 	public TriStatus triSend(TriComponentId componentId, TriPortId tsiPortId,
 			TriAddress address, TriMessage sendMessage) {
 		System.out.println("PortFilter " + this

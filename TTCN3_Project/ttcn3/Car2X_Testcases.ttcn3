@@ -1,3 +1,8 @@
+/**
+ * @author Christian Damm, Sascha Kretzschmann
+ * @desc Some simple test cases to start with.
+ * @remark This class needs to be extended sophistically.
+ */
 module Car2X_Testcases {
 	
 	import from Car2X_ConfigSystem all;
@@ -5,6 +10,12 @@ module Car2X_Testcases {
 	import from Car2X_Types all;
 	import from Car2X_Templates all;
 
+	/**
+	 * @desc Checks that the vehicle speed is greater 50km/h.
+	 * @verdict pass Successfully received vehicle speed.
+	 * @verdict fail Not received anything.
+	 * @verdict inconclusive Timer ran out.
+	 */
 	testcase TC_vehicleSpeed_over50 ()
 		runs on TesterComponentType
 		system SystemComponentType
