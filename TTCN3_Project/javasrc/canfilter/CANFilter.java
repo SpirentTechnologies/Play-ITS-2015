@@ -34,14 +34,15 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import sun.security.util.Length;
 
-
-
+import java.util.Hashtable;
 
 public class CANFilter {
 	private static final String DEFAULT_TCP_SERVER_HOST = "localhost";
@@ -54,6 +55,8 @@ public class CANFilter {
 		System.out.println("TCPClient started");
 
 		Socket sock = null;
+		
+		Hashtable hashTable = new Hashtable();
 
 		try {
 			// establish the socket
@@ -63,41 +66,39 @@ public class CANFilter {
 			System.out.println("TCPClient connected to  " + serverHost + ":"
 					+ serverPort + " on local port " + sock.getLocalPort());
 
-			Scanner inputStream = new Scanner(sock.getInputStream()).useDelimiter("}");
+			Scanner inputStream = new Scanner(sock.getInputStream())
+					.useDelimiter("}");
 			// echo back any message received
-			
-			JSONObject jsonObject = null;
-			
+
+			int counter = 1000;
+			long startTime = System.currentTimeMillis();
 			String str = new String();
 			while (true) {
-				
+				if (counter == 1000) {
+					startTime = System.currentTimeMillis();
+				}
+				counter--;
 				str = inputStream.next() + "}";
-				str = str.substring(1); //delete first " "
-
-				
-//				System.out.println(str);
-				
-				try {
-					jsonObject = new JSONObject(str);
-					String name = jsonObject.getString("name"); // get the name from data.
-					Object value = jsonObject.get("value");
-					String valueAsString = "";
-							
-					if (value instanceof Double)
-						valueAsString = new Double((double) value).toString();
-					else if (value instanceof Boolean)
-						valueAsString = new Boolean((boolean) value).toString();
-					else valueAsString = (String) value;
-					
-					System.out.println(valueAsString);
-							 
-					
-				} catch (JSONException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+				if (!(str.substring(0, 1).equals("{"))) {
+					str = str.substring(1); // delete first " "
 				}
 
-//				System.out.println(str);
+				TableDataType tabledata = stringReceive(str);
+//				tabledata = stringReceive(str);
+//				regExpReceive(str);
+				if (counter == 0) {
+					long stopTime = System.currentTimeMillis();
+					long elapsedTime = stopTime - startTime;
+					System.out.println(elapsedTime);
+					counter = 1000;
+				}
+				
+				hashTable.put(tabledata.openxckey, tabledata);
+				
+//				System.out.println(hashTable.get("vehicle_speed"));
+//				System.out.println(hashTable);
+				System.out.println(hashTable.size());
+
 			}
 
 		} catch (SocketTimeoutException e) {
@@ -110,6 +111,65 @@ public class CANFilter {
 				sock.close();
 			}
 		}
+	}
+
+	private static void regExpReceive(String str) {
+		Pattern pattern = Pattern.compile("[\\w\\.\\-]+");
+		Matcher matcher = pattern.matcher(str);
+
+		if (matcher.find()) {
+			int groupCount = matcher.groupCount();
+			System.out.println(groupCount);
+			for (int i = 0; i < groupCount; i++) {
+				System.out.print(matcher.group(i) + ", ");
+			}
+		}
+		// System.out.println();
+		// String name = matcher.group(2);
+		// String value = matcher.group(4);
+		// String event = matcher.group(6);
+
+	}
+
+	private static TableDataType stringReceive(String str) {
+		// System.out.println(str);
+		
+		JSONObject jsonObject = null;
+		
+		String valueAsString = "";
+		String eventAsString = "";
+		String name = "";
+		try {
+			jsonObject = new JSONObject(str);
+			name = jsonObject.getString("name"); // get the name from data.
+			Object value = jsonObject.get("value");
+			
+			
+			if (jsonObject.has("event")){
+				Object event = jsonObject.get("event");
+				if (event instanceof Double)
+					eventAsString = new Double((double) event).toString();
+				else if (event instanceof Boolean)
+					eventAsString = new Boolean((boolean) event).toString();
+				else
+					eventAsString = (String) event;
+				
+			}
+
+			if (value instanceof Double)
+				valueAsString = new Double((double) value).toString();
+			else if (value instanceof Boolean)
+				valueAsString = new Boolean((boolean) value).toString();
+			else
+				valueAsString = (String) value;
+			// System.out.println(name + ":" + valueAsString);
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		// System.out.println(str);
+		return new TableDataType(name, "", valueAsString, eventAsString);
 	}
 
 	private static String bufferToString(byte[] buffer) {
