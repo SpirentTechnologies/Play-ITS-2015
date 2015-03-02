@@ -31,4 +31,7 @@
     <string name="textview_break_results">Die Handbremse ist %s.</string>
     <string name="textview_break_commands">Bitte %s.</string>
 
+    <!-- colors -->
+    <color name="red_background">#FBE9E9</color>
+
 </resources>
