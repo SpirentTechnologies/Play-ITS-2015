@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#FFFFFF"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
@@ -55,18 +56,53 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="35dp" />
     </LinearLayout>
+
+    <!--smoothScrollToPosition(int position)-->
+
+    <ScrollView
+        android:id="@+id/progress"
+        android:layout_width="fill_parent"
+        android:layout_height="85dp"
+        android:layout_marginTop="30dp"
+        android:background="@drawable/rectangle_border_white"
+        android:layout_below="@id/status">
+        <TableLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+
+            android:stretchColumns="1" >
+            <TextView
+                android:text="Motor starten"
+                android:gravity="center"
+                android:textSize="20sp" />
+            <TextView
+                android:text="50 kmh fahren"
+                android:background="@drawable/rectangle_border_red"
+                android:gravity="center"
+                android:textSize="20sp" />
+            <TextView
+                android:text="Auf 30 kmh abbremsen"
+                android:gravity="center"
+                android:textSize="20sp" />
+            <TextView
+                android:text="Ausrollen lassen"
+                android:gravity="center"
+                android:textSize="20sp" />
+        </TableLayout>
+    </ScrollView>
+
     <TextView
         android:id="@+id/results"
-        android:text=""
+        android:text="a"
         android:textSize="20sp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
         android:layout_centerHorizontal="true"
-        android:layout_below="@id/status" />
+        android:layout_below="@id/progress" />
     <TextView
         android:id="@+id/commands"
-        android:text=""
+        android:text="b"
         android:textSize="24sp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
