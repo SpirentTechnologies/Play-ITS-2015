@@ -18,7 +18,7 @@ import com.testingtech.util.HexViewer;
 
 public class CANPortFilter extends PortFilter {
 	
-	File speed = new File("../../resource/Speed");
+	File speed = new File("/home/sascha/git/Play-ITS-2015/TTCN3_Project/resource/Speed");
 	FileInputStream fis = null;
 
 	private static final long serialVersionUID = -3492721938799363917L;
@@ -54,7 +54,7 @@ public class CANPortFilter extends PortFilter {
 		
 		System.out.println("PortFilter " + this
 				+ " receives following incoming message: "
-				+ HexViewer.hexString(filecontent));
+				+ new String(filecontent));
 
 		receivedMessage.setEncodedMessage(filecontent);
 		if (receivedMessage.getEncodedMessage().length > 0) { // do not enqueue
@@ -62,6 +62,7 @@ public class CANPortFilter extends PortFilter {
 																// messages
 			super.triEnqueueMsg(tsiPortId, SUTAddress, componentId,
 					receivedMessage);
+			
 		}
 
 	}

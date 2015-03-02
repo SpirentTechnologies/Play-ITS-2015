@@ -1,69 +1,68 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testadapter>
+  <codec encode="blubb">
+    <plugin id="com.testingtech.ttcn.XTestAdapter.builtin.tci.codecs">
+      <parameter id="class" value="com.testingtech.ttcn.tci.codec.plugin.ValueStringCodecPluginProvider"/>
+    </plugin>
+    <parameter id="default" value="true"/>
+  </codec>
   <port>
-    <plugin id="com.testingtech.tt3rt.rs232.rs232RuntimePlugin">
-      <parameter id="class" value="com.testingtech.ttworkbench.tt3rt.rs232.port.RS232PortPluginProvider"/>
+    <plugin id="com.testingtech.ttworkbench.tt3rt.tcp.port.TcpPortPlugin">
+      <parameter id="class" value="com.testingtech.ttworkbench.tt3rt.tcp.port.TcpPortPluginProvider"/>
     </plugin>
     <parameter id="taParams">
-      <parameter id="SerialPortName">
-        <value>
-          <Values:charstring xmlns:Values="Values.xsd" type="charstring">
-            <Values:value>COM6</Values:value>
-          </Values:charstring>
-        </value>
-      </parameter>
-      <parameter id="BaudRate">
-        <value>
-          <Values:integer name="" type="integer">
-            <Values:value>9600</Values:value>
-          </Values:integer>
-        </value>
-      </parameter>
-      <parameter id="DataBits">
-        <value>
-          <Values:integer name="" type="integer">
-            <Values:value>8</Values:value>
-          </Values:integer>
-        </value>
-      </parameter>
-      <parameter id="StopBits">
-        <value>
-          <Values:integer name="" type="integer">
-            <Values:value>1</Values:value>
-          </Values:integer>
-        </value>
-      </parameter>
-      <parameter id="Parity">
-        <value>
-          <Values:integer name="" type="integer">
-            <Values:value>0</Values:value>
-          </Values:integer>
-        </value>
-      </parameter>
-      <parameter id="FlowControl">
+      <parameter id="TCP_MODE">
         <value>
           <Values:charstring name="" type="charstring">
-            <Values:value>1,2</Values:value>
+            <Values:value>mixed</Values:value>
           </Values:charstring>
         </value>
       </parameter>
-      <parameter id="CheckDSR">
+      <parameter id="TCP_LOCAL_HOST">
         <value>
-          <Values:boolean xmlns:Values="Values.xsd" type="boolean">
-            <Values:value>true</Values:value>
-          </Values:boolean>
+          <Values:charstring name="" type="charstring">
+            <Values:value>localhost</Values:value>
+          </Values:charstring>
+        </value>
+      </parameter>
+      <parameter id="TCP_LOCAL_PORT">
+        <value>
+          <Values:integer name="" type="integer">
+            <Values:value>5000</Values:value>
+          </Values:integer>
+        </value>
+      </parameter>
+      <parameter id="TCP_REMOTE_HOST">
+        <value>
+          <Values:charstring name="" type="charstring">
+            <Values:value>localhost</Values:value>
+          </Values:charstring>
+        </value>
+      </parameter>
+      <parameter id="TCP_REMOTE_PORT">
+        <value>
+          <Values:integer name="" type="integer">
+            <Values:value>5000</Values:value>
+          </Values:integer>
+        </value>
+      </parameter>
+      <parameter id="TCP_SERVER_WAIT_TIME">
+        <value>
+          <Values:integer xmlns:Values="Values.xsd" type="integer">
+            <Values:value>-1</Values:value>
+          </Values:integer>
         </value>
       </parameter>
       <parameter id="portFilters">
         <parameter id="CAN_Filter"/>
       </parameter>
     </parameter>
-    <parameter id="portType" value="Car2X_ConfigSystem.FiltererPortType"/>
     <parameter id="portFilters">
       <parameter id="portFilter">
         <parameter id="pluginId" value="CAN_Filter"/>
         <parameter id="class" value="CANPortFilter.CANPortFilterProvider"/>
       </parameter>
     </parameter>
+    <parameter id="portType" value="Car2X_ConfigSystem.FiltererPortType"/>
   </port>
 </testadapter>

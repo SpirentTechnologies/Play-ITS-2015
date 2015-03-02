@@ -1,5 +1,5 @@
 module Car2X_Templates {
-	import from Car2X_ModuleParameters all; 
+	import from Car2X_ModuleParameters all;
 	import from Car2X_Types all;
 	
 	template ElmRequest m_Elm_vehicleSpeed() := {
@@ -20,4 +20,4 @@ module Car2X_Templates {
 	  response := ?
 	}
 
-}
+} with {encode "blubb"};

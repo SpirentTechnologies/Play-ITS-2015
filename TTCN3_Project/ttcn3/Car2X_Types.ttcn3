@@ -17,4 +17,4 @@ module Car2X_Types {
 	type record FiltererResponse {
 		charstring response
 	}
-}
+} with {encode "blubb"};

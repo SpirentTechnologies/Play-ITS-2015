@@ -7,7 +7,15 @@
     </testadapter>
     <module Name="Car2X_Testcases" File="ttcn3/Car2X_Testcases.jar" Package="generated_ttcn"/>
     <testcase Name="TC_vehicleSpeed_over50" Alias="" Module="Car2X_Testcases" Retries="0" Runs="1" ActionOnFail="continue" Selection="false" Status="stopped" Verdict="fail">
-      <description></description>
+      <description>Checks that the vehicle speed is greater 50km/h.</description>
+      <metadata>
+        <comment>/**
+	 * @desc Checks that the vehicle speed is greater 50km/h.
+	 * @verdict pass Successfully received vehicle speed.
+	 * @verdict fail Not received anything.
+	 * @verdict inconclusive Timer ran out.
+	 */</comment>
+      </metadata>
     </testcase>
   </campaign>
 </campaignloader>
