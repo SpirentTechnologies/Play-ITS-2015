@@ -55,8 +55,8 @@ public class CANFilter {
 		System.out.println("TCPClient started");
 
 		Socket sock = null;
-		
-		Hashtable hashTable = new Hashtable();
+
+		Hashtable<String, TableDataType> hashTable = new Hashtable<String, TableDataType>();
 
 		try {
 			// establish the socket
@@ -70,34 +70,18 @@ public class CANFilter {
 					.useDelimiter("}");
 			// echo back any message received
 
-			int counter = 1000;
-			long startTime = System.currentTimeMillis();
 			String str = new String();
 			while (true) {
-				if (counter == 1000) {
-					startTime = System.currentTimeMillis();
-				}
-				counter--;
-				str = inputStream.next() + "}";
-				if (!(str.substring(0, 1).equals("{"))) {
-					str = str.substring(1); // delete first " "
-				}
+				str = inputStream.next();
+				TableDataType tabledata = regExpReceive(str);
 
-				TableDataType tabledata = stringReceive(str);
-//				tabledata = stringReceive(str);
-//				regExpReceive(str);
-				if (counter == 0) {
-					long stopTime = System.currentTimeMillis();
-					long elapsedTime = stopTime - startTime;
-					System.out.println(elapsedTime);
-					counter = 1000;
-				}
+				 hashTable.put(tabledata.getOpenxckey(), tabledata);
 				
-				hashTable.put(tabledata.openxckey, tabledata);
-				
-//				System.out.println(hashTable.get("vehicle_speed"));
-//				System.out.println(hashTable);
-				System.out.println(hashTable.size());
+//				 TableDataType tmp = hashTable.get("vehicle_speed");
+//				 if (tmp != null){
+//					 System.out.println(tmp.value1);
+//				 }
+			 System.out.println(hashTable);
 
 			}
 
@@ -113,29 +97,30 @@ public class CANFilter {
 		}
 	}
 
-	private static void regExpReceive(String str) {
+	private static TableDataType regExpReceive(String str) {
 		Pattern pattern = Pattern.compile("[\\w\\.\\-]+");
 		Matcher matcher = pattern.matcher(str);
 
-		if (matcher.find()) {
-			int groupCount = matcher.groupCount();
-			System.out.println(groupCount);
-			for (int i = 0; i < groupCount; i++) {
-				System.out.print(matcher.group(i) + ", ");
-			}
-		}
-		// System.out.println();
-		// String name = matcher.group(2);
-		// String value = matcher.group(4);
-		// String event = matcher.group(6);
+		String name = match(matcher, "name");
+		String value = match(matcher, "value");
+		String event = match(matcher, "event");
 
+//		System.out.println(name + " = " + value + " event: " + (event == "" ? "none" : event));
+		return new TableDataType(name, "", value, event); 
+	}
+
+	private static String match(Matcher matcher, String str) {
+		if (matcher.find() && matcher.group().equals(str) && matcher.find())
+			return matcher.group();
+		else
+			return "";
 	}
 
 	private static TableDataType stringReceive(String str) {
 		// System.out.println(str);
-		
+
 		JSONObject jsonObject = null;
-		
+
 		String valueAsString = "";
 		String eventAsString = "";
 		String name = "";
@@ -143,9 +128,8 @@ public class CANFilter {
 			jsonObject = new JSONObject(str);
 			name = jsonObject.getString("name"); // get the name from data.
 			Object value = jsonObject.get("value");
-			
-			
-			if (jsonObject.has("event")){
+
+			if (jsonObject.has("event")) {
 				Object event = jsonObject.get("event");
 				if (event instanceof Double)
 					eventAsString = new Double((double) event).toString();
@@ -153,7 +137,7 @@ public class CANFilter {
 					eventAsString = new Boolean((boolean) event).toString();
 				else
 					eventAsString = (String) event;
-				
+
 			}
 
 			if (value instanceof Double)
