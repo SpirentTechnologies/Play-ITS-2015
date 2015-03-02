@@ -8,7 +8,9 @@ module Car2X_Testcases {
 	import from Car2X_ConfigSystem all;
 
 	import from Car2X_Types all;
-	import from Car2X_Templates all;
+	import from Car2X_Templates {
+		template m_Filterer_vehicleSpeed, mw_Filterer_vehicleSpeed;
+	}
 
 	/**
 	 * @desc Checks that the vehicle speed is greater 50km/h.
@@ -28,17 +30,18 @@ module Car2X_Testcases {
 		t_TC.start;
 		alt{
 			[] filtererPort.receive(mw_Filterer_vehicleSpeed){
-				setverdict(pass);
-				t_TC.stop;
-			}
-			[] filtererPort.receive{
-				setverdict(fail);
 				t_TC.stop;
 			}
 			[] t_TC.timeout{
 				setverdict(inconc);
 			}
-		}			
+		}
+		if(str2int(mw_Filterer_vehicleSpeed) > "50"){
+			setverdict(pass);
+		}
+		else {
+			setverdict(fail);
+		}
 	unmap(mtc:filtererPort,system:filtererPort);
 	}
 	
