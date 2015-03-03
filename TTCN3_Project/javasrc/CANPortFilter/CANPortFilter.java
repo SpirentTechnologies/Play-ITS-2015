@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.charset.Charset;
 
 import org.etsi.ttcn.tri.TriAddress;
 import org.etsi.ttcn.tri.TriComponentId;
@@ -13,13 +14,16 @@ import org.etsi.ttcn.tri.TriStatus;
 
 //import sun.misc.IOUtils;
 
+
+
+
 import com.testingtech.ttcn.tri.PortFilter;
 import com.testingtech.util.HexViewer;
 
 public class CANPortFilter extends PortFilter {
 	
-	File speed = new File("/home/sascha/git/Play-ITS-2015/TTCN3_Project/resource/Speed");
-	FileInputStream fis = null;
+	//File speed = new File("/home/sascha/git/Play-ITS-2015/TTCN3_Project/resource/Speed");
+	//FileInputStream fis = null;
 
 	private static final long serialVersionUID = -3492721938799363917L;
 
@@ -35,28 +39,30 @@ public class CANPortFilter extends PortFilter {
 			TriComponentId componentId, TriMessage receivedMessage) {
 		
 
-		byte filecontent[] = new byte[(int)speed.length()];
+//		byte filecontent[] = new byte[(int)speed.length()];
+//		
+//		try {
+//			fis = new FileInputStream(speed);
+//		} catch (FileNotFoundException e) {
+//			System.err.println("Error! File " + speed.getAbsoluteFile() + " not found.");
+//			e.printStackTrace();
+//		}
+//		
+//		try {
+//			fis.read(filecontent);
+//		} catch (IOException e) {
+//			System.err.println("Error while reading file.");
+//			e.printStackTrace();
+//		}
 		
-		try {
-			fis = new FileInputStream(speed);
-		} catch (FileNotFoundException e) {
-			System.err.println("Error! File " + speed.getAbsoluteFile() + " not found.");
-			e.printStackTrace();
-		}
-		
-		try {
-			fis.read(filecontent);
-		} catch (IOException e) {
-			System.err.println("Error while reading file.");
-			e.printStackTrace();
-		}
-		
+		String x = "50";
+		byte[] y = x.getBytes();
 		
 		System.out.println("PortFilter " + this
-				+ " receives following incoming message: "
-				+ new String(filecontent));
+				+ " sends following outgoing message: "
+				+ new String(y));
 
-		receivedMessage.setEncodedMessage(filecontent);
+		receivedMessage.setEncodedMessage(y);
 		if (receivedMessage.getEncodedMessage().length > 0) { // do not enqueue
 																// zero length
 																// messages
@@ -80,7 +86,7 @@ public class CANPortFilter extends PortFilter {
 			TriAddress address, TriMessage sendMessage) {
 		System.out.println("PortFilter " + this
 				+ " receives following outgoing message: "
-				+ HexViewer.hexString(sendMessage.getEncodedMessage()));
+				+ new String(sendMessage.getEncodedMessage()));
 		//checkValue(sendMessage)
 		// message can be send out without any modification
 		return super.triSend(componentId, tsiPortId, address, sendMessage);
