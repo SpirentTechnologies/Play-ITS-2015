@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin PUBLIC "-//TESTING TECH//DTD TT3plugin//1.0" "TT3plugin.dtd">
+
+<plugin id="com.testingtech.ttcn.tci.codec.generated.Car2X_Types"
+     name="Car2X_TypesCodecPlugin"
+  version="1.0.0"
+  provider-name="Testing Technologies">
+
+  <runtime>
+      <library name="Car2X_TypesCodec.jar"/>
+  </runtime>
+
+    <dependency>
+    </dependency>
+
+  <extension point="com.testingtech.ttcn.extension.CodecProvider">
+    <parameter id="name" value="Car2X_Types Codec"/>
+    <parameter id="class" value="com.testingtech.generated.codec.Car2X_Types.TabularCar2X_TypesCodecProvider"/>
+    <parameter id="encoding" value="Car2X_Types"/>
+  </extension>
+
+</plugin>
