@@ -1,10 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testadapter>
-  <codec encode="blubb">
+  <codec encode="">
     <plugin id="com.testingtech.ttcn.XTestAdapter.builtin.tci.codecs">
-      <parameter id="class" value="com.testingtech.ttcn.tci.codec.plugin.ValueStringCodecPluginProvider"/>
+      <parameter id="class" value="com.testingtech.ttcn.tci.codec.plugin.BitBaseCodecPluginProvider"/>
     </plugin>
     <parameter id="default" value="true"/>
+  </codec>
+  <codec encode="blubb">
+    <plugin id="com.testingtech.ttcn.tci.codec.generated.Car2X_Types">
+      <parameter id="class" value="com.testingtech.generated.codec.Car2X_Types.TabularCar2X_TypesCodecProvider"/>
+    </plugin>
   </codec>
   <port>
     <plugin id="com.testingtech.ttworkbench.tt3rt.tcp.port.TcpPortPlugin">

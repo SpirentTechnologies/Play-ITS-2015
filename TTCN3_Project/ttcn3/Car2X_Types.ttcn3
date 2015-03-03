@@ -16,5 +16,11 @@ module Car2X_Types {
 	
 	type record FiltererResponse {
 		charstring response
+	} with {
+	  variant (response) "length=infinity"
 	}
-} with {encode "blubb"};
+} 
+with {
+  encode "blubb";
+  variant "GenCodec";
+};

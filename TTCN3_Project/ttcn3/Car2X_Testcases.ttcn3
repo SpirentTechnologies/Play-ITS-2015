@@ -22,7 +22,7 @@ module Car2X_Testcases {
 		runs on TesterComponentType
 		system SystemComponentType
 	{
-		var TesterComponentType Tester;		
+		var TesterComponentType Tester;
 		Tester := TesterComponentType.create;
 		
 		map(self:filtererPort,system:filtererPort);
