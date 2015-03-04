@@ -32,11 +32,8 @@ package com.testingtech.car2xhmi;
 
         @Override
         protected String doInBackground(Void... params) {
-            Map<String, String> comment = new HashMap<String, String>();    // create data type according to json structure
-            comment.put("subject", "Using the GSON library");               // add information to send
-            comment.put("message", "Using libraries is convenient.");
-            String json = new GsonBuilder().create().toJson(comment, Map.class);    // convert to json
-            HttpResponse response = makeRequest("http://192.168.0.1:3000/post/77/comments", json);          // send to URL
+            String json = createJson();
+            HttpResponse response = makeRequest("http://192.168.0.1:3000/post/77/comments", json);    // send to URL
             if(response != null)
                 return response.toString();
             else
@@ -48,7 +45,14 @@ package com.testingtech.car2xhmi;
             textview.setText(results);
         }
 
-        public static HttpResponse makeRequest(String uri, String json) {
+        private String createJson(){
+            Map<String, String> comment = new HashMap<String, String>();    // create data type according to json structure
+            comment.put("subject", "Using the GSON library");               // add information to send
+            comment.put("message", "Using libraries is convenient.");
+            return new GsonBuilder().create().toJson(comment, Map.class);    // convert to json
+        }
+
+        private static HttpResponse makeRequest(String uri, String json) {
             try {
                 HttpPost httpPost = new HttpPost(uri);
                 httpPost.setEntity(new StringEntity(json));
