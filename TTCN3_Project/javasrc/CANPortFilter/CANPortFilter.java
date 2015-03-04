@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.charset.Charset;
 
 import org.etsi.ttcn.tri.TriAddress;
 import org.etsi.ttcn.tri.TriComponentId;
@@ -12,13 +11,7 @@ import org.etsi.ttcn.tri.TriMessage;
 import org.etsi.ttcn.tri.TriPortId;
 import org.etsi.ttcn.tri.TriStatus;
 
-//import sun.misc.IOUtils;
-
-
-
-
 import com.testingtech.ttcn.tri.PortFilter;
-import com.testingtech.util.HexViewer;
 
 public class CANPortFilter extends PortFilter {
 	
@@ -38,9 +31,9 @@ public class CANPortFilter extends PortFilter {
 	public void triEnqueueMsg(TriPortId tsiPortId, TriAddress SUTAddress,
 			TriComponentId componentId, TriMessage receivedMessage) {
 		
-
 		byte filecontent[] = new byte[(int)speed.length()];
 		
+		// create a new file input stream
 		try {
 			fis = new FileInputStream(speed);
 		} catch (FileNotFoundException e) {
@@ -48,15 +41,13 @@ public class CANPortFilter extends PortFilter {
 			e.printStackTrace();
 		}
 		
+		// read content from file input stream
 		try {
 			fis.read(filecontent);
 		} catch (IOException e) {
 			System.err.println("Error while reading file.");
 			e.printStackTrace();
 		}
-		
-//		String x = "50";
-//		byte[] y = x.getBytes();
 		
 		System.out.println("PortFilter " + this
 				+ " sends following outgoing message: "
@@ -67,10 +58,8 @@ public class CANPortFilter extends PortFilter {
 																// zero length
 																// messages
 			super.triEnqueueMsg(tsiPortId, SUTAddress, componentId,
-					receivedMessage);
-			
+					receivedMessage);			
 		}
-
 	}
 
 	/**
@@ -87,7 +76,7 @@ public class CANPortFilter extends PortFilter {
 		System.out.println("PortFilter " + this
 				+ " receives following outgoing message: "
 				+ new String(sendMessage.getEncodedMessage()));
-		//checkValue(sendMessage)
+
 		// message can be send out without any modification
 		return super.triSend(componentId, tsiPortId, address, sendMessage);
 	}

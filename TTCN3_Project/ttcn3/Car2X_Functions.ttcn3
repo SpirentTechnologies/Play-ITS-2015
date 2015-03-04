@@ -1,0 +1,68 @@
+/**
+ * @author Sascha Kretzschmann
+ * @desc This module provides function for each test case.
+ * 		 Additionally this module provide set up and
+ * 		 tear down configurations to reuse.
+ */
+module Car2X_Functions {
+	import from Car2X_Types {type FiltererResponse;}
+
+	import from Car2X_Templates {
+		template m_Filterer_vehicleSpeed, mw_Filterer_vehicleSpeed;
+	}
+
+	import from Car2X_ConfigSystem {type TesterComponentType;}
+
+	/**
+	 * @desc Testbody function for @see Car2X_Testcases.TC_VEHICLE_SPEED_OVER_50
+	 * @verdict pass The given speed ist greater than 50.0.
+	 * @verdict fail Due to invalid parameter.
+	 * @verdict inconc Due to a timeout.
+	 */
+	function f_VEHICLE_SPEED_OVER_50() runs on TesterComponentType{
+		var template FiltererResponse v_speed;
+		
+		// fire the request
+		filtererPort.send(m_Filterer_vehicleSpeed);
+		
+		// start the timer
+		t_TC.start;
+		alt{
+			// store received template into value
+			[] filtererPort.receive(mw_Filterer_vehicleSpeed) -> value v_speed {
+				t_TC.stop;
+			}
+			[] t_TC.timeout{
+				setverdict(inconc);
+			}
+		}
+		// check whether vehicle speed is greater than 50.0
+		if(str2float(v_speed.response) > 50.0){
+			setverdict(pass);
+		}
+		else {
+			setverdict(fail);
+		}
+	}
+	
+	/**
+	 * @desc Set up the configuration for test cases running on @see Car2X_ConfigSystem.TesterComponentType.
+	 * 		 Maps the port of the tester to the system port.
+	 */
+	function f_setUp() runs on TesterComponentType{
+		// create an instance of the tester
+		var TesterComponentType Tester;
+		Tester := TesterComponentType.create;
+		
+		// map the tester port to the system port
+		map(self:filtererPort,system:filtererPort);
+	}
+	
+	/**
+	 * @desc Tear down the configuration for test cases running on @see Car2X_ConfigSystem.TesterComponentType.
+	 * 		 UnMaps the ports.
+	 */
+	function f_tearDown() runs on TesterComponentType{
+		unmap(self:filtererPort,system:filtererPort);
+	}
+}

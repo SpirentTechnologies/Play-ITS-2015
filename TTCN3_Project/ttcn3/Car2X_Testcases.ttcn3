@@ -5,6 +5,10 @@
  */
 module Car2X_Testcases {
 	
+	import from Car2X_Functions {
+		function f_VEHICLE_SPEED_OVER_50, f_setUp, f_tearDown;
+	}
+
 	import from Car2X_ConfigSystem all;
 
 	import from Car2X_Types {type FiltererResponse;}
@@ -18,32 +22,18 @@ module Car2X_Testcases {
 	 * @verdict fail Not received anything.
 	 * @verdict inconclusive Timer ran out.
 	 */
-	testcase TC_vehicleSpeed_over50 ()
+	testcase TC_VEHICLE_SPEED_OVER_50 ()
 		runs on TesterComponentType
 		system SystemComponentType
 	{
-		var TesterComponentType Tester;
-		Tester := TesterComponentType.create;
+		// set up configuration
+		f_setUp();
 		
-		map(self:filtererPort,system:filtererPort);
-		filtererPort.send(m_Filterer_vehicleSpeed);
-		t_TC.start;
-		var template FiltererResponse v_speed;
-		alt{
-			[] filtererPort.receive(mw_Filterer_vehicleSpeed) -> value v_speed {
-				t_TC.stop;
-			}
-			[] t_TC.timeout{
-				setverdict(inconc);
-			}
-		}
-		if(str2float(v_speed.response) > 50.0){
-			setverdict(pass);
-		}
-		else {
-			setverdict(fail);
-		}
-	unmap(self:filtererPort,system:filtererPort);
+		// test body
+		f_VEHICLE_SPEED_OVER_50();
+		
+		// tear down configuration
+		f_tearDown();
 	}
 	
 	

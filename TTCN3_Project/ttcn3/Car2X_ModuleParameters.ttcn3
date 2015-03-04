@@ -1,9 +1,13 @@
+/**
+ * @author Christian Damm, Sascha Kretzschmann
+ * @desc Define parameters we use within our project.
+ */
 module Car2X_ModuleParameters {
 	
-	//CAN MODE 01
+	// CAN MODE 01
 	const charstring c_modePrefix_01 := "01";
 	
-	//keys for data table
+	// keys for data table
 	const charstring c_steering_wheel_angle := "steering_wheel_angle";
 	const charstring c_torque_at_transmission := "torque_at_transmission";
 	const charstring c_engine_speed := "engine_speed";

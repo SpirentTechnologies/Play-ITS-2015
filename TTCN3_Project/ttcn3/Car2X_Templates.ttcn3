@@ -1,21 +1,40 @@
+/**
+ * @author Christian Damm, Sascha Kretzschmann
+ * @desc Here we define our templates.
+ */
 module Car2X_Templates {
 	import from Car2X_ModuleParameters all;
 	import from Car2X_Types all;
 	
+	/**
+	 * 
+	 * @desc Request template to communicate with ELM.
+	 */
 	template ElmRequest m_Elm_vehicleSpeed() := {
 	  modePrefix := c_modePrefix_01,
 	  parameterID := "0D"
 	}
 	
-
+	/**
+	 * 
+	 * @desc Response template receiving from ELM.
+	 */
 	template ElmResponse mw_Elm_vehicleSpeed() := {
 	  response := ?
 	}
 	
+	/**
+	 * 
+	 * @desc Request template to communicate with CAN.
+	 */
 	template FiltererRequest m_Filterer_vehicleSpeed() := {
 	  request := c_vehicle_speed
 	}
 	
+	/**
+	 * 
+	 * @desc Response template receiving from CAN.
+	 */
 	template FiltererResponse mw_Filterer_vehicleSpeed() := {
 	  response := ?
 	}
