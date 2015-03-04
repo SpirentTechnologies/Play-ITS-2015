@@ -22,8 +22,8 @@ import com.testingtech.util.HexViewer;
 
 public class CANPortFilter extends PortFilter {
 	
-	//File speed = new File("/home/sascha/git/Play-ITS-2015/TTCN3_Project/resource/Speed");
-	//FileInputStream fis = null;
+	File speed = new File("resource/Speed");
+	FileInputStream fis = null;
 
 	private static final long serialVersionUID = -3492721938799363917L;
 
@@ -39,30 +39,30 @@ public class CANPortFilter extends PortFilter {
 			TriComponentId componentId, TriMessage receivedMessage) {
 		
 
-//		byte filecontent[] = new byte[(int)speed.length()];
-//		
-//		try {
-//			fis = new FileInputStream(speed);
-//		} catch (FileNotFoundException e) {
-//			System.err.println("Error! File " + speed.getAbsoluteFile() + " not found.");
-//			e.printStackTrace();
-//		}
-//		
-//		try {
-//			fis.read(filecontent);
-//		} catch (IOException e) {
-//			System.err.println("Error while reading file.");
-//			e.printStackTrace();
-//		}
+		byte filecontent[] = new byte[(int)speed.length()];
 		
-		String x = "50";
-		byte[] y = x.getBytes();
+		try {
+			fis = new FileInputStream(speed);
+		} catch (FileNotFoundException e) {
+			System.err.println("Error! File " + speed.getAbsoluteFile() + " not found.");
+			e.printStackTrace();
+		}
+		
+		try {
+			fis.read(filecontent);
+		} catch (IOException e) {
+			System.err.println("Error while reading file.");
+			e.printStackTrace();
+		}
+		
+//		String x = "50";
+//		byte[] y = x.getBytes();
 		
 		System.out.println("PortFilter " + this
 				+ " sends following outgoing message: "
-				+ new String(y));
+				+ new String(filecontent));
 
-		receivedMessage.setEncodedMessage(y);
+		receivedMessage.setEncodedMessage(filecontent);
 		if (receivedMessage.getEncodedMessage().length > 0) { // do not enqueue
 																// zero length
 																// messages
