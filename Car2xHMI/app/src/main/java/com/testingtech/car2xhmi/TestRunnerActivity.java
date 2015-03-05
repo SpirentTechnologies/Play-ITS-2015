@@ -2,7 +2,6 @@ package com.testingtech.car2xhmi;
 
 import android.content.Intent;
 import android.graphics.drawable.AnimationDrawable;
-import android.os.AsyncTask;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -17,7 +16,6 @@ public class TestRunnerActivity extends ActionBarActivity {
 
     private AnimationDrawable logoAnimation;
     private String testName;
-    private AsyncTask client;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +53,7 @@ public class TestRunnerActivity extends ActionBarActivity {
         TextView socketConn = (TextView) findViewById(R.id.socket);
         ScrollView progress = (ScrollView) findViewById(R.id.progress);
 
-        client = new SocketClient(socketConn, progress).execute();
+        new SocketClient(socketConn, progress).execute();
         switch(testName){
             case "drive":
                 // TODO: get speed and replace the 0

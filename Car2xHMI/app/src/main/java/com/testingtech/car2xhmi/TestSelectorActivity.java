@@ -10,7 +10,6 @@ import android.view.View;
 
 public class TestSelectorActivity extends ActionBarActivity {
 
-    private Intent intent;
     public final static String TEST_NAME = "drive";
 
     @Override
@@ -32,7 +31,7 @@ public class TestSelectorActivity extends ActionBarActivity {
     }
 
     public void startTestRunnerActivity(String test) {
-        intent = new Intent(this, TestRunnerActivity.class);
+        Intent intent = new Intent(this, TestRunnerActivity.class);
         intent.putExtra(TEST_NAME, test);
         startActivity(intent);
     }

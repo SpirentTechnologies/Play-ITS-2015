@@ -33,5 +33,6 @@
 
     <!-- colors -->
     <color name="red_background">#FBE9E9</color>
+    <color name="white">#FFFFFF</color>
 
 </resources>
