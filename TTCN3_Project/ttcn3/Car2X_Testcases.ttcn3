@@ -5,9 +5,7 @@
  */
 module Car2X_Testcases {
 	
-	import from Car2X_Functions {
-		function f_VEHICLE_SPEED_OVER_50, f_setUp, f_tearDown;
-	}
+	import from Car2X_Functions all;
 
 	import from Car2X_ConfigSystem all;
 
@@ -26,15 +24,23 @@ module Car2X_Testcases {
 		runs on TesterComponentType
 		system SystemComponentType
 	{
+		var verdicttype v_ret := pass;
+		var integer v_stage := 1;
 		// set up configuration
 		f_setUp();
 		
+		// send stage information
+		action("stage:"&int2str(v_stage));
+		
 		// test body
-		f_VEHICLE_SPEED_OVER_50();
+		v_ret := f_TP_VEHICLE_SPEED_OVER_50();
+		
+		setverdict(v_ret);
+		
+		// send verdict
+		action("verdict:"& int2str(f_verdictToInt(v_ret)));
 		
 		// tear down configuration
 		f_tearDown();
 	}
-	
-	
 }

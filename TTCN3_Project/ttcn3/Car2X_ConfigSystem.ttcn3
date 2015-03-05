@@ -29,7 +29,7 @@ module Car2X_ConfigSystem {
 	
 	/**
 	 * @desc This component represents the Tester that contains the test logic
-	 * 		 to stimulate the SUT
+	 * 		 to simulate the SUT
 	 * @member t_TC Timer
 	 * @member elmPort @see Car2X_ConfigSystem.ElmPortType
 	 * @member filtererPort @see Car2X_ConfigSystem.FiltererPortType
