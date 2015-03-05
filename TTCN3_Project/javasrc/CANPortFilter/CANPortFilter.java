@@ -1,8 +1,9 @@
 package CANPortFilter;
 
+import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 
 import org.etsi.ttcn.tri.TriAddress;
@@ -15,8 +16,9 @@ import com.testingtech.ttcn.tri.PortFilter;
 
 public class CANPortFilter extends PortFilter {
 	
-	File speed = new File("resource/Speed");
-	FileInputStream fis = null;
+	File speedFile = new File("resource/Speed");
+	BufferedReader br = null;
+	String speed = null;
 
 	private static final long serialVersionUID = -3492721938799363917L;
 
@@ -31,19 +33,17 @@ public class CANPortFilter extends PortFilter {
 	public void triEnqueueMsg(TriPortId tsiPortId, TriAddress SUTAddress,
 			TriComponentId componentId, TriMessage receivedMessage) {
 		
-		byte filecontent[] = new byte[(int)speed.length()];
-		
 		// create a new file input stream
 		try {
-			fis = new FileInputStream(speed);
+			br = new BufferedReader(new FileReader(speedFile));
 		} catch (FileNotFoundException e) {
-			System.err.println("Error! File " + speed.getAbsoluteFile() + " not found.");
+			System.err.println("Error! File " + speedFile.getAbsoluteFile() + " not found.");
 			e.printStackTrace();
 		}
 		
 		// read content from file input stream
-		try {
-			fis.read(filecontent);
+		try {			
+			speed = br.readLine();
 		} catch (IOException e) {
 			System.err.println("Error while reading file.");
 			e.printStackTrace();
@@ -51,9 +51,9 @@ public class CANPortFilter extends PortFilter {
 		
 		System.out.println("PortFilter " + this
 				+ " sends following outgoing message: "
-				+ new String(filecontent));
+				+ speed);
 
-		receivedMessage.setEncodedMessage(filecontent);
+		receivedMessage.setEncodedMessage(speed.getBytes());
 		if (receivedMessage.getEncodedMessage().length > 0) { // do not enqueue
 																// zero length
 																// messages
