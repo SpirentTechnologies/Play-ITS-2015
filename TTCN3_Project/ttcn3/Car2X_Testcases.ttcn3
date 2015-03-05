@@ -34,7 +34,5 @@ module Car2X_Testcases {
 		
 		// tear down configuration
 		f_tearDown();
-	}
-	
-	
+	}	
 }
