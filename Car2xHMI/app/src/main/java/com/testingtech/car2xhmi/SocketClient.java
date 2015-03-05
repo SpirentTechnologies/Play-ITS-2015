@@ -1,9 +1,7 @@
 package com.testingtech.car2xhmi;
 
-import android.content.Context;
 import android.graphics.Color;
 import android.os.AsyncTask;
-import android.view.View;
 import android.widget.ScrollView;
 import android.widget.TableLayout;
 import android.widget.TextView;
@@ -16,7 +14,6 @@ public class SocketClient extends AsyncTask<Void, Integer, String> {
 
     TextView textview;
     ScrollView scrollview;
-    Context context;
 
     public SocketClient(TextView tv, ScrollView sv) {
         textview = tv;
@@ -52,21 +49,30 @@ public class SocketClient extends AsyncTask<Void, Integer, String> {
     protected void onProgressUpdate(Integer... progress) {
         super.onProgressUpdate(progress);
         textview.setText("[Client] received code [" + progress[0] + "]");
+        // get the table as child of the scrollview
         TableLayout table = (TableLayout) scrollview.getChildAt(0);
         if(progress[1] > 0) {
+            // get the textview from the position above as child of the table
             TextView oldText = (TextView) table.getChildAt(progress[1] - 1);
+            // change color back to white
             oldText.setBackgroundColor(Color.WHITE);
         }
+        // get the current textview as child of the table
         TextView text = (TextView) table.getChildAt(progress[1]);
+        // change color to red
         text.setBackgroundResource(R.drawable.rectangle_border_red);
+        // scroll to current textview
         scrollview.smoothScrollTo(0, text.getTop());
     }
 
     @Override
     protected void onPostExecute(String results) {
         textview.setText(results);
+        // get the table as child of the scrollview
         TableLayout table = (TableLayout) scrollview.getChildAt(0);
+        // get the last textview as child of the table
         TextView oldText = (TextView) table.getChildAt(table.getChildCount() - 1);
+        // change color back to white
         oldText.setBackgroundColor(Color.WHITE);
     }
 }
