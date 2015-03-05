@@ -2,12 +2,14 @@ package com.testingtech.car2xhmi;
 
 import android.content.Intent;
 import android.graphics.drawable.AnimationDrawable;
+import android.os.AsyncTask;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 
@@ -15,6 +17,7 @@ public class TestRunnerActivity extends ActionBarActivity {
 
     private AnimationDrawable logoAnimation;
     private String testName;
+    private AsyncTask client;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,24 +52,28 @@ public class TestRunnerActivity extends ActionBarActivity {
 
         TextView results = (TextView) findViewById(R.id.results);
         TextView commands = (TextView) findViewById(R.id.commands);
+        TextView socketConn = (TextView) findViewById(R.id.socket);
+        ScrollView progress = (ScrollView) findViewById(R.id.progress);
+
+        client = new SocketClient(socketConn, progress).execute();
         switch(testName){
             case "drive":
                 // TODO: get speed and replace the 0
                 results.setText(String.format(getString(R.string.textview_drive_results), 0));
                 // TODO: if greater, if less: faster, slower
-                commands.setText(String.format(getString(R.string.textview_drive_commands), "beschleunigen"));
+                commands.setText(String.format(getString(R.string.textview_drive_commands), "speed up"));
                 break;
             case "door":
                 // TODO
-                results.setText(String.format(getString(R.string.textview_door_results), "offen"));
+                results.setText(String.format(getString(R.string.textview_door_results), "open"));
                 // TODO
-                commands.setText(String.format(getString(R.string.textview_door_commands), "schließen"));
+                commands.setText(String.format(getString(R.string.textview_door_commands), "close"));
                 break;
             case "break":
                 // TODO
-                results.setText(String.format(getString(R.string.textview_break_results), "angezogen"));
+                results.setText(String.format(getString(R.string.textview_break_results), "pulled"));
                 // TODO
-                commands.setText(String.format(getString(R.string.textview_break_commands), "lösen"));
+                commands.setText(String.format(getString(R.string.textview_break_commands), "release"));
                 break;
             default:
                 setTitle("Test");
@@ -81,12 +88,6 @@ public class TestRunnerActivity extends ActionBarActivity {
         TextView commands = (TextView) findViewById(R.id.commands);
         commands.setText("");
         logoAnimation.stop();
-        // TODO remove
-     /*   TextView textview1 = (TextView) findViewById(R.id.results);
-        new RestPostClient(textview1).execute();
-        TextView textview2 = (TextView) findViewById(R.id.commands);
-        new RestGetClient(textview2).execute();
-     */
     }
 
     @Override
