@@ -44,9 +44,10 @@ import sun.security.util.Length;
 
 import java.util.Hashtable;
 
-public class CANFilter {
+public class CANFilterClient {
 	private static final String DEFAULT_TCP_SERVER_HOST = "localhost";
 	private static final int DEFAULT_TCP_SERVER_PORT = 50001;
+	static Hashtable<String, TableDataType> hashTable = new Hashtable<String, TableDataType>();
 
 	public static void main(String[] args) throws IOException {
 		String serverHost = DEFAULT_TCP_SERVER_HOST;
@@ -56,7 +57,6 @@ public class CANFilter {
 
 		Socket sock = null;
 
-		Hashtable<String, TableDataType> hashTable = new Hashtable<String, TableDataType>();
 
 		try {
 			// establish the socket
@@ -74,13 +74,8 @@ public class CANFilter {
 			while (true) {
 				str = inputStream.next();
 				TableDataType tabledata = regExpReceive(str);
-
-				 hashTable.put(tabledata.getOpenxckey(), tabledata);
+				addToDataTable(tabledata);
 				
-//				 TableDataType tmp = hashTable.get("vehicle_speed");
-//				 if (tmp != null){
-//					 System.out.println(tmp.value1);
-//				 }
 			 System.out.println(hashTable);
 
 			}
@@ -114,6 +109,10 @@ public class CANFilter {
 			return matcher.group();
 		else
 			return "";
+	}
+	
+	synchronized public static void addToDataTable(TableDataType tabledata){
+		hashTable.put(tabledata.getOpenxckey(), tabledata);
 	}
 
 	private static TableDataType stringReceive(String str) {
@@ -165,6 +164,11 @@ public class CANFilter {
 			e.printStackTrace();
 		}
 		return str;
+	}
+	
+	public static Hashtable<String, TableDataType> getHashTable(){
+		return hashTable;
+		
 	}
 
 }
