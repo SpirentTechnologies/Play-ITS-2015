@@ -16,6 +16,10 @@ public class TableDataType {
 		this.timestamp = new Date().getTime();
 	}	
 	
+	public TableDataType(String openxckey, String obd2key, String value1) {
+		this(openxckey, obd2key, value1, "");
+	}
+
 	public String getOpenxckey() {
 		return openxckey;
 	}

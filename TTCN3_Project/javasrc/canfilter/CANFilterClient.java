@@ -33,6 +33,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
+import java.util.Hashtable;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -40,82 +41,87 @@ import java.util.regex.Pattern;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import sun.security.util.Length;
+public class CANFilterClient extends Thread {
+	
+	private Hashtable<String, TableDataType> hashTable;
 
-import java.util.Hashtable;
-
-public class CANFilterClient {
 	private static final String DEFAULT_TCP_SERVER_HOST = "localhost";
 	private static final int DEFAULT_TCP_SERVER_PORT = 50001;
-	static Hashtable<String, TableDataType> hashTable = new Hashtable<String, TableDataType>();
+	private InetSocketAddress address;
 
-	public static void main(String[] args) throws IOException {
-		String serverHost = DEFAULT_TCP_SERVER_HOST;
-		int serverPort = DEFAULT_TCP_SERVER_PORT;
+	public CANFilterClient(Hashtable<String, TableDataType> hashTable, InetSocketAddress address) {
+		this.hashTable = hashTable;
+		this.address = address;
+	}
+
+	public void run() {
 
 		System.out.println("TCPClient started");
 
 		Socket sock = null;
-
+		Scanner scanner = null;
 
 		try {
 			// establish the socket
 			sock = new Socket();
 			sock.setSoLinger(true, 0);
-			sock.connect(new InetSocketAddress(serverHost, serverPort), 50001);
-			System.out.println("TCPClient connected to  " + serverHost + ":"
-					+ serverPort + " on local port " + sock.getLocalPort());
+			sock.connect(address);
+			System.out.println("TCPClient connected to host : "
+					+ address.getHostName() + " on local port " + address.getPort());
 
-			Scanner inputStream = new Scanner(sock.getInputStream())
-					.useDelimiter("}");
-			// echo back any message received
+			scanner = new Scanner(sock.getInputStream()).useDelimiter("}");
 
-			String str = new String();
 			while (true) {
-				str = inputStream.next();
-				TableDataType tabledata = regExpReceive(str);
+				TableDataType tabledata = regExpReceive(scanner.next() + "}");
 				addToDataTable(tabledata);
-				
-			 System.out.println(hashTable);
-
+				System.out.println(hashTable);
 			}
 
 		} catch (SocketTimeoutException e) {
-			System.out.println("Timeout could not connect to " + serverHost
-					+ ":" + serverPort);
+			System.out.println("Timeout could not connect to " + address.getHostName()
+					+ ":" + address.getPort());
 		} catch (IOException ioe) {
 			ioe.printStackTrace();
 		} finally {
-			if (sock != null) {
-				sock.close();
-			}
+			if (sock != null)
+				try {
+					sock.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			if (scanner != null)
+				scanner.close();
 		}
 	}
 
 	private static TableDataType regExpReceive(String str) {
-		Pattern pattern = Pattern.compile("[\\w\\.\\-]+");
+		Pattern pattern = Pattern
+				.compile("\\{\"name\": \"(\\w+)\", \"value\": \"?(\\w+|[-+]?[0-9]*\\.?[0-9]+)\"?\\}");
+		Pattern eventPattern = Pattern
+				.compile("\\{\"name\": \"(\\w+)\", \"value\": \"?(\\w+|[-+]?[0-9]*\\.?[0-9]+)\"?, \"event\": (true|false)\\}");
+
 		Matcher matcher = pattern.matcher(str);
 
-		String name = match(matcher, "name");
-		String value = match(matcher, "value");
-		String event = match(matcher, "event");
-
-//		System.out.println(name + " = " + value + " event: " + (event == "" ? "none" : event));
-		return new TableDataType(name, "", value, event); 
+		if (matcher.find()) {
+			// group(1) = name, group(2) = value
+			return new TableDataType(matcher.group(1), "", matcher.group(2));
+		} else {
+			matcher = eventPattern.matcher(str);
+			if (matcher.find()) {
+				// group(1) = name, group(2) = value, group(3) = event
+				return new TableDataType(matcher.group(1), "",
+						matcher.group(2), matcher.group(3));
+			}
+		}
+		return null; // etwas unschön, besser ne Exception
 	}
 
-	private static String match(Matcher matcher, String str) {
-		if (matcher.find() && matcher.group().equals(str) && matcher.find())
-			return matcher.group();
-		else
-			return "";
-	}
-	
-	synchronized public static void addToDataTable(TableDataType tabledata){
+	synchronized public void addToDataTable(TableDataType tabledata) {
 		hashTable.put(tabledata.getOpenxckey(), tabledata);
 	}
 
-	private static TableDataType stringReceive(String str) {
+	private static TableDataType stringReceive(String str) { // kann eigentlich
+																// raus
 		// System.out.println(str);
 
 		JSONObject jsonObject = null;
@@ -125,9 +131,8 @@ public class CANFilterClient {
 		String name = "";
 		try {
 			jsonObject = new JSONObject(str);
-			name = jsonObject.getString("name"); // get the name from data.
+			name = jsonObject.getString("name");
 			Object value = jsonObject.get("value");
-
 			if (jsonObject.has("event")) {
 				Object event = jsonObject.get("event");
 				if (event instanceof Double)
@@ -136,9 +141,7 @@ public class CANFilterClient {
 					eventAsString = new Boolean((boolean) event).toString();
 				else
 					eventAsString = (String) event;
-
 			}
-
 			if (value instanceof Double)
 				valueAsString = new Double((double) value).toString();
 			else if (value instanceof Boolean)
@@ -150,8 +153,6 @@ public class CANFilterClient {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
-		// System.out.println(str);
 		return new TableDataType(name, "", valueAsString, eventAsString);
 	}
 
@@ -165,10 +166,4 @@ public class CANFilterClient {
 		}
 		return str;
 	}
-	
-	public static Hashtable<String, TableDataType> getHashTable(){
-		return hashTable;
-		
-	}
-
 }

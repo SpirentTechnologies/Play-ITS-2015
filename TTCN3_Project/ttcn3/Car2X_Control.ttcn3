@@ -1,0 +1,6 @@
+module Car2X_Control {
+	external function start_Server_SUT(in charstring host, in integer portNumber) return charstring;
+	external function start_Client_SUT(in charstring host, in integer portNumber) return charstring;
+
+	external function stop_SUT(in charstring sutId) return boolean;
+}
