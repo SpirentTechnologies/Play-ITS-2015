@@ -16,44 +16,6 @@ module Car2X_Functions {
 
 	import from Car2X_ConfigSystem {type TesterComponentType;}
 
-//	/**
-//	 * @desc Testbody function for @see Car2X_Testcases.TC_VEHICLE_SPEED_OVER_50
-//	 * @verdict pass The given speed ist greater than 50.0.
-//	 * @verdict fail Due to invalid parameter.
-//	 * @verdict inconc Due to a timeout.
-//	 */
-//	function f_TP_VEHICLE_SPEED_OVER_50() runs on TesterComponentType return verdicttype{
-//		var template FiltererResponse v_speed;
-//		var verdicttype v_ret := pass;
-//		
-//		// fire the request
-//		filtererPort.send(m_Filterer_vehicleSpeed);
-//		
-//		// start the timer
-//		t_TC.start;
-//		alt{
-//			// store received template into value
-//			[] filtererPort.receive(mw_Filterer_vehicleSpeed) -> value v_speed {
-//				t_TC.stop;
-//			// check whether vehicle speed is greater than 50.0
-//    			if(str2float(v_speed.response) > 50.0){
-//    			 v_ret := pass;
-//    			}
-//    			else {
-//				 v_ret := fail;
-//    			}
-//			}
-//			[] filtererPort.receive {
-//				t_TC.stop;
-//				v_ret := fail;
-//			}
-//				
-//			[] t_TC.timeout{
-//				v_ret := inconc;
-//			}
-//		}
-//		return(v_ret);
-//	}
 	
 	/**
 		 * @desc Testbody function for @see Car2X_Testcases.TC_VEHICLE_SPEED_OVER_50
@@ -61,7 +23,7 @@ module Car2X_Functions {
 		 * @verdict fail Due to invalid parameter.
 		 * @verdict inconc Due to a timeout.
 		 */
-		function f_receive_from_filter(float p_waiting_time) runs on TesterComponentType return verdicttype{
+		function f_TP_VEHICLE_SPEED_OVER_50_10_SEC(float p_waiting_time) runs on TesterComponentType return verdicttype{
 			var template FilterResponse v_speed;
 			var verdicttype v_ret := pass;
 		

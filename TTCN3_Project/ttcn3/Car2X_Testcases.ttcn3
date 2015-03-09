@@ -10,33 +10,6 @@ module Car2X_Testcases {
 	import from Car2X_Types all;
 	import from Car2X_Templates all;
 
-//	/**
-//	 * @desc Checks that the vehicle speed is greater 50km/h.
-//	 * @verdict pass Successfully received vehicle speed.
-//	 * @verdict fail Not received anything.
-//	 * @verdict inconclusive Timer ran out.
-//	 */
-//	testcase TC_VEHICLE_SPEED_OVER_50()
-//		runs on TesterComponentType system SystemComponentType {
-//		var verdicttype v_ret := pass;
-//		var integer v_stage := 1;
-//		// set up configuration
-//		f_setUp();
-//
-//		// send stage information
-//		action("stage:" & int2str(v_stage));
-//
-//		// test body
-//		v_ret := f_TP_VEHICLE_SPEED_OVER_50();
-//
-//		setverdict(v_ret);
-//
-//		// send verdict
-//		action("verdict:" & int2str(f_verdictToInt(v_ret)));
-//
-//		// tear down configuration
-//		f_tearDown();
-//	}
 
 	/**
 	 * @desc Checks that the vehicle speed is greater 50km/h.
@@ -51,24 +24,25 @@ module Car2X_Testcases {
 		// set up configuration
 		f_setUp();
 
+		//start value request for TC
 		filtererPort.send(m_Filter_vehicleSpeed_Start);
 
 		// send stage information
 		action("stage:" & int2str(v_stage));
 		t_TC_Global.start(10.0);
 		
+		//loop to check if speed is over 50 the whole time
 		while (t_TC_Global.running) {
 			// test body
-			v_ret := f_receive_from_filter(2.0);
+			v_ret := f_TP_VEHICLE_SPEED_OVER_50_10_SEC(2.0);
 		}
 
+		// stop value request
 		filtererPort.send(m_Filter_vehicleSpeed_Stop);
 		setverdict(v_ret);
 
 		// send verdict
 		action("verdict:" & int2str(f_verdictToInt(v_ret)));
-
-
 
 		// tear down configuration
 		f_tearDown();
