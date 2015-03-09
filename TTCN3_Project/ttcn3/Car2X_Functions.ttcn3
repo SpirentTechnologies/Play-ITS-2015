@@ -5,52 +5,91 @@
  * 		 tear down configurations to reuse.
  */
 module Car2X_Functions {
-	import from Car2X_Types {type FiltererResponse;}
+	import from Car2X_Types {type FilterResponse, FiltererResponse;}
 
 	import from Car2X_Templates {
-		template m_Filterer_vehicleSpeed, mw_Filterer_vehicleSpeed;
+		template
+			m_Filterer_vehicleSpeed,
+			mw_Filter_Response_vS,
+			mw_Filterer_vehicleSpeed;
 	}
 
 	import from Car2X_ConfigSystem {type TesterComponentType;}
 
+//	/**
+//	 * @desc Testbody function for @see Car2X_Testcases.TC_VEHICLE_SPEED_OVER_50
+//	 * @verdict pass The given speed ist greater than 50.0.
+//	 * @verdict fail Due to invalid parameter.
+//	 * @verdict inconc Due to a timeout.
+//	 */
+//	function f_TP_VEHICLE_SPEED_OVER_50() runs on TesterComponentType return verdicttype{
+//		var template FiltererResponse v_speed;
+//		var verdicttype v_ret := pass;
+//		
+//		// fire the request
+//		filtererPort.send(m_Filterer_vehicleSpeed);
+//		
+//		// start the timer
+//		t_TC.start;
+//		alt{
+//			// store received template into value
+//			[] filtererPort.receive(mw_Filterer_vehicleSpeed) -> value v_speed {
+//				t_TC.stop;
+//			// check whether vehicle speed is greater than 50.0
+//    			if(str2float(v_speed.response) > 50.0){
+//    			 v_ret := pass;
+//    			}
+//    			else {
+//				 v_ret := fail;
+//    			}
+//			}
+//			[] filtererPort.receive {
+//				t_TC.stop;
+//				v_ret := fail;
+//			}
+//				
+//			[] t_TC.timeout{
+//				v_ret := inconc;
+//			}
+//		}
+//		return(v_ret);
+//	}
+	
 	/**
-	 * @desc Testbody function for @see Car2X_Testcases.TC_VEHICLE_SPEED_OVER_50
-	 * @verdict pass The given speed ist greater than 50.0.
-	 * @verdict fail Due to invalid parameter.
-	 * @verdict inconc Due to a timeout.
-	 */
-	function f_TP_VEHICLE_SPEED_OVER_50() runs on TesterComponentType return verdicttype{
-		var template FiltererResponse v_speed;
-		var verdicttype v_ret := pass;
+		 * @desc Testbody function for @see Car2X_Testcases.TC_VEHICLE_SPEED_OVER_50
+		 * @verdict pass The given speed ist greater than 50.0.
+		 * @verdict fail Due to invalid parameter.
+		 * @verdict inconc Due to a timeout.
+		 */
+		function f_receive_from_filter(float p_waiting_time) runs on TesterComponentType return verdicttype{
+			var template FilterResponse v_speed;
+			var verdicttype v_ret := pass;
 		
-		// fire the request
-		filtererPort.send(m_Filterer_vehicleSpeed);
-		
-		// start the timer
-		t_TC.start;
-		alt{
-			// store received template into value
-			[] filtererPort.receive(mw_Filterer_vehicleSpeed) -> value v_speed {
-				t_TC.stop;
-			// check whether vehicle speed is greater than 50.0
-    			if(str2float(v_speed.response) > 50.0){
-    			 v_ret := pass;
-    			}
-    			else {
-				 v_ret := fail;
-    			}
-			}
-			[] filtererPort.receive {
-				t_TC.stop;
-				v_ret := fail;
-			}
+			// start the timer
+			t_TC.start(p_waiting_time);
+			alt{
+				// store received template into value
+				[] filtererPort.receive(mw_Filter_Response_vS) -> value v_speed {
+					t_TC.stop;
+				// check whether vehicle speed is greater than 50.0
+					if(v_speed.valueA.floatValue > 50.0){
+					 v_ret := pass;
+					}
+					else {
+					 v_ret := fail;
+					}
+				}
+				[] filtererPort.receive {
+					t_TC.stop;
+					v_ret := fail;
+				}
 				
-			[] t_TC.timeout{
-				v_ret := inconc;
+				[] t_TC.timeout{
+					v_ret := inconc;
+				}
 			}
+			return(v_ret);
 		}
-		return(v_ret);
-	}
 	
 	function f_verdictToInt(verdicttype p_verdict) runs on TesterComponentType return integer {
 		

@@ -6,7 +6,7 @@
       <description></description>
     </testadapter>
     <module Name="Car2X_Testcases" File="ttcn3build/Car2X_Testcases.jar" Package="generated_ttcn"/>
-    <testcase Name="TC_VEHICLE_SPEED_OVER_50" Alias="" Module="Car2X_Testcases" Retries="0" Runs="1" ActionOnFail="continue" Selection="false" Status="stopped" Verdict="fail">
+    <testcase Name="TC_VEHICLE_SPEED_OVER_50_10_SEC" Alias="" Module="Car2X_Testcases" Retries="0" Runs="1" ActionOnFail="continue" Selection="false" Status="stopped" Verdict="fail">
       <description></description>
     </testcase>
   </campaign>

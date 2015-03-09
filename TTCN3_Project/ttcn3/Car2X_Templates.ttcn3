@@ -3,40 +3,79 @@
  * @desc Here we define our templates.
  */
 module Car2X_Templates {
-	import from Car2X_ModuleParameters all;
-	import from Car2X_Types all;
-	
+	import from Car2X_ModuleParameters {
+		const c_headlamp_status, c_modePrefix_01, c_vehicle_speed;
+	}
+	import from Car2X_Types {
+		type
+			ElmRequest,
+			ElmResponse,
+			FilterRequest,
+			FilterResponse,
+			FiltererRequest,
+			FiltererResponse;
+	}
+
 	/**
-	 * 
 	 * @desc Request template to communicate with ELM.
 	 */
 	template ElmRequest m_Elm_vehicleSpeed() := {
-	  modePrefix := c_modePrefix_01,
-	  parameterID := "0D"
+		modePrefix := c_modePrefix_01, parameterID := "0D"
 	}
-	
+
 	/**
-	 * 
 	 * @desc Response template receiving from ELM.
 	 */
-	template ElmResponse mw_Elm_vehicleSpeed() := {
-	  response := ?
-	}
-	
+	template ElmResponse mw_Elm_vehicleSpeed() := {response := ?}
+
 	/**
-	 * 
 	 * @desc Request template to communicate with CAN.
 	 */
 	template FiltererRequest m_Filterer_vehicleSpeed() := {
-	  request := c_vehicle_speed
+		request := c_vehicle_speed
+	}
+
+	/**
+	 * @desc Response template receiving from CAN.
+	 */
+	template FiltererResponse mw_Filterer_vehicleSpeed() := {response := ?}
+
+	template FilterRequest m_Filter_vehicleSpeed_Start() := {
+		reqType := "start",
+		reqData := {
+			{key := c_vehicle_speed, interval := 1500},
+			{key := c_headlamp_status, interval := 500}
+		}
+	}
+
+	template FilterRequest m_Filter_vehicleSpeed_Stop() := {
+		reqType := "stop",
+		reqData := {{key := c_vehicle_speed}, {key := c_headlamp_status}}
 	}
 	
 	/**
-	 * 
-	 * @desc Response template receiving from CAN.
+	 * template for vehicle Speed response
+	 * @desc 
 	 */
-	template FiltererResponse mw_Filterer_vehicleSpeed() := {
-	  response := ?
+	template FilterResponse mw_Filter_Response_vS() := {
+		OpenXCKey := c_vehicle_speed,
+		OBD2Key :=  "0D",
+		valueA := { 
+			floatValue := ?
+		},
+		myTimestamp := ?
 	}
-
-} with {encode "blubb"};
+	
+	/**
+	 * template for head lamp status response
+	 */
+	template FilterResponse mw_Filter_Response_hL() := {
+			OpenXCKey := c_headlamp_status,
+			OBD2Key :=  ?,
+			valueA := ?,
+			myTimestamp := ?
+		}
+}
+with {
+	encode "blubb";
+}

@@ -23,8 +23,8 @@ module Car2X_ConfigSystem {
 	 * @member FiltererRequest @see Car2X_Types.FiltererRequest
 	 */
 	type port FiltererPortType message {		
-		in FiltererResponse;
-		out FiltererRequest;
+		in FilterResponse;
+		out FilterRequest;
 	}
 	
 	/**
@@ -36,6 +36,7 @@ module Car2X_ConfigSystem {
 	 */
 	type component TesterComponentType {
 		timer t_TC := 5.0;
+		timer t_TC_Global := 5.0;
 		port ElmPortType elmPort;
 		port FiltererPortType filtererPort;
 	}
