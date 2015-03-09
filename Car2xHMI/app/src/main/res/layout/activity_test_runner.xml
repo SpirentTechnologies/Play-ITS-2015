@@ -16,16 +16,18 @@
         android:layout_height="wrap_content">
         <Button
             android:text="@string/button_start"
-            android:textSize="18sp"
             android:layout_width="0dp"
-            android:layout_weight="1"
+            android:layout_weight="14"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:onClick="startTest"/>
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
         <Button
             android:text="@string/button_stop"
-            android:textSize="18sp"
-            android:layout_weight="1"
+            android:layout_weight="14"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
@@ -37,8 +39,8 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/buttons">
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
             android:layout_weight="2"/>
         <ImageView
             android:id="@+id/status_animation"
@@ -89,7 +91,7 @@
 
     <TextView
         android:id="@+id/results"
-        android:text="a"
+        android:text=""
         android:textSize="20sp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -98,7 +100,7 @@
         android:layout_below="@id/progress" />
     <TextView
         android:id="@+id/commands"
-        android:text="b"
+        android:text=""
         android:textSize="24sp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -107,7 +109,7 @@
         android:layout_below="@id/results" />
     <TextView
         android:id="@+id/socket"
-        android:text="c"
+        android:text=""
         android:textSize="20sp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
