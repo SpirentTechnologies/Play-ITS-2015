@@ -1,4 +1,4 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -9,61 +9,42 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.testingtech.car2xhmi.TestSelectorActivity">
 
-    <ScrollView
+    <TableLayout
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent">
+        android:layout_height="wrap_content"
+        android:stretchColumns="1">
 
-        <TableLayout
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:stretchColumns="1">
+        <Button
+            android:onClick="startDriveTest"
+            android:text="@string/title_activity_drive_test" />
 
-            <Button
-                android:onClick="startDriveTest"
-                android:text="@string/title_activity_drive_test"
-                android:textSize="18sp" />
+        <Button
+            android:onClick="startDoorTest"
+            android:text="@string/title_activity_door_test" />
 
-            <Button
-                android:onClick="startDoorTest"
-                android:text="@string/title_activity_door_test"
-                android:textSize="18sp" />
+        <Button
+            android:onClick="startBreakTest"
+            android:text="@string/title_activity_break_test" />
 
-            <Button
-                android:onClick="startBreakTest"
-                android:text="@string/title_activity_break_test"
-                android:textSize="18sp" />
+        <Button android:text="A" />
 
-            <Button
-                android:text="A"
-                android:textSize="18sp" />
-            <Button
-                android:text="B"
-                android:textSize="18sp" />
-            <Button
-                android:text="C"
-                android:textSize="18sp" />
-            <Button
-                android:text="D"
-                android:textSize="18sp" />
-            <Button
-                android:text="E"
-                android:textSize="18sp" />
-            <Button
-                android:text="F"
-                android:textSize="18sp" />
-            <Button
-                android:text="G"
-                android:textSize="18sp" />
-            <Button
-                android:text="H"
-                android:textSize="18sp" />
-            <Button
-                android:text="I"
-                android:textSize="18sp" />
-            <Button
-                android:text="J"
-                android:textSize="18sp" />
+        <Button android:text="B" />
 
-        </TableLayout>
-    </ScrollView>
-</RelativeLayout>
+        <Button android:text="C" />
+
+        <Button android:text="D" />
+
+        <Button android:text="E" />
+
+        <Button android:text="F" />
+
+        <Button android:text="G" />
+
+        <Button android:text="H" />
+
+        <Button android:text="I" />
+
+        <Button android:text="J" />
+
+    </TableLayout>
+</ScrollView>

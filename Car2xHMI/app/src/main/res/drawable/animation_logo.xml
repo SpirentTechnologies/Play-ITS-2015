@@ -1,19 +1,21 @@
 <animation-list xmlns:android="http://schemas.android.com/apk/res/android"
     android:oneshot="false">
-    <item android:drawable="@drawable/logo" android:duration="60" />
-    <item android:drawable="@drawable/logo22" android:duration="60" />
-    <item android:drawable="@drawable/logo45" android:duration="60" />
-    <item android:drawable="@drawable/logo67" android:duration="60" />
-    <item android:drawable="@drawable/logo90" android:duration="60" />
-    <item android:drawable="@drawable/logo112" android:duration="60" />
-    <item android:drawable="@drawable/logo135" android:duration="60" />
-    <item android:drawable="@drawable/logo157" android:duration="60" />
+    <item android:drawable="@drawable/logo000" android:duration="60" />
+    <item android:drawable="@drawable/logo020" android:duration="60" />
+    <item android:drawable="@drawable/logo040" android:duration="60" />
+    <item android:drawable="@drawable/logo060" android:duration="60" />
+    <item android:drawable="@drawable/logo080" android:duration="60" />
+    <item android:drawable="@drawable/logo100" android:duration="60" />
+    <item android:drawable="@drawable/logo120" android:duration="60" />
+    <item android:drawable="@drawable/logo140" android:duration="60" />
+    <item android:drawable="@drawable/logo160" android:duration="60" />
     <item android:drawable="@drawable/logo180" android:duration="60" />
-    <item android:drawable="@drawable/logo202" android:duration="60" />
-    <item android:drawable="@drawable/logo225" android:duration="60" />
-    <item android:drawable="@drawable/logo247" android:duration="60" />
-    <item android:drawable="@drawable/logo270" android:duration="60" />
-    <item android:drawable="@drawable/logo292" android:duration="60" />
-    <item android:drawable="@drawable/logo315" android:duration="60" />
-    <item android:drawable="@drawable/logo337" android:duration="60" />
+    <item android:drawable="@drawable/logo200" android:duration="60" />
+    <item android:drawable="@drawable/logo220" android:duration="60" />
+    <item android:drawable="@drawable/logo240" android:duration="60" />
+    <item android:drawable="@drawable/logo260" android:duration="60" />
+    <item android:drawable="@drawable/logo280" android:duration="60" />
+    <item android:drawable="@drawable/logo300" android:duration="60" />
+    <item android:drawable="@drawable/logo320" android:duration="60" />
+    <item android:drawable="@drawable/logo340" android:duration="60" />
 </animation-list>
