@@ -19,6 +19,63 @@ module Car2X_Types {
 	} with {
 	  variant (response) "length=infinity"
 	}
+	
+	/**
+	 * 
+	 * @desc Type for filter requests.
+	 * @member reqType Determine the type of the request.
+	 * 				   'start' to start receiving requested data.
+	 * 				   'stop' to stop receiving requested data.
+	 * @member reqData @see ReqData
+	 */
+	type record FilterRequest {
+		charstring reqType,
+		record of ReqData reqData
+	}
+	
+	/**
+	 * 
+	 * @desc The data structure that is requested from the server.
+	 * 		 It is used for 'start' and 'stop' requests.
+	 * @member key Determines the key. All key are listed here @url https://github.com/TestingTechnologies/Play-ITS-2015/wiki/Filter#data-table
+	 * @member interval Determines the interval in which the given data is received.
+	 */
+	type record ReqData {
+		charstring key,
+		integer interval optional
+	}
+	
+	/**
+     * 
+     * @desc Type for the filter response.
+     * 		 For more information @url https://github.com/TestingTechnologies/Play-ITS-2015/wiki/TTWorkbench#filter-response
+     * @member OpenXCKey Key for given OpenXC value.
+     * @member OBD2Key Key for given OBD2 value.
+     * @member valueA First value of the requested data (@see UnionValue)
+     * @member valueB An optional value for some OpenXC statements.
+     * @member myTimestamp Timestamp of the response.
+     */
+	type record FilterResponse {
+		charstring OpenXCKey,
+		charstring OBD2Key,
+		UnionValue valueA ,
+		boolean valueB,
+		integer myTimestamp
+	}
+	
+	/**
+	 * 
+	 * @desc The response can have different types. To avoid conversion a union is defined to
+	 * 		 take the suitable type.
+	 * @member stringValue The response value given as string.
+	 * @member floatValue The response value given as float.
+	 * @member booleanValue The response value given as boolean.
+	 */
+	type union UnionValue {
+		charstring stringValue,
+		float floatValue,
+		boolean booleanValue
+	}
 } 
 with {
   encode "blubb";
