@@ -1,15 +1,17 @@
-package com.testingtech.car2xhmi;
+package com.testingtech.car2x.hmi;
 
 import android.content.Intent;
 import android.graphics.drawable.AnimationDrawable;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TextView;
+
+import com.testingtech.car2x.R;
 
 
 public class TestRunnerActivity extends ActionBarActivity {

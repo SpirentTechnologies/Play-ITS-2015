@@ -1,7 +1,7 @@
 /**
  * Base class of all socket messages.
  */
-package com.testingtech.car2xhmi.messages;
+package com.testingtech.car2x.hmi.messages;
 
 import java.io.Serializable;
 import java.util.Date;

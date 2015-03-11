@@ -1,4 +1,4 @@
-package com.testingtech.car2xhmi;
+package com.testingtech.car2x;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

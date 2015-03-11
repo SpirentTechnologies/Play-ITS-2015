@@ -2,7 +2,7 @@
  * Messages sent to the client socket containing information regarding
  * the status of test cases.
  */
-package com.testingtech.car2xhmi.messages;
+package com.testingtech.car2x.hmi.messages;
 
 import java.util.Date;
 
