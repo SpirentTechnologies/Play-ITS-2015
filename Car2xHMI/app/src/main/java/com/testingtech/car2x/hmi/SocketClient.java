@@ -1,15 +1,15 @@
-package com.testingtech.car2xhmi;
+package com.testingtech.car2x.hmi;
 
 import android.graphics.Color;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.AsyncTask;
-import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TableLayout;
 import android.widget.TextView;
 
-import com.testingtech.car2xhmi.messages.ControlMessage;
-import com.testingtech.car2xhmi.messages.StatusMessage;
+import com.testingtech.car2x.R;
+import com.testingtech.car2x.hmi.messages.ControlMessage;
+import com.testingtech.car2x.hmi.messages.StatusMessage;
 
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
