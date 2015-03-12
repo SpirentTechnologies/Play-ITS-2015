@@ -1,29 +1,29 @@
-/**
- * Messages received from the client socket containing information regarding
- * controlling of test cases.
- */
 package com.testingtech.car2x.hmi.messages;
 
 import java.util.Date;
 
+/**
+ * Messages received from the client socket containing information regarding controlling of test
+ * cases.
+ */
 public class ControlMessage extends Message {
 
-  private static final long serialVersionUID = 6458145498447577207L;
-  // TODO make command an ENUM
-  public final String command;
+    private static final long serialVersionUID = 6458145498447577207L;
 
-  public ControlMessage(String testCaseId, Date date, String command) {
-    super(testCaseId, date);
-    this.command = command;
-  }
+    public final TestCaseCommand command;
 
-  @Override
-  public String toString() {
-    return String.format(
-        "%s, command:[%s]",
-        super.toString(),
-        command
-    );
-  }
+    public ControlMessage(TestCase testCaseId, Date date, TestCaseCommand command) {
+        super(testCaseId, date);
+        this.command = command;
+    }
+
+    @Override
+    public String toString() {
+        return String.format(
+                "%s, command:[%s]",
+                super.toString(),
+                command
+        );
+    }
 
 }
