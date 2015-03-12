@@ -7,17 +7,19 @@ public class TableDataType {
 	private String value1;
 	private String value2;
 	private  long timestamp;
+	private int interval;
 	//Constructor
-	public TableDataType(String openxckey, String obd2key, String value1, String value2){
+	public TableDataType(String openxckey, String obd2key, String value1, String value2, int interval){
 		this.openxckey = openxckey;
 		this.obd2key = obd2key;
 		this.value1 = value1;
 		this.value2 = value2;
 		this.timestamp = new Date().getTime();
+		this.interval = interval;
 	}	
 	
 	public TableDataType(String openxckey, String obd2key, String value1) {
-		this(openxckey, obd2key, value1, "");
+		this(openxckey, obd2key, value1, "",0);
 		this.timestamp = new Date().getTime();
 	}
 
@@ -41,6 +43,10 @@ public class TableDataType {
 		return value2;
 	}
 	
+	public int getInterval(){
+		return interval;
+	}
+	
 	public void setOpenxckey(String str){
 		this.obd2key = str;
 	}
@@ -59,5 +65,9 @@ public class TableDataType {
 	
 	public void setValue2(String str){
 		this.value2 = str;
+	}
+	
+	public void setInterval(int interval){
+		this.interval = interval;
 	}
 }

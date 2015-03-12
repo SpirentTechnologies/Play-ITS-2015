@@ -60,18 +60,16 @@ public class CANFilterServer extends Thread {
 	String iface = "localhost";
 
 	private Hashtable<String, TableDataType> hashTable;
-	private Hashtable<String, Integer> intervallTable;
+	public Hashtable<String, Integer> intervallTable;
 	private InetSocketAddress address;
 
-	public CANFilterServer(Hashtable<String, TableDataType> hashTable, InetSocketAddress address) {
+	public CANFilterServer(Hashtable<String, TableDataType> hashTable, Hashtable<String, Integer> intervallTable ,InetSocketAddress address) {
 		this.hashTable = hashTable;
 		this.address = address;
+		this.intervallTable = intervallTable;
 	}
 
 	public void run() {
-		
-		//Test SQL Get
-		System.out.println(getFromDatabase("vehicle_speed"));
 
 		ServerSocket sock = null;
 
@@ -110,12 +108,12 @@ public class CANFilterServer extends Thread {
 
 	public void ServiceConnection(Socket client) {
 
-		Pattern pattern = Pattern
-				.compile("\\{\"type\": \"(\\w+)\", \"data\": \\[(\"\\w+\",?)+\\]\\}");
+//		Pattern pattern = Pattern
+//				.compile("\\{\"type\": \"(\\w+)\", \"data\": \\[(\"\\w+\",?)+\\]\\}");
 		BufferedInputStream networkBin = null;
 		OutputStream networkPout = null;
 
-		JSONObject jsonObject = null;
+//		JSONObject jsonObject = null;
 
 		byte[] buf = new byte[512];
 
@@ -179,7 +177,7 @@ public class CANFilterServer extends Thread {
 						JSONArray requestData = jo.getJSONArray("reqData");
 
 						if (requestType == "stop") {
-							stopGettingData(requestData);
+							removeFromIntervallTable(requestData);
 							// TODO: abklären wir hier reagiert werden soll
 
 							// stop receiving this particular data out of
@@ -264,7 +262,7 @@ public class CANFilterServer extends Thread {
 		}
 	}
 	
-	synchronized private void stopGettingData(JSONArray ja){
+	synchronized private void removeFromIntervallTable(JSONArray ja){
 		for (int i = 0; i < ja.length(); i++) {
 			try {
 				intervallTable.remove(ja.getString(i));
@@ -276,46 +274,48 @@ public class CANFilterServer extends Thread {
 	}
 	
 	
-	private TableDataType getFromDatabase(String str){
-		TableDataType result = new TableDataType("","","");
-		  Connection connect = null;
-		  Statement statement = null;
-		  ResultSet resultSet = null;
-		  
-		    try {
-	      // This will load the MySQL driver, each DB has its own driver
-	      Class.forName("com.mysql.jdbc.Driver");
-	      // Setup the connection with the DB
-	      connect = DriverManager
-	          .getConnection("jdbc:mysql://localhost/feedback?"
-	              + "user=car2xuser&password=car2x");
-
-	      // Statements allow to issue SQL queries to the database
-	      statement = connect.createStatement();
-	      
-	      // Result set get the result of the SQL query
-	      resultSet = statement
-	          .executeQuery("select * from valuetable.car2xvalues where openxckey = " + str + "\"");
-	      result.setObds2key(resultSet.getString("obds2key"));
-	      result.setOpenxckey(resultSet.getString("openXCkey"));
-	      result.setValue1(resultSet.getString("valuea"));
-	      result.setValue2(resultSet.getString("valueb"));
-	      result.setTimestamp(resultSet.getLong("timestamp"));
-	      
-	      
-		    } catch (Exception e) {
-		        try {
-					throw e;
-				} catch (Exception e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-		    }
-//		    } finally {
-//		      close();
-//		    }
+	
+	//SQL-Test not used anymore
+//	private TableDataType getFromDatabase(String str){
+//		TableDataType result = new TableDataType("","","");
+//		  Connection connect = null;
+//		  Statement statement = null;
+//		  ResultSet resultSet = null;
+//		  
+//		    try {
+//	      // This will load the MySQL driver, each DB has its own driver
+//	      Class.forName("com.mysql.jdbc.Driver");
+//	      // Setup the connection with the DB
+//	      connect = DriverManager
+//	          .getConnection("jdbc:mysql://localhost/feedback?"
+//	              + "user=car2xuser&password=car2x");
+//
+//	      // Statements allow to issue SQL queries to the database
+//	      statement = connect.createStatement();
 //	      
-	      
-	      return result;
-	}
+//	      // Result set get the result of the SQL query
+//	      resultSet = statement
+//	          .executeQuery("select * from valuetable.car2xvalues where openxckey = " + str + "\"");
+//	      result.setObds2key(resultSet.getString("obds2key"));
+//	      result.setOpenxckey(resultSet.getString("openXCkey"));
+//	      result.setValue1(resultSet.getString("valuea"));
+//	      result.setValue2(resultSet.getString("valueb"));
+//	      result.setTimestamp(resultSet.getLong("timestamp"));
+//	      
+//	      
+//		    } catch (Exception e) {
+//		        try {
+//					throw e;
+//				} catch (Exception e1) {
+//					// TODO Auto-generated catch block
+//					e1.printStackTrace();
+//				}
+//		    }
+////		    } finally {
+////		      close();
+////		    }
+////	      
+//	      
+//	      return result;
+//	}
 }
