@@ -9,5 +9,11 @@
     <testcase Name="TC_VEHICLE_SPEED_OVER_50_10_SEC" Alias="" Module="Car2X_Testcases" Retries="0" Runs="1" ActionOnFail="continue" Selection="false" Status="stopped" Verdict="fail">
       <description></description>
     </testcase>
+    <testcase Name="TC_VEHICLE_SPEED_SIMULATED" Alias="" Module="Car2X_Testcases" Retries="0" Runs="1" ActionOnFail="continue" Selection="false" Status="stopped" Verdict="fail">
+      <description></description>
+    </testcase>
+    <testcase Name="TC_STEERING_WHEEL_ANGLE" Alias="" Module="Car2X_Testcases" Retries="0" Runs="1" ActionOnFail="continue" Selection="false" Status="stopped" Verdict="fail">
+      <description></description>
+    </testcase>
   </campaign>
 </campaignloader>

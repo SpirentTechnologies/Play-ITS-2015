@@ -5,18 +5,18 @@
  *   		 tear down configurations to reuse.
  */
 module Car2X_Functions {
-	import from Car2X_Types {type FilterResponse;}
+	import from Car2X_Types {type FilterResponse, IgnitionStatus;}
 
 	import from Car2X_Templates {
 		template
 			m_Filter_steeringWheel_Start,
 			m_Filter_steeringWheel_Stop,
+			mw_Filter_Response_iS,
 			mw_Filter_Response_sW,
 			mw_Filter_Response_vS;
 	}
 
 	import from Car2X_ConfigSystem {type TesterComponentType;}
-
 
 	/**
 	 * @desc Testbody function for
@@ -111,6 +111,50 @@ module Car2X_Functions {
 		}
 
 
+	function f_ignitionStatus(IgnitionStatus ignitionStatus)
+		runs on TesterComponentType return verdicttype{
+			
+		var verdicttype v_ret := pass;
+		t_TC_Global.start;
+		while (t_TC_Global.running) {
+			v_ret := f_ignitionStatus_SUB(ignitionStatus, 0.5);
+			if (v_ret == pass) {
+				t_TC_Global.stop;
+			}
+		}		
+		return v_ret;
+	}
+
+	function f_ignitionStatus_SUB(IgnitionStatus ignitionStatus, float interval)
+		runs on TesterComponentType return verdicttype{
+			
+		var template FilterResponse v_ignitionStatus;
+		var verdicttype v_ret := pass;
+		
+		t_TC.start(interval);
+		
+		alt {
+			// store received template into value
+			[] filterPort.receive(mw_Filter_Response_iS) -> value v_ignitionStatus {
+				if(ignitionStatus2str(ignitionStatus) == v_ignitionStatus.valueA.stringValue){
+					v_ret := pass;
+				} else {
+					v_ret := fail;
+				}
+				t_TC.stop;
+			}
+			[] filterPort.receive {
+				t_TC.stop;
+				v_ret := fail;
+			}
+			[] t_TC.timeout {
+				v_ret := inconc;
+			}
+		}
+		
+		return v_ret;
+	}
+
 	function f_verdictToInt(verdicttype p_verdict)
 		runs on TesterComponentType return integer  {
 
@@ -147,12 +191,29 @@ module Car2X_Functions {
 	}
 	
 	function min(float valueA, float valueB) return float{
-			if(valueA < valueB){
-				return valueA;
-			}else{
-				return valueB;
-			}
+		if(valueA < valueB){
+			return valueA;
+		}else{
+			return valueB;
 		}
+	}
+	
+	/**
+	 * 
+	 * @desc Auxiliary function to cast the ignitionStatus to string.
+	 * 		 We cannot compare an enum type with a charstring that is
+	 * 		 needed for the function @see f_ignitionStatus_SUB
+	 * @param ignitionStatus
+	 * @return charstring Ignition status as string
+	 */
+	function ignitionStatus2str(IgnitionStatus ignitionStatus) return charstring{
+		select(enum2int(ignitionStatus)){
+			case(0){return "off"}
+			case(1){return "accessory"}
+			case(2){return "run"}
+			case(3){return "start"}
+		}			
+	}
 
 	/**
 	 * @desc Tear down the configuration for test cases running on

@@ -66,6 +66,13 @@ module Car2X_Types {
 		float floatValue,
 		boolean booleanValue
 	}
+	
+	type enumerated IgnitionStatus {
+		e_off,
+		e_accessory,
+		e_run,
+		e_start
+	};
 } 
 with {
   encode "blubb";

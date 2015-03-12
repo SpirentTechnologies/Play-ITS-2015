@@ -6,16 +6,13 @@ module Car2X_Templates {
 	import from Car2X_ModuleParameters {
 		const
 			c_headlamp_status,
+			c_ignition_status,
 			c_modePrefix_01,
 			c_steering_wheel_angle,
 			c_vehicle_speed;
 	}
 	import from Car2X_Types {
-		type
-			ElmRequest,
-			ElmResponse,
-			FilterRequest,
-			FilterResponse
+		type ElmRequest, ElmResponse, FilterRequest, FilterResponse;
 	}
 
 	/**
@@ -50,9 +47,19 @@ module Car2X_Templates {
 		reqData := {{key := c_steering_wheel_angle, interval := 1500}}
 	}
 
+	template FilterRequest m_Filter_ignitionState_Start() := {
+		reqType := "start",
+		reqData := {{key := c_ignition_status, interval := 500}}
+	}
+
 	template FilterRequest m_Filter_steeringWheel_Stop() := {
 		reqType := "stop", 
 		reqData := {{key := c_steering_wheel_angle}}
+	}
+	
+	template FilterRequest m_Filter_ignitionStatus_Stop() := {
+		reqType := "stop", 
+		reqData := {{key := c_ignition_status}}
 	}
 
 	/**
@@ -63,6 +70,13 @@ module Car2X_Templates {
 		OpenXCKey := c_steering_wheel_angle,
 		OBD2Key := ?,
 		valueA := {floatValue := ?},
+		respTimestamp := ?
+	}
+	
+	template FilterResponse mw_Filter_Response_iS() := {
+		OpenXCKey := c_ignition_status,
+		OBD2Key := ?,
+		valueA := {stringValue := ?},
 		respTimestamp := ?
 	}
 
