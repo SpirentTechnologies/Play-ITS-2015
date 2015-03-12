@@ -29,98 +29,80 @@
 package canfilter;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
+import java.util.Date;
+import java.util.Hashtable;
 import java.util.Scanner;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import sun.security.util.Length;
+public class CANSimulatorReader extends Thread {
 
-
-
-
-public class CANFilter {
 	private static final String DEFAULT_TCP_SERVER_HOST = "localhost";
 	private static final int DEFAULT_TCP_SERVER_PORT = 50001;
 
-	public static void main(String[] args) throws IOException {
-		String serverHost = DEFAULT_TCP_SERVER_HOST;
-		int serverPort = DEFAULT_TCP_SERVER_PORT;
+	private Hashtable<String, Car2XEntry> car2xEntries;
+	private InetSocketAddress address;
 
+	public CANSimulatorReader(Hashtable<String, Car2XEntry> car2xEntries) {
+		this.car2xEntries = car2xEntries;
+		this.address = new InetSocketAddress(DEFAULT_TCP_SERVER_HOST,
+				DEFAULT_TCP_SERVER_PORT);
+	}
+
+	public void run() {
 		System.out.println("TCPClient started");
-
 		Socket sock = null;
+		Scanner scanner = null;
 
 		try {
 			// establish the socket
 			sock = new Socket();
-			sock.setSoLinger(true, 0);
-			sock.connect(new InetSocketAddress(serverHost, serverPort), 50001);
-			System.out.println("TCPClient connected to  " + serverHost + ":"
-					+ serverPort + " on local port " + sock.getLocalPort());
+			sock.connect(address);
+			System.out.println("TCPClient connected to host : "
+					+ address.getHostName() + " on local port "
+					+ address.getPort());
 
-			Scanner inputStream = new Scanner(sock.getInputStream()).useDelimiter("}");
-			// echo back any message received
-			
-			JSONObject jsonObject = null;
-			
-			String str = new String();
+			scanner = new Scanner(sock.getInputStream()).useDelimiter("}");
+
 			while (true) {
-				
-				str = inputStream.next() + "}";
-				str = str.substring(1); //delete first " "
-
-				
-//				System.out.println(str);
-				
-				try {
-					jsonObject = new JSONObject(str);
-					String name = jsonObject.getString("name"); // get the name from data.
-					Object value = jsonObject.get("value");
-					String valueAsString = "";
-							
-					if (value instanceof Double)
-						valueAsString = new Double((double) value).toString();
-					else if (value instanceof Boolean)
-						valueAsString = new Boolean((boolean) value).toString();
-					else valueAsString = (String) value;
-					
-					System.out.println(valueAsString);
-							 
-					
-				} catch (JSONException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-
-//				System.out.println(str);
+				addCar2XEntry(scanner.next() + "}");
 			}
 
 		} catch (SocketTimeoutException e) {
-			System.out.println("Timeout could not connect to " + serverHost
-					+ ":" + serverPort);
+			System.out.println("Timeout could not connect to "
+					+ address.getHostName() + ":" + address.getPort());
 		} catch (IOException ioe) {
 			ioe.printStackTrace();
-		} finally {
-			if (sock != null) {
-				sock.close();
-			}
-		}
-	}
-
-	private static String bufferToString(byte[] buffer) {
-		String str = "";
-		try {
-			str = new String(buffer, "UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
+		} catch (JSONException e) {
 			e.printStackTrace();
+		} finally {
+			if (sock != null)
+				try {
+					sock.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			if (scanner != null)
+				scanner.close();
 		}
-		return str;
 	}
 
+	private void addCar2XEntry(String str) throws JSONException {
+		JSONObject jsonObject = new JSONObject(str);
+		updateValues(jsonObject);
+	}
+
+	// TODO add obd2 key
+	private void updateValues(JSONObject jsonObject) throws JSONException {
+		Car2XEntry car2xEntry = car2xEntries.get(jsonObject.get("name"));
+		car2xEntry.setTimestamp(new Date().getTime());
+		car2xEntry.setValueA(jsonObject.get("value").toString());
+		String event = jsonObject.getString("event");
+		if (event != null)
+			car2xEntry.setValueB(event);
+	}
 }

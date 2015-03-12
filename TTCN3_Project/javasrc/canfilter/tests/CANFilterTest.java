@@ -14,7 +14,7 @@ import java.util.Scanner;
 
 import org.junit.Test;
 
-import canfilter.TableDataType;
+import canfilter.Car2XEntry;
 
 public class CANFilterTest {
 
@@ -50,9 +50,9 @@ public class CANFilterTest {
 	
 	@Test
 	public void putToHashTableTest(){
-		Hashtable<String, TableDataType> hashTable = new Hashtable<String, TableDataType>();
-		TableDataType tabledata = new TableDataType("vehicle_speed", "0x07","217"," false");
-		hashTable.put(tabledata.getOpenxckey(), tabledata);
+		Hashtable<String, Car2XEntry> hashTable = new Hashtable<String, Car2XEntry>();
+		Car2XEntry tabledata = new Car2XEntry(1500);
+		hashTable.put("vehicle_speed", tabledata);
         assertTrue(tabledata.equals(hashTable.get("vehicle_speed")));  
 	}
 	
