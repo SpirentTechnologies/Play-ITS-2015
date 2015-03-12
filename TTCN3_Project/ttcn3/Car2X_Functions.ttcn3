@@ -200,18 +200,18 @@ module Car2X_Functions {
 	
 	/**
 	 * 
-	 * @desc Auxiliary function to cast the ignitionStatus to string.
+	 * @desc Auxiliary function to cast the ignitionStatus to charstring.
 	 * 		 We cannot compare an enum type with a charstring that is
 	 * 		 needed for the function @see f_ignitionStatus_SUB
 	 * @param ignitionStatus
 	 * @return charstring Ignition status as string
 	 */
 	function ignitionStatus2str(IgnitionStatus ignitionStatus) return charstring{
-		select(enum2int(ignitionStatus)){
-			case(0){return "off"}
-			case(1){return "accessory"}
-			case(2){return "run"}
-			case(3){return "start"}
+		select(ignitionStatus){
+			case(e_off){return "off"}
+			case(e_accessory){return "accessory"}
+			case(e_run){return "run"}
+			case(e_start){return "start"}
 		}			
 	}
 
