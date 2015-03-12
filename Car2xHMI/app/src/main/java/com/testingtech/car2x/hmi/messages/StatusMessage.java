@@ -1,32 +1,31 @@
-/**
- * Messages sent to the client socket containing information regarding
- * the status of test cases.
- */
 package com.testingtech.car2x.hmi.messages;
 
 import java.util.Date;
 
+/**
+ * Messages sent to the client socket containing progress feedback concerning a test case.
+ */
 public class StatusMessage extends Message {
 
-  private static final long serialVersionUID = -1216127552974401911L;
-  // TODO both should actually be ENUMs
-  public final String statusType;
-  public final int statusValue;
+    private static final long serialVersionUID = -1216127552974401911L;
 
-  public StatusMessage(String testCaseId, Date date, String statusType, int statusValue) {
-    super(testCaseId, date);
-    this.statusType = statusType;
-    this.statusValue = statusValue;
-  }
+    public final TestCaseProgress progress;
+    public int value;
 
-  @Override
-  public String toString() {
-    return String.format(
-        "%s, statusType:[%s], statusValue:[%s]",
-        super.toString(),
-        statusType,
-        statusValue
-    );
-  }
+    public StatusMessage(TestCase testCaseId, Date date, TestCaseProgress progress, int value) {
+        super(testCaseId, date);
+        this.progress = progress;
+        this.value = value;
+    }
+
+    @Override
+    public String toString() {
+        return String.format(
+                "%s, statusType:[%s], statusValue:[%d]",
+                super.toString(),
+                progress,
+                value
+        );
+    }
 
 }
