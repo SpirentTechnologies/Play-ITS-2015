@@ -5,10 +5,18 @@
  */
 module Car2X_Testcases {
 	import from Car2X_Functions all;
-	import from Car2X_ConfigSystem all;
+	import from Car2X_ConfigSystem {
+		type SystemComponentType, TesterComponentType;
+	}
 
 	import from Car2X_Types all;
-	import from Car2X_Templates all;
+	import from Car2X_Templates {
+		template
+			m_Filter_steeringWheel_Start,
+			m_Filter_steeringWheel_Stop,
+			m_Filter_vehicleSpeed_Start,
+			m_Filter_vehicleSpeed_Stop;
+	}
 
 
 	/**
@@ -24,21 +32,66 @@ module Car2X_Testcases {
 		// set up configuration
 		f_setUp();
 
-		//start value request for TC
-		filtererPort.send(m_Filter_vehicleSpeed_Start);
+		// start value request for TC
+		filterPort.send(m_Filter_vehicleSpeed_Start);
 
 		// send stage information
 		action("stage:" & int2str(v_stage));
 		t_TC_Global.start(10.0);
-		
-		//loop to check if speed is over 50 the whole time
+
+		// loop to check if speed is over 50 the whole time
 		while (t_TC_Global.running) {
 			// test body
 			v_ret := f_TP_VEHICLE_SPEED_OVER_50_10_SEC(2.0);
 		}
 
 		// stop value request
-		filtererPort.send(m_Filter_vehicleSpeed_Stop);
+		filterPort.send(m_Filter_vehicleSpeed_Stop);
+		setverdict(v_ret);
+
+		// send verdict
+		action("verdict:" & int2str(f_verdictToInt(v_ret)));
+
+		// tear down configuration
+		f_tearDown();
+	}
+
+	testcase TC_VEHICLE_SPEED_SIMULATED()
+		runs on TesterComponentType system SystemComponentType {
+		var verdicttype v_ret := pass;
+		var integer v_stage := 1;
+
+		// set up configuration
+		f_setUp();
+		action("stage:" & int2str(v_stage));
+
+		t_TC_Global.start(5.0);
+
+		while (t_TC_Global.running) {}
+		v_stage := 2;
+		action("stage:" & int2str(v_stage));
+		t_TC_Global.start(5.0);
+
+		while (t_TC_Global.running) {}
+		setverdict(v_ret);
+
+		// send verdict
+		action("verdict:" & int2str(f_verdictToInt(v_ret)));
+	}
+
+
+	testcase TC_STEERING_WHEEL_ANGLE()
+		runs on TesterComponentType system SystemComponentType {
+		var verdicttype v_ret := pass;
+		var integer v_stage := 1;
+
+		// set up configuration
+		f_setUp();
+		
+		// send stage information
+		action("stage:" & int2str(v_stage));
+
+
 		setverdict(v_ret);
 
 		// send verdict

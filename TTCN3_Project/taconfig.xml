@@ -68,6 +68,6 @@
         <parameter id="class" value="CANPortFilter.CANPortFilterProvider"/>
       </parameter>
     </parameter>
-    <parameter id="portType" value="Car2X_ConfigSystem.FiltererPortType"/>
+    <parameter id="portType" value="Car2X_ConfigSystem.FilterPortType"/>
   </port>
 </testadapter>

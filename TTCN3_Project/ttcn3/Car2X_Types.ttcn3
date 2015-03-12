@@ -10,16 +10,6 @@ module Car2X_Types {
 		charstring response
 	}
 	
-	type record FiltererRequest {
-		charstring request
-	}
-	
-	type record FiltererResponse {
-		charstring response
-	} with {
-	  variant (response) "length=infinity"
-	}
-	
 	/**
 	 * 
 	 * @desc Type for filter requests.
@@ -60,7 +50,7 @@ module Car2X_Types {
 		charstring OBD2Key,
 		UnionValue valueA ,
 		boolean valueB optional,
-		integer myTimestamp
+		integer respTimestamp
 	}
 	
 	/**

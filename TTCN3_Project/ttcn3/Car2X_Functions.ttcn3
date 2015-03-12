@@ -1,87 +1,100 @@
 /**
  * @author Sascha Kretzschmann
  * @desc This module provides function for each test case.
- * 		 Additionally this module provide set up and
- * 		 tear down configurations to reuse.
+ *   		 Additionally this module provide set up and
+ *   		 tear down configurations to reuse.
  */
 module Car2X_Functions {
-	import from Car2X_Types {type FilterResponse, FiltererResponse;}
+	import from Car2X_Types {type FilterResponse;}
 
 	import from Car2X_Templates {
-		template
-			m_Filterer_vehicleSpeed,
-			mw_Filter_Response_vS,
-			mw_Filterer_vehicleSpeed;
+		template m_Filter_steeringWheel_Stop, mw_Filter_Response_vS;
 	}
 
 	import from Car2X_ConfigSystem {type TesterComponentType;}
 
-	
+
 	/**
-		 * @desc Testbody function for @see Car2X_Testcases.TC_VEHICLE_SPEED_OVER_50
-		 * @verdict pass The given speed ist greater than 50.0.
-		 * @verdict fail Due to invalid parameter.
-		 * @verdict inconc Due to a timeout.
-		 */
-		function f_TP_VEHICLE_SPEED_OVER_50_10_SEC(float p_waiting_time) runs on TesterComponentType return verdicttype{
-			var template FilterResponse v_speed;
-			var verdicttype v_ret := pass;
-		
-			// start the timer
-			t_TC.start(p_waiting_time);
-			alt{
-				// store received template into value
-				[] filtererPort.receive(mw_Filter_Response_vS) -> value v_speed {
-					t_TC.stop;
+	 * @desc Testbody function for
+	 * @see Car2X_Testcases.TC_VEHICLE_SPEED_OVER_50
+	 * @verdict pass The given speed ist greater than 50.0.
+	 * @verdict fail Due to invalid parameter.
+	 * @verdict inconc Due to a timeout.
+	 */
+	function f_TP_VEHICLE_SPEED_OVER_50_10_SEC(float p_waiting_time)
+		runs on TesterComponentType return verdicttype  {
+		var template FilterResponse v_speed;
+		var verdicttype v_ret := pass;
+
+		// start the timer
+		t_TC.start(p_waiting_time);
+		alt {
+			// store received template into value
+			[] filterPort.receive(mw_Filter_Response_vS) -> value v_speed {
+				t_TC.stop;
 				// check whether vehicle speed is greater than 50.0
-					if(v_speed.valueA.floatValue > 50.0){
-					 v_ret := pass;
-					}
-					else {
-					 v_ret := fail;
-					}
-				}
-				[] filtererPort.receive {
-					t_TC.stop;
+				if (v_speed.valueA.floatValue > 50.0) {
+					v_ret := pass;
+				} else {
 					v_ret := fail;
 				}
-				
-				[] t_TC.timeout{
-					v_ret := inconc;
-				}
 			}
-			return(v_ret);
+			[] filterPort.receive {
+				t_TC.stop;
+				v_ret := fail;
+			}
+			[] t_TC.timeout {
+				v_ret := inconc;
+			}
 		}
-	
-	function f_verdictToInt(verdicttype p_verdict) runs on TesterComponentType return integer {
-		
-		if(p_verdict == pass){
+		return (v_ret);
+	}
+
+	function f_TP_STEERING_WHEEL_ANGLE(float targetAngle, float variance)
+		runs on TesterComponentType return verdicttype  {
+			var verdicttype v_ret := pass;
+			
+//			filterPort.request(m_Filter_steeringWheel_Start);
+			
+//			filter.request(m_Filter_steeringWheel_Stop);
+			
+			return v_ret;
+		}
+
+
+	function f_verdictToInt(verdicttype p_verdict)
+		runs on TesterComponentType return integer  {
+
+		if (p_verdict == pass) {
 			return 1;
-		} else if (p_verdict == fail){
+		} else if (p_verdict == fail) {
 			return 0;
 		} else {
-			return (-1);
+			return (- 1);
 		}
 	}
-	
+
 	/**
-	 * @desc Set up the configuration for test cases running on @see Car2X_ConfigSystem.TesterComponentType.
-	 * 		 Maps the port of the tester to the system port.
+	 * @desc Set up the configuration for test cases running on
+	 * @see Car2X_ConfigSystem.TesterComponentType.
+	 *   		 Maps the port of the tester to the system port.
 	 */
-	function f_setUp() runs on TesterComponentType{
+	function f_setUp() runs on TesterComponentType  {
+
 		// create an instance of the tester
 		var TesterComponentType Tester;
 		Tester := TesterComponentType.create;
-		
+
 		// map the tester port to the system port
-		map(self:filtererPort,system:filtererPort);
+		map(self:filterPort, system:filterPort);
 	}
-	
+
 	/**
-	 * @desc Tear down the configuration for test cases running on @see Car2X_ConfigSystem.TesterComponentType.
-	 * 		 UnMaps the ports.
+	 * @desc Tear down the configuration for test cases running on
+	 * @see Car2X_ConfigSystem.TesterComponentType.
+	 *   		 UnMaps the ports.
 	 */
-	function f_tearDown() runs on TesterComponentType{
-		unmap(self:filtererPort,system:filtererPort);
+	function f_tearDown() runs on TesterComponentType  {
+		unmap(self:filterPort, system:filterPort);
 	}
 }

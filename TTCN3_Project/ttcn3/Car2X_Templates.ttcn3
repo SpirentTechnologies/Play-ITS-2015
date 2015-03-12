@@ -4,16 +4,18 @@
  */
 module Car2X_Templates {
 	import from Car2X_ModuleParameters {
-		const c_headlamp_status, c_modePrefix_01, c_vehicle_speed;
+		const
+			c_headlamp_status,
+			c_modePrefix_01,
+			c_steering_wheel_angle,
+			c_vehicle_speed;
 	}
 	import from Car2X_Types {
 		type
 			ElmRequest,
 			ElmResponse,
 			FilterRequest,
-			FilterResponse,
-			FiltererRequest,
-			FiltererResponse;
+			FilterResponse
 	}
 
 	/**
@@ -28,17 +30,7 @@ module Car2X_Templates {
 	 */
 	template ElmResponse mw_Elm_vehicleSpeed() := {response := ?}
 
-	/**
-	 * @desc Request template to communicate with CAN.
-	 */
-	template FiltererRequest m_Filterer_vehicleSpeed() := {
-		request := c_vehicle_speed
-	}
 
-	/**
-	 * @desc Response template receiving from CAN.
-	 */
-	template FiltererResponse mw_Filterer_vehicleSpeed() := {response := ?}
 
 	template FilterRequest m_Filter_vehicleSpeed_Start() := {
 		reqType := "start",
@@ -52,29 +44,48 @@ module Car2X_Templates {
 		reqType := "stop",
 		reqData := {{key := c_vehicle_speed}, {key := c_headlamp_status}}
 	}
-	
+
+	template FilterRequest m_Filter_steeringWheel_Start() := {
+		reqType := "start",
+		reqData := {{key := c_steering_wheel_angle, interval := 1500}}
+	}
+
+	template FilterRequest m_Filter_steeringWheel_Stop() := {
+		reqType := "stop", 
+		reqData := {{key := c_steering_wheel_angle}}
+	}
+
+	/**
+	 * template for steering wheel angle response
+	 * @desc
+	 */
+	template FilterResponse mw_Filter_Response_sW() := {
+		OpenXCKey := c_steering_wheel_angle,
+		OBD2Key := ?,
+		valueA := {floatValue := ?},
+		respTimestamp := ?
+	}
+
 	/**
 	 * template for vehicle Speed response
-	 * @desc 
+	 * @desc
 	 */
 	template FilterResponse mw_Filter_Response_vS() := {
 		OpenXCKey := c_vehicle_speed,
-		OBD2Key :=  "0D",
-		valueA := { 
-			floatValue := ?
-		},
-		myTimestamp := ?
+		OBD2Key := "0D",
+		valueA := {floatValue := ?},
+		respTimestamp := ?
 	}
-	
+
 	/**
 	 * template for head lamp status response
 	 */
 	template FilterResponse mw_Filter_Response_hL() := {
-			OpenXCKey := c_headlamp_status,
-			OBD2Key :=  ?,
-			valueA := ?,
-			myTimestamp := ?
-		}
+		OpenXCKey := c_headlamp_status,
+		OBD2Key := ?,
+		valueA := ?,
+		respTimestamp := ?
+	}
 }
 with {
 	encode "blubb";
