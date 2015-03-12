@@ -4,18 +4,20 @@
  * @remark This class needs to be extended sophistically.
  */
 module Car2X_Testcases {
-	import from Car2X_Functions all;
+	import from Car2X_Functions {
+		function
+			f_TP_STEERING_WHEEL_ANGLE,
+			f_TP_VEHICLE_SPEED_OVER_50_10_SEC,
+			f_setUp,
+			f_tearDown,
+			f_verdictToInt;
+	}
 	import from Car2X_ConfigSystem {
 		type SystemComponentType, TesterComponentType;
 	}
 
-	import from Car2X_Types all;
 	import from Car2X_Templates {
-		template
-			m_Filter_steeringWheel_Start,
-			m_Filter_steeringWheel_Stop,
-			m_Filter_vehicleSpeed_Start,
-			m_Filter_vehicleSpeed_Stop;
+		template m_Filter_vehicleSpeed_Start, m_Filter_vehicleSpeed_Stop;
 	}
 
 
@@ -70,6 +72,8 @@ module Car2X_Testcases {
 		while (t_TC_Global.running) {}
 		v_stage := 2;
 		action("stage:" & int2str(v_stage));
+//		setverdict(inconc);
+//		stop;
 		t_TC_Global.start(5.0);
 
 		while (t_TC_Global.running) {}
@@ -87,17 +91,37 @@ module Car2X_Testcases {
 
 		// set up configuration
 		f_setUp();
-		
+
+		// TODO: stage 1
+		// send stage information
+		v_stage := v_stage + 1;
+		action("stage:" & int2str(v_stage));
+
+		// executing stage 2
+		v_ret :=f_TP_STEERING_WHEEL_ANGLE(-600.0,50.0);
+
+		setverdict(v_ret);
+		v_stage := v_stage + 1;
 		// send stage information
 		action("stage:" & int2str(v_stage));
 
+		// 	executing stage 3
+		v_ret :=f_TP_STEERING_WHEEL_ANGLE(600.0,50.0);
+
+		setverdict(v_ret);		
+		v_stage := v_stage + 1;
+		// send stage information
+		action("stage:" & int2str(v_stage));
+
+		// 	executing stage 4
+		v_ret :=f_TP_STEERING_WHEEL_ANGLE(0.0,50.0);
 
 		setverdict(v_ret);
-
 		// send verdict
 		action("verdict:" & int2str(f_verdictToInt(v_ret)));
 
 		// tear down configuration
 		f_tearDown();
 	}
+	
 }
