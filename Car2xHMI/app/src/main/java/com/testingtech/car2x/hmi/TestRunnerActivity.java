@@ -55,7 +55,7 @@ public class TestRunnerActivity extends ActionBarActivity {
         TextView socketConn = (TextView) findViewById(R.id.socket);
         ScrollView progress = (ScrollView) findViewById(R.id.progress);
 
-        new SocketClient(socketConn, progress, logoAnimation).execute();
+        new SocketClient(socketConn, progress, logoAnimation, status).execute();
         switch(testName){
             case "drive":
                 // TODO: get speed and replace the 0

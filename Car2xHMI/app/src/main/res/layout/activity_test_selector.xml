@@ -18,33 +18,25 @@
             android:onClick="startDriveTest"
             android:text="@string/title_activity_drive_test" />
 
-        <Button
-            android:onClick="startDoorTest"
-            android:text="@string/title_activity_door_test" />
+        <Button android:text="Test steering wheel angle sensor" />
 
-        <Button
-            android:onClick="startBreakTest"
-            android:text="@string/title_activity_break_test" />
+        <Button android:text="Test headlamp status" />
 
-        <Button android:text="A" />
+        <Button android:text="Test engine rotation speed" />
 
-        <Button android:text="B" />
+        <Button android:text="Test full brake with speed over 60 km/h" />
 
-        <Button android:text="C" />
+        <Button android:text="Test open door with speed over 50 km/h" />
 
-        <Button android:text="D" />
+        <Button android:text="Activate hand brake" />
 
-        <Button android:text="E" />
+        <Button android:text="Speed up to 50 and slow down to 30 km/h" />
 
-        <Button android:text="F" />
+        <Button android:text="Speed up to 30 and stop" />
 
-        <Button android:text="G" />
+        <Button android:text="Drive in reverse" />
 
-        <Button android:text="H" />
-
-        <Button android:text="I" />
-
-        <Button android:text="J" />
+        <Button android:text="Test Brakes' efficiency" />
 
     </TableLayout>
 </ScrollView>
