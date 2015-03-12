@@ -22,15 +22,16 @@ import java.util.Date;
 
 public class SocketClient extends AsyncTask<Void, Message, String> {
 
-    private TextView textview;
+    private TextView textview, statusRunning;
     private ScrollView scrollview;
     private AnimationDrawable logoAnimation;
     private int stageNum = 0;
 
-    public SocketClient(TextView tv, ScrollView sv, AnimationDrawable ad) {
-        textview = tv;
-        scrollview = sv;
-        logoAnimation = ad;
+    public SocketClient(TextView tv, ScrollView sv, AnimationDrawable ad, TextView sr) {
+        this.textview = tv;
+        this.scrollview = sv;
+        this.logoAnimation = ad;
+        this.statusRunning = sr;
     }
 
     @Override
@@ -119,6 +120,7 @@ public class SocketClient extends AsyncTask<Void, Message, String> {
         TextView oldText = (TextView) table.getChildAt(table.getChildCount() - 1);
         // change color back to white
         oldText.setBackgroundColor(Color.WHITE);
+        statusRunning.setText("Test is not running.");
         logoAnimation.stop();
     }
 }
