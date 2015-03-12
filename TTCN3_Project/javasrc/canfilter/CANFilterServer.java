@@ -39,8 +39,17 @@ import java.util.Hashtable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.Date;
 
 public class CANFilterServer extends Thread {
 	private static char[] HEX_VAL = { '0', '1', '2', '3', '4', '5', '6', '7',
@@ -51,7 +60,7 @@ public class CANFilterServer extends Thread {
 	String iface = "localhost";
 
 	private Hashtable<String, TableDataType> hashTable;
-
+	private Hashtable<String, Integer> intervallTable;
 	private InetSocketAddress address;
 
 	public CANFilterServer(Hashtable<String, TableDataType> hashTable, InetSocketAddress address) {
@@ -60,6 +69,9 @@ public class CANFilterServer extends Thread {
 	}
 
 	public void run() {
+		
+		//Test SQL Get
+		System.out.println(getFromDatabase("vehicle_speed"));
 
 		ServerSocket sock = null;
 
@@ -141,29 +153,33 @@ public class CANFilterServer extends Thread {
 //					Pattern pattern = Pattern
 //							.compile("\\{\"type\": \"(\\w+)\", \"data\": \"?(\\w+|[-+]?[0-9]*\\.?[0-9]+)\"?\\}");
 					
-					Matcher matcher = pattern.matcher(request);
-
-					if (matcher.find()) {
-						// get type and first data element
-						//type
-						String requestType = matcher.group(1);
-						//data
-						String requestDataString = matcher.group(2);
-						//cut "[" and "]"
-						requestDataString = requestDataString.substring(0, requestDataString.length()-2);
-						//remove additional ""
-						requestDataString = requestDataString.replace("\"", "");
-						//convert to StringArray
-						String[] requestData = requestDataString.split(",");
-
-						// if more than one requested element (immernoch unschön, weil's nicht intuitiv ist)
-						while (matcher.find()) {
-							TableDataType tableDataType = hashTable.get(matcher.group());
-							printOut(networkPout, tableDataType.getValue1());
-						}
-
+//					Matcher matcher = pattern.matcher(request);
+//
+//					if (matcher.find()) {
+//						// get type and first data element
+//						//type
+//						String requestType = matcher.group(1);
+//						//data
+//						String requestDataString = matcher.group(2);
+//						//cut "[" and "]"
+//						requestDataString = requestDataString.substring(0, requestDataString.length()-2);
+//						//remove additional ""
+//						requestDataString = requestDataString.replace("\"", "");
+//						//convert to StringArray
+//						String[] requestData = requestDataString.split(",");
+//
+//						// if more than one requested element (immernoch unschön, weil's nicht intuitiv ist)
+//						while (matcher.find()) {
+//							TableDataType tableDataType = hashTable.get(matcher.group());
+//							printOut(networkPout, tableDataType.getValue1());
+//						}
+						
+						JSONObject jo = new JSONObject(request);
+						String requestType = jo.getString("reqType");
+						JSONArray requestData = jo.getJSONArray("reqData");
 
 						if (requestType == "stop") {
+							stopGettingData(requestData);
 							// TODO: abklären wir hier reagiert werden soll
 
 							// stop receiving this particular data out of
@@ -172,21 +188,23 @@ public class CANFilterServer extends Thread {
 							// ggf sende bestätigung
 
 						} else if (requestType == "start") {
+							addToIntervallTable(requestData);
+							
 							// from now on receive accordingly data from
 							// sim/ELM327
-							TableDataType[] reply = getFromDataTable(requestData);
-
-							for (int i = 0; i < reply.length; i++) {
-								JSONObject replyJson = new JSONObject(
-										"{ \"type\":data, \"data\": "
-												+ reply[i].toString() + "}");
-								String jsonString = replyJson.toString();
-								printOut(networkPout, jsonString);
-							}
+//							TableDataType[] reply = getFromDataTable(requestData);
+//
+//							for (int i = 0; i < reply.length; i++) {
+//								JSONObject replyJson = new JSONObject(
+//										"{ \"type\":data, \"data\": "
+//												+ reply[i].toString() + "}");
+//								String jsonString = replyJson.toString();
+//								printOut(networkPout, jsonString);
+//							}
 						} else if (requestType == "info") {
 							// TODO: abklären wir hier reagiert werden soll
 						}
-					}
+//					}
 
 				} catch (JSONException e) {
 					// TODO Auto-generated catch block
@@ -227,5 +245,77 @@ public class CANFilterServer extends Thread {
 			stringArray[i] = hashTable.get(str);
 		}
 		return stringArray;
+	}
+	
+	
+	synchronized private void addToIntervallTable(JSONArray  ja){
+		for (int i = 0; i < ja.length(); i++) {
+			JSONObject obj;
+			try {
+				obj = ja.getJSONObject(i);
+				String name = obj.getString("key");
+				int intervall = obj.getInt("interval");
+				intervallTable.put(name, intervall);
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		}
+	}
+	
+	synchronized private void stopGettingData(JSONArray ja){
+		for (int i = 0; i < ja.length(); i++) {
+			try {
+				intervallTable.remove(ja.getString(i));
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	
+	private TableDataType getFromDatabase(String str){
+		TableDataType result = new TableDataType("","","");
+		  Connection connect = null;
+		  Statement statement = null;
+		  ResultSet resultSet = null;
+		  
+		    try {
+	      // This will load the MySQL driver, each DB has its own driver
+	      Class.forName("com.mysql.jdbc.Driver");
+	      // Setup the connection with the DB
+	      connect = DriverManager
+	          .getConnection("jdbc:mysql://localhost/feedback?"
+	              + "user=car2xuser&password=car2x");
+
+	      // Statements allow to issue SQL queries to the database
+	      statement = connect.createStatement();
+	      
+	      // Result set get the result of the SQL query
+	      resultSet = statement
+	          .executeQuery("select * from valuetable.car2xvalues where openxckey = " + str + "\"");
+	      result.setObds2key(resultSet.getString("obds2key"));
+	      result.setOpenxckey(resultSet.getString("openXCkey"));
+	      result.setValue1(resultSet.getString("valuea"));
+	      result.setValue2(resultSet.getString("valueb"));
+	      result.setTimestamp(resultSet.getLong("timestamp"));
+	      
+	      
+		    } catch (Exception e) {
+		        try {
+					throw e;
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+		    }
+//		    } finally {
+//		      close();
+//		    }
+//	      
+	      
+	      return result;
 	}
 }

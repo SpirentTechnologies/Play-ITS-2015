@@ -18,6 +18,7 @@ public class TableDataType {
 	
 	public TableDataType(String openxckey, String obd2key, String value1) {
 		this(openxckey, obd2key, value1, "");
+		this.timestamp = new Date().getTime();
 	}
 
 	public String getOpenxckey() {
@@ -38,5 +39,25 @@ public class TableDataType {
 	
 	public String getValue2() {
 		return value2;
+	}
+	
+	public void setOpenxckey(String str){
+		this.obd2key = str;
+	}
+	
+	public void setObds2key(String str){
+		this.obd2key = str;
+	}
+	
+	public void setTimestamp(long ts){
+		this.timestamp = ts;
+	}
+	
+	public void setValue1(String str){
+		this.value1 = str;
+	}
+	
+	public void setValue2(String str){
+		this.value2 = str;
 	}
 }
