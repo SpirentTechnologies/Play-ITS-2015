@@ -51,25 +51,13 @@ public class SocketClient extends AsyncTask<Void, Message, Message> {
             );
             oos.writeObject(controlMessage);
             oos.flush();
-            publishProgress(controlMessage);
 
-            Thread.sleep(2000);
-            message = (ProgressMessage) ois.readObject();
-            publishProgress(message);
+            message = (Message) ois.readObject();
+            while(!(message instanceof VerdictMessage)) {
+                publishProgress(message);
+                message = (Message) ois.readObject();
+            }
 
-            message = (ProgressMessage) ois.readObject();
-            publishProgress(message);
-
-            message = (ProgressMessage) ois.readObject();
-            publishProgress(message);
-
-            message = (ProgressMessage) ois.readObject();
-            publishProgress(message);
-
-            message = (ProgressMessage) ois.readObject();
-            publishProgress(message);
-
-            Thread.sleep(2000);
             mySocket.close();
 
         } catch (Exception e) {
@@ -87,7 +75,6 @@ public class SocketClient extends AsyncTask<Void, Message, Message> {
             textview.setText(((ControlMessage) progress[0]).command.toString());
         } else if(progress[0] instanceof VerdictMessage) {
             textview.setText(((VerdictMessage) progress[0]).verdict.toString());
-            return;
         }
         // get the table as child of the scrollview
         TableLayout table = (TableLayout) scrollview.getChildAt(0);

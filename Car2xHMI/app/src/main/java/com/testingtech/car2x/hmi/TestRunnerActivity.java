@@ -17,7 +17,6 @@ import com.testingtech.car2x.R;
 public class TestRunnerActivity extends ActionBarActivity {
 
     private AnimationDrawable logoAnimation;
-    private String testName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,7 +24,7 @@ public class TestRunnerActivity extends ActionBarActivity {
         setContentView(R.layout.activity_test_runner);
 
         Intent intent = getIntent();
-        testName = intent.getStringExtra(TestSelectorActivity.TEST_NAME);
+        String testName = intent.getStringExtra(TestSelectorActivity.TEST_NAME);
         switch(testName){
             case "drive":
                 setTitle(getString(R.string.title_activity_drive_test));
@@ -50,43 +49,15 @@ public class TestRunnerActivity extends ActionBarActivity {
         status.setText(getString(R.string.textview_running));
         logoAnimation.start();
 
-        TextView results = (TextView) findViewById(R.id.results);
-        TextView commands = (TextView) findViewById(R.id.commands);
         TextView socketConn = (TextView) findViewById(R.id.socket);
         ScrollView progress = (ScrollView) findViewById(R.id.progress);
 
         new SocketClient(socketConn, progress, logoAnimation, status).execute();
-        switch(testName){
-            case "drive":
-                // TODO: get speed and replace the 0
-                results.setText(String.format(getString(R.string.textview_drive_results), 0));
-                // TODO: if greater, if less: faster, slower
-                commands.setText(String.format(getString(R.string.textview_drive_commands), "speed up"));
-                break;
-            case "door":
-                // TODO
-                results.setText(String.format(getString(R.string.textview_door_results), "open"));
-                // TODO
-                commands.setText(String.format(getString(R.string.textview_door_commands), "close"));
-                break;
-            case "break":
-                // TODO
-                results.setText(String.format(getString(R.string.textview_break_results), "pulled"));
-                // TODO
-                commands.setText(String.format(getString(R.string.textview_break_commands), "release"));
-                break;
-            default:
-                setTitle("Test");
-        }
     }
 
     public void stopTest(View view) {
         TextView status = (TextView) findViewById(R.id.status_text);
         status.setText(getString(R.string.textview_not_running));
-        TextView results = (TextView) findViewById(R.id.results);
-        results.setText("");
-        TextView commands = (TextView) findViewById(R.id.commands);
-        commands.setText("");
         logoAnimation.stop();
     }
 
