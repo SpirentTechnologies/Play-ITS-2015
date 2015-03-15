@@ -9,6 +9,8 @@ module Car2X_Functions {
 
 	import from Car2X_Templates {
 		template
+			m_Filter_ignitionState_Start,
+			m_Filter_ignitionState_Stop,
 			m_Filter_steeringWheel_Start,
 			m_Filter_steeringWheel_Stop,
 			mw_Filter_Response_iS,
@@ -130,7 +132,10 @@ module Car2X_Functions {
 			
 		var template FilterResponse v_ignitionStatus;
 		var verdicttype v_ret := pass;
-		
+
+		//start ignition status request
+		filterPort.send(m_Filter_ignitionState_Start);
+			
 		t_TC.start(interval);
 		
 		alt {
@@ -151,6 +156,10 @@ module Car2X_Functions {
 				v_ret := inconc;
 			}
 		}
+		
+
+		//stop ignition status request
+		filterPort.send(m_Filter_ignitionState_Stop);
 		
 		return v_ret;
 	}

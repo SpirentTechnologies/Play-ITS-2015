@@ -57,7 +57,7 @@ module Car2X_Templates {
 		reqData := {{key := c_steering_wheel_angle}}
 	}
 	
-	template FilterRequest m_Filter_ignitionStatus_Stop() := {
+	template FilterRequest m_Filter_ignitionState_Stop() := {
 		reqType := "stop", 
 		reqData := {{key := c_ignition_status}}
 	}
