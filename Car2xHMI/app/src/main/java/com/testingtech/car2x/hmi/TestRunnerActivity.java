@@ -8,11 +8,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
-
-import com.testingtech.car2x.R;
-
 
 public class TestRunnerActivity extends ActionBarActivity {
 
@@ -45,14 +43,15 @@ public class TestRunnerActivity extends ActionBarActivity {
     }
 
     public void startTest(View view) {
-        TextView status = (TextView) findViewById(R.id.status_text);
-        status.setText(getString(R.string.textview_running));
+        TextView statusText = (TextView) findViewById(R.id.status_text);
+        statusText.setText(getString(R.string.textview_running));
         logoAnimation.start();
 
         TextView socketConn = (TextView) findViewById(R.id.socket);
         ScrollView progress = (ScrollView) findViewById(R.id.progress);
+        ProgressBar progressBar = (ProgressBar) findViewById(R.id.progressbar);
 
-        new SocketClient(socketConn, progress, logoAnimation, status).execute();
+        new SocketClient(socketConn, progress, progressBar, logoAnimation, statusText).execute();
     }
 
     public void stopTest(View view) {

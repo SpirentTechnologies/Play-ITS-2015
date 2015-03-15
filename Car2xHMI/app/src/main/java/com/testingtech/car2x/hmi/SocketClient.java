@@ -3,11 +3,11 @@ package com.testingtech.car2x.hmi;
 import android.graphics.Color;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.AsyncTask;
+import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TableLayout;
 import android.widget.TextView;
 
-import com.testingtech.car2x.R;
 import com.testingtech.car2x.hmi.messages.ProgressMessage;
 import com.testingtech.car2x.hmi.messages.TestCaseCommand;
 import com.testingtech.car2x.hmi.messages.ControlMessage;
@@ -24,14 +24,16 @@ public class SocketClient extends AsyncTask<Void, Message, Message> {
 
     private TextView textview, statusRunning;
     private ScrollView scrollview;
+    private ProgressBar progressBar;
     private AnimationDrawable logoAnimation;
     private int stageNum = 0;
 
-    public SocketClient(TextView tv, ScrollView sv, AnimationDrawable ad, TextView sr) {
+    public SocketClient(TextView tv, ScrollView sv, ProgressBar pb, AnimationDrawable ad, TextView sr) {
         this.textview = tv;
         this.scrollview = sv;
         this.logoAnimation = ad;
         this.statusRunning = sr;
+        this.progressBar = pb;
     }
 
     @Override
@@ -82,7 +84,7 @@ public class SocketClient extends AsyncTask<Void, Message, Message> {
             // get the textview from the position above as child of the table
             TextView oldText = (TextView) table.getChildAt(stageNum - 1);
             // change color back to white
-            oldText.setBackgroundColor(Color.WHITE);
+            oldText.setBackgroundColor(Color.TRANSPARENT);
         }
         // get the current textview as child of the table
         TextView text = (TextView) table.getChildAt(stageNum);
@@ -90,6 +92,8 @@ public class SocketClient extends AsyncTask<Void, Message, Message> {
         text.setBackgroundResource(R.drawable.rectangle_border_red);
         // scroll to current textview
         scrollview.smoothScrollTo(0, text.getTop());
+        // update progress bar
+        progressBar.setProgress(((stageNum + 1) * 100) / 4);
         // next stage
         if(progress[0] instanceof ProgressMessage) {
             stageNum = ((ProgressMessage)progress[0]).progress.ordinal() + 1;
@@ -107,7 +111,7 @@ public class SocketClient extends AsyncTask<Void, Message, Message> {
         // get the last textview as child of the table
         TextView oldText = (TextView) table.getChildAt(table.getChildCount() - 1);
         // change color back to white
-        oldText.setBackgroundColor(Color.WHITE);
+        oldText.setBackgroundColor(Color.TRANSPARENT);
         statusRunning.setText("Test is not running.");
         logoAnimation.stop();
     }
