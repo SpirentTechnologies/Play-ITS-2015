@@ -7,9 +7,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.testingtech.car2x.R;
-
-
 public class MainActivity extends ActionBarActivity {
 
     @Override

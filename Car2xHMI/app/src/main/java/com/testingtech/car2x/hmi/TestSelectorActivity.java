@@ -7,9 +7,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.testingtech.car2x.R;
-
-
 public class TestSelectorActivity extends ActionBarActivity {
 
     public final static String TEST_NAME = "drive";
