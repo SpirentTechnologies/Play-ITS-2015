@@ -3,15 +3,15 @@ package com.testingtech.car2x.hmi.messages;
 import java.util.Date;
 
 /**
- * Messages received from the client socket containing commands for controlling test cases.
+ * Messages sent to the client socket in response to a ControlMessage.
  */
-public class ControlMessage extends Message {
+public class AckMessage extends Message {
 
-    private static final long serialVersionUID = 1614390838540081371L;
+    private static final long serialVersionUID = -5734370360142692570L;
 
     public final TestCaseCommand command;
 
-    public ControlMessage(TestCase testCaseId, Date date, TestCaseCommand command) {
+    public AckMessage(TestCase testCaseId, Date date, TestCaseCommand command) {
         super(testCaseId, date);
         this.command = command;
     }

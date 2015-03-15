@@ -1,14 +1,14 @@
-/**
- * Base class of all socket messages.
- */
 package com.testingtech.car2x.hmi.messages;
 
 import java.io.Serializable;
 import java.util.Date;
 
+/**
+ * Base class of all socket messages.
+ */
 public abstract class Message implements Serializable {
 
-    private static final long serialVersionUID = -1475042464034501344L;
+    private static final long serialVersionUID = -2609347609614186025L;
 
     public final TestCase testCaseId;
     public final Date date;

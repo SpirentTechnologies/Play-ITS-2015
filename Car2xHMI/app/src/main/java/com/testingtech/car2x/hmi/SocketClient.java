@@ -8,19 +8,19 @@ import android.widget.TableLayout;
 import android.widget.TextView;
 
 import com.testingtech.car2x.R;
+import com.testingtech.car2x.hmi.messages.ProgressMessage;
 import com.testingtech.car2x.hmi.messages.TestCaseCommand;
 import com.testingtech.car2x.hmi.messages.ControlMessage;
 import com.testingtech.car2x.hmi.messages.Message;
-import com.testingtech.car2x.hmi.messages.TestCaseProgress;
-import com.testingtech.car2x.hmi.messages.StatusMessage;
 import com.testingtech.car2x.hmi.messages.TestCase;
+import com.testingtech.car2x.hmi.messages.VerdictMessage;
 
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.Date;
 
-public class SocketClient extends AsyncTask<Void, Message, String> {
+public class SocketClient extends AsyncTask<Void, Message, Message> {
 
     private TextView textview, statusRunning;
     private ScrollView scrollview;
@@ -35,10 +35,9 @@ public class SocketClient extends AsyncTask<Void, Message, String> {
     }
 
     @Override
-    protected String doInBackground(Void... params) {
+    protected Message doInBackground(Void... params) {
         ControlMessage controlMessage;
-        StatusMessage statusMessage = new StatusMessage(TestCase.TC_VEHICLE_SPEED_OVER_50,
-                new Date(), TestCaseProgress.STAGE, 1);
+        Message message = null;
         try {
             Socket mySocket = new Socket("10.0.2.2", 30000);
 
@@ -55,20 +54,20 @@ public class SocketClient extends AsyncTask<Void, Message, String> {
             publishProgress(controlMessage);
 
             Thread.sleep(2000);
-            statusMessage = (StatusMessage) ois.readObject();
-            publishProgress(statusMessage);
+            message = (ProgressMessage) ois.readObject();
+            publishProgress(message);
 
-            statusMessage = (StatusMessage) ois.readObject();
-            publishProgress(statusMessage);
+            message = (ProgressMessage) ois.readObject();
+            publishProgress(message);
 
-            statusMessage = (StatusMessage) ois.readObject();
-            publishProgress(statusMessage);
+            message = (ProgressMessage) ois.readObject();
+            publishProgress(message);
 
-            statusMessage = (StatusMessage) ois.readObject();
-            publishProgress(statusMessage);
+            message = (ProgressMessage) ois.readObject();
+            publishProgress(message);
 
-            statusMessage = (StatusMessage) ois.readObject();
-            publishProgress(statusMessage);
+            message = (ProgressMessage) ois.readObject();
+            publishProgress(message);
 
             Thread.sleep(2000);
             mySocket.close();
@@ -76,19 +75,19 @@ public class SocketClient extends AsyncTask<Void, Message, String> {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return "[Client] closing: [" + statusMessage.progress + "].";
+        return message;
     }
 
     @Override
     protected void onProgressUpdate(Message... progress) {
         super.onProgressUpdate(progress);
-        if(progress[0] instanceof StatusMessage) {
-            textview.setText(((StatusMessage) progress[0]).progress.toString() + " "
-                    + ((StatusMessage) progress[0]).value);
-            if(((StatusMessage) progress[0]).progress.equals(TestCaseProgress.VERDICT))
-                return;
+        if(progress[0] instanceof ProgressMessage) {
+            textview.setText(((ProgressMessage) progress[0]).progress.toString());
         } else if(progress[0] instanceof ControlMessage) {
             textview.setText(((ControlMessage) progress[0]).command.toString());
+        } else if(progress[0] instanceof VerdictMessage) {
+            textview.setText(((VerdictMessage) progress[0]).verdict.toString());
+            return;
         }
         // get the table as child of the scrollview
         TableLayout table = (TableLayout) scrollview.getChildAt(0);
@@ -105,15 +104,17 @@ public class SocketClient extends AsyncTask<Void, Message, String> {
         // scroll to current textview
         scrollview.smoothScrollTo(0, text.getTop());
         // next stage
-        if(progress[0] instanceof StatusMessage) {
-            if(((StatusMessage)progress[0]).progress.equals(TestCaseProgress.STAGE))
-                stageNum = ((StatusMessage)progress[0]).value;
+        if(progress[0] instanceof ProgressMessage) {
+            stageNum = ((ProgressMessage)progress[0]).progress.ordinal() + 1;
         }
     }
 
     @Override
-    protected void onPostExecute(String results) {
-        textview.setText(results);
+    protected void onPostExecute(Message result) {
+        if(result instanceof VerdictMessage)
+            textview.setText(((VerdictMessage) result).verdict.toString());
+        else
+            textview.setText(result.toString());
         // get the table as child of the scrollview
         TableLayout table = (TableLayout) scrollview.getChildAt(0);
         // get the last textview as child of the table
