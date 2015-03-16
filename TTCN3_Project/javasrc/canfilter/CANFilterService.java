@@ -29,6 +29,7 @@
 package canfilter;
 
 import java.io.IOException;
+import java.lang.Thread.State;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -65,10 +66,8 @@ public class CANFilterService {
 			System.out.println("TCP echo server listening on "
 					+ address.getHostName() + ":" + address.getPort());
 
-			TimeoutResponder timeoutResponder = new TimeoutResponder(
-					car2xEntries, client);
-			CANSimulatorReader canFilterClient = new CANSimulatorReader(
-					car2xEntries);
+			TimeoutResponder timeoutResponder = null;
+			Car2xEntryUpdater canSimulatorReader = null;
 
 			/**
 			 * listen for new connection requests. when a request arrives,
@@ -82,10 +81,14 @@ public class CANFilterService {
 				switch (jsonObject.getString("reqType")) {
 				case "start":
 					addEntry(data);
-					if (!timeoutResponder.isAlive())
+					if (canSimulatorReader == null || canSimulatorReader.getState() != State.RUNNABLE) {
+						canSimulatorReader = new Car2xEntryUpdater(car2xEntries);
+						canSimulatorReader.start();
+					}
+					if (timeoutResponder == null || timeoutResponder.getState() != State.RUNNABLE) {
+						timeoutResponder = new TimeoutResponder(car2xEntries, client);
 						timeoutResponder.start();
-					if (!canFilterClient.isAlive())
-						canFilterClient.start();
+					}
 					break;
 				case "stop":
 					removeEntry(data);

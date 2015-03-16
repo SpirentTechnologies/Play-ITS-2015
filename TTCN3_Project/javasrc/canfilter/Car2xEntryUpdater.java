@@ -39,7 +39,7 @@ import java.util.Scanner;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class CANSimulatorReader extends Thread {
+public class Car2xEntryUpdater extends Thread {
 
 	private static final String DEFAULT_TCP_SERVER_HOST = "localhost";
 	private static final int DEFAULT_TCP_SERVER_PORT = 50001;
@@ -47,7 +47,7 @@ public class CANSimulatorReader extends Thread {
 	private Hashtable<String, Car2XEntry> car2xEntries;
 	private InetSocketAddress address;
 
-	public CANSimulatorReader(Hashtable<String, Car2XEntry> car2xEntries) {
+	public Car2xEntryUpdater(Hashtable<String, Car2XEntry> car2xEntries) {
 		this.car2xEntries = car2xEntries;
 		this.address = new InetSocketAddress(DEFAULT_TCP_SERVER_HOST,
 				DEFAULT_TCP_SERVER_PORT);
@@ -68,8 +68,11 @@ public class CANSimulatorReader extends Thread {
 
 			scanner = new Scanner(sock.getInputStream()).useDelimiter("}");
 
-			while (true) {
-				addCar2XEntry(scanner.next() + "}");
+			while (!car2xEntries.isEmpty()) {
+				JSONObject jsonObject = new JSONObject(scanner.next() + "}");
+				Car2XEntry car2xEntry = car2xEntries.get(jsonObject.get("name"));
+				if (car2xEntry != null)
+					updateEntry(car2xEntry, jsonObject);
 			}
 
 		} catch (SocketTimeoutException e) {
@@ -91,18 +94,12 @@ public class CANSimulatorReader extends Thread {
 		}
 	}
 
-	private void addCar2XEntry(String str) throws JSONException {
-		JSONObject jsonObject = new JSONObject(str);
-		updateValues(jsonObject);
-	}
-
 	// TODO add obd2 key
-	private void updateValues(JSONObject jsonObject) throws JSONException {
-		Car2XEntry car2xEntry = car2xEntries.get(jsonObject.get("name"));
-		car2xEntry.setTimestamp(new Date().getTime());
-		car2xEntry.setValueA(jsonObject.get("value").toString());
-		String event = jsonObject.getString("event");
-		if (event != null)
-			car2xEntry.setValueB(event);
+	private void updateEntry(Car2XEntry car2xEntry, JSONObject jsonObject) throws JSONException {
+			car2xEntry.setTimestamp(new Date().getTime());
+			car2xEntry.setValueA(jsonObject.get("value").toString());
+			String event = jsonObject.getString("event");
+			if (event != null)
+				car2xEntry.setValueB(event);
 	}
 }

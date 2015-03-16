@@ -8,7 +8,6 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -20,6 +19,7 @@ public class TimeoutResponder extends Thread {
 	public TimeoutResponder(Hashtable<String, Car2XEntry> car2xValues,
 			Socket client) {
 		this.car2xValues = car2xValues;
+		this.client = client;
 	}
 
 	public void run() {
