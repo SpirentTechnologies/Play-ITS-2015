@@ -1,5 +1,4 @@
 module Car2X_Types {
-	// add types here
 	
 	type record ElmRequest {
 		charstring modePrefix length(2),
@@ -48,23 +47,9 @@ module Car2X_Types {
 	type record FilterResponse {
 		charstring OpenXCKey,
 		charstring OBD2Key,
-		UnionValue valueA ,
+		charstring valueA ,
 		boolean valueB optional,
 		integer respTimestamp
-	}
-	
-	/**
-	 * 
-	 * @desc The response can have different types. To avoid conversion a union is defined to
-	 * 		 take the suitable type.
-	 * @member stringValue The response value given as string.
-	 * @member floatValue The response value given as float.
-	 * @member booleanValue The response value given as boolean.
-	 */
-	type union UnionValue {
-		charstring stringValue,
-		float floatValue,
-		boolean booleanValue
 	}
 	
 	type enumerated IgnitionStatus {

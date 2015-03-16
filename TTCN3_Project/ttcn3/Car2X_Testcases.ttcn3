@@ -32,8 +32,7 @@ module Car2X_Testcases {
 	 */
 	testcase TC_VEHICLE_SPEED_OVER_50_10_SEC()
 		runs on TesterComponentType system SystemComponentType {
-		var verdicttype v_ret := pass;
-		var integer v_stage := 1;
+			
 		// set up configuration
 		f_setUp();
 
@@ -47,7 +46,7 @@ module Car2X_Testcases {
 		// loop to check if speed is over 50 the whole time
 		while (t_TC_Global.running) {
 			// test body
-			v_ret := f_TP_VEHICLE_SPEED_OVER_50_10_SEC(2.0);
+			f_TP_VEHICLE_SPEED_OVER_50_10_SEC(2.0);
 		}
 
 		// stop value request
@@ -60,8 +59,6 @@ module Car2X_Testcases {
 
 	testcase TC_VEHICLE_SPEED_SIMULATED()
 		runs on TesterComponentType system SystemComponentType {
-		var verdicttype v_ret := pass;
-		var integer v_stage := 1;
 
 		// set up configuration
 		f_setUp();
@@ -83,8 +80,6 @@ module Car2X_Testcases {
 
 	testcase TC_STEERING_WHEEL_ANGLE()
 		runs on TesterComponentType system SystemComponentType {
-		var verdicttype v_ret := pass;
-		var integer v_stage := 1;
 
 		// set up configuration
 		f_setUp();
@@ -93,19 +88,19 @@ module Car2X_Testcases {
 		action("stage:" & int2str(v_stage));
 
 		// executing stage 1
-		v_ret := f_IGNITION_STATUS(e_accessory);
-		v_stage := f_set_verdict_and_stage(v_ret, v_stage);
+		f_IGNITION_STATUS(e_accessory);
+		f_set_verdict_and_stage(v_ret, v_stage);
 
 		// executing stage 2
-		v_ret := f_TP_STEERING_WHEEL_ANGLE(- 600.0, 50.0);
-		v_stage := f_set_verdict_and_stage(v_ret, v_stage);
+		f_TP_STEERING_WHEEL_ANGLE(- 600.0, 50.0);
+		f_set_verdict_and_stage(v_ret, v_stage);
 
 		// 	executing stage 3
-		v_ret := f_TP_STEERING_WHEEL_ANGLE(600.0, 50.0);
-		v_stage := f_set_verdict_and_stage(v_ret, v_stage);
+		f_TP_STEERING_WHEEL_ANGLE(600.0, 50.0);
+		f_set_verdict_and_stage(v_ret, v_stage);
 
 		// 	executing stage 4
-		v_ret := f_TP_STEERING_WHEEL_ANGLE(0.0, 50.0);
+		f_TP_STEERING_WHEEL_ANGLE(0.0, 50.0);
 
 		setverdict(v_ret);
 
