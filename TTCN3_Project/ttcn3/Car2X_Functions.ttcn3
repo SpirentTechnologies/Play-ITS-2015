@@ -9,11 +9,14 @@ module Car2X_Functions {
 		template
 			m_Filter_doorStatus_Start,
 			m_Filter_doorStatus_Stop,
+			m_Filter_headLampStatus_Start,
+			m_Filter_headLampStatus_Stop,
 			m_Filter_ignitionState_Start,
 			m_Filter_ignitionState_Stop,
 			m_Filter_steeringWheel_Start,
 			m_Filter_steeringWheel_Stop,
 			mw_Filter_Response_dS,
+			mw_Filter_Response_hL,
 			mw_Filter_Response_iS,
 			mw_Filter_Response_sW,
 			mw_Filter_Response_vS;
@@ -135,22 +138,66 @@ module Car2X_Functions {
 		filterPort.send(m_Filter_steeringWheel_Stop);
 	}
 
-
-	function f_IGNITION_STATUS(IgnitionStatus ignitionStatus)
+	function f_TP_HEADLAMP_STATUS(boolean p_Status)
 		runs on TesterComponentType  {
 
 		t_TC_Global.start;
 		while (t_TC_Global.running) {
-			f_IGNITION_STATUS_SUB(ignitionStatus, 0.5);
+			f_TP_HEADLAMP_STATUS_SUB(p_Status, 0.5);
 			if (v_ret == pass) {
 				t_TC_Global.stop;
 			}
 		}
 	}
 
-	function f_IGNITION_STATUS_SUB(IgnitionStatus ignitionStatus,
-								   float interval) runs on TesterComponentType
-	{
+	function f_TP_HEADLAMP_STATUS_SUB(boolean p_Status, float p_interval)
+		runs on TesterComponentType  {
+		var template FilterResponse v_headLampStatus;
+
+		// start ignition status request
+		filterPort.send(m_Filter_headLampStatus_Start);
+
+		t_TC.start(p_interval);
+
+		alt {
+			// store received template into value
+			[] filterPort.receive(mw_Filter_Response_hL) ->
+			   value v_headLampStatus {
+				if (p_Status == str2bool(v_headLampStatus.valueA)) {
+					v_ret := pass;
+				} else {
+					v_ret := fail;
+				}
+				t_TC.stop;
+			}
+			[] filterPort.receive {
+				t_TC.stop;
+				v_ret := fail;
+			}
+			[] t_TC.timeout {
+				v_ret := inconc;
+			}
+		}
+
+		// stop ignition status request
+		filterPort.send(m_Filter_headLampStatus_Stop);
+	}
+
+	function f_TP_IGNITION_STATUS(IgnitionStatus ignitionStatus)
+		runs on TesterComponentType  {
+
+		t_TC_Global.start;
+		while (t_TC_Global.running) {
+			f_TP_IGNITION_STATUS_SUB(ignitionStatus, 0.5);
+			if (v_ret == pass) {
+				t_TC_Global.stop;
+			}
+		}
+	}
+
+	function f_TP_IGNITION_STATUS_SUB(IgnitionStatus ignitionStatus,
+									  float interval)
+		runs on TesterComponentType  {
 
 		var template FilterResponse v_ignitionStatus;
 
@@ -184,12 +231,13 @@ module Car2X_Functions {
 		filterPort.send(m_Filter_ignitionState_Stop);
 	}
 
-	function f_TP_DOOR_STATUS(DoorStatus door, boolean status,
-							  float intervall) runs on TesterComponentType  {
+	function f_TP_DOOR_STATUS(DoorStatus p_door, boolean p_status,
+							  float p_intervall) runs on TesterComponentType  {
 
-		t_TC_Global.start(intervall);
+		t_TC_Global.start(p_intervall);
+
 		while (t_TC_Global.running) {
-			f_TP_DOOR_STATUS_SUB(door, status);
+			f_TP_DOOR_STATUS_SUB(p_door, p_status);
 			if (v_ret == pass) {
 				t_TC_Global.stop;
 			}
@@ -202,7 +250,7 @@ module Car2X_Functions {
 		}
 	}
 
-	function f_TP_DOOR_STATUS_SUB(DoorStatus door, boolean status)
+	function f_TP_DOOR_STATUS_SUB(DoorStatus p_door, boolean p_status)
 		runs on TesterComponentType  {
 
 		var template FilterResponse v_doorStatus;
@@ -213,8 +261,8 @@ module Car2X_Functions {
 
 		alt {
 			[] filterPort.receive(mw_Filter_Response_dS) -> value v_doorStatus {
-				if (doorStatus2Str(door) == v_doorStatus.valueA and
-					status == v_doorStatus.valueB) {
+				if (doorStatus2Str(p_door) == v_doorStatus.valueA and
+					p_status == v_doorStatus.valueB) {
 					v_ret := pass;
 				}
 			}
@@ -236,6 +284,7 @@ module Car2X_Functions {
 	 *   		 Maps the port of the tester to the system port.
 	 */
 	function f_setUp() runs on TesterComponentType  {
+
 
 
 		// create an instance of the tester
@@ -331,5 +380,14 @@ module Car2X_Functions {
 	function f_tearDown() runs on TesterComponentType  {
 		unmap(self:filterPort, system:filterPort);
 		stop;
+	}
+
+	function str2bool(template charstring p_str) return boolean  {
+		if (p_str == "true" or p_str == "True" or p_str == "TRUE" or
+			p_str == "1") {
+			return true;
+		} else {
+			return false;
+		}
 	}
 }
