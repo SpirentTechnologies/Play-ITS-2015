@@ -47,7 +47,7 @@ module Car2X_Testcases {
 		// loop to check if speed is over 50 the whole time
 		while (t_TC_Global.running) {
 			// test body
-			f_TP_VEHICLE_SPEED(50.0, 10.0, 2.0);
+			f_TP_VEHICLE_SPEED(50.0, 10.0, 5.0, 2.0);
 		}
 
 		// stop value request

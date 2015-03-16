@@ -32,10 +32,12 @@ module Car2X_Functions {
 	import from Car2X_ConfigSystem {type TesterComponentType;}
 
 	function f_TP_VEHICLE_SPEED(float p_speed, float p_holding_time,
-								float p_interval) runs on TesterComponentType  {
+								float p_variance, float p_interval)
+		runs on TesterComponentType  {
 		t_TC_Global.start;
 		while (t_TC_Global.running) {
-			f_TP_VEHICLE_SPEED_SUB(p_speed, p_holding_time, p_interval);
+			f_TP_VEHICLE_SPEED_SUB(p_speed, p_holding_time, p_variance,
+								   p_interval);
 			if (v_ret == pass) {
 				t_TC_Global.stop;
 			}
@@ -54,7 +56,7 @@ module Car2X_Functions {
 	 * @verdict inconc Due to a timeout.
 	 */
 	function f_TP_VEHICLE_SPEED_SUB(float p_speed, float p_holding_time,
-									float p_interval)
+									float p_variance, float p_interval)
 		runs on TesterComponentType  {
 		var template FilterResponse v_speed;
 		timer t_holding;
@@ -67,7 +69,9 @@ module Car2X_Functions {
 			[] filterPort.receive(mw_Filter_Response_vS) -> value v_speed {
 				t_TC.stop;
 				// check whether vehicle speed is greater than given speed
-				if (str2float(v_speed.valueA) >= p_speed) {
+				speed := str2float(v_speed.valueA);
+				if (max(p_speed - p_variance, 0.0) <= speed and
+					speed >= min(p_speed + p_variance, 655.0)) {
 					t_holding.start(p_holding_time);
 					while (t_holding.running and v_ret == pass) {
 						filterPort.receive(mw_Filter_Response_vS) ->
