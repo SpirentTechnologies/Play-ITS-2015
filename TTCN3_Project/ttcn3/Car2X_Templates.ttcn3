@@ -10,6 +10,7 @@ module Car2X_Templates {
 			c_ignition_status,
 			c_modePrefix_01,
 			c_steering_wheel_angle,
+			c_transmission_gear_position,
 			c_vehicle_speed;
 	}
 	import from Car2X_Types {
@@ -58,6 +59,17 @@ module Car2X_Templates {
 			reqData := {{key := c_door_status, interval := 1000}}
 	}
 	
+	template FilterRequest m_Filter_transmissionGear_Start() :={
+			reqType := "start",
+			reqData := {{key := c_transmission_gear_position, interval := 1000}}
+		}
+	
+		template FilterRequest m_Filter_transmissionGear_Stop() :={
+				reqType := "stop",
+				reqData := {{key := c_transmission_gear_position, interval := 1000}}
+		}
+	
+	
 	template FilterRequest m_Filter_headLampStatus_Start() :={
 					reqType := "start",
 					reqData := {{key := c_headlamp_status, interval := 1000}}
@@ -104,6 +116,19 @@ module Car2X_Templates {
 		valueA := ?,
 		respTimestamp := ?
 	}
+	
+	/**
+		 * template for transmission gear reponse
+		 * @desc 
+		 */
+		template FilterResponse mw_Filter_Response_tG() :={
+			OpenXCKey := c_transmission_gear_position,
+			OBD2Key := ?,
+			valueA := ?,
+			respTimestamp := ?
+		}
+	
+	
 	
 	/**
 	 * template for ignition status response

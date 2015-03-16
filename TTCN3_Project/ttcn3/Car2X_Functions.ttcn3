@@ -15,14 +15,19 @@ module Car2X_Functions {
 			m_Filter_ignitionState_Stop,
 			m_Filter_steeringWheel_Start,
 			m_Filter_steeringWheel_Stop,
+			m_Filter_transmissionGear_Start,
+			m_Filter_transmissionGear_Stop,
 			mw_Filter_Response_dS,
 			mw_Filter_Response_hL,
 			mw_Filter_Response_iS,
 			mw_Filter_Response_sW,
+			mw_Filter_Response_tG,
 			mw_Filter_Response_vS;
 	}
 
-	import from Car2X_Types {type DoorStatus, FilterResponse, IgnitionStatus;}
+	import from Car2X_Types {
+		type DoorStatus, FilterResponse, IgnitionStatus, TransmissionGear;
+	}
 
 	import from Car2X_ConfigSystem {type TesterComponentType;}
 
@@ -67,7 +72,7 @@ module Car2X_Functions {
 					while (t_holding.running and v_ret == pass) {
 						filterPort.receive(mw_Filter_Response_vS) ->
 						value v_speed;
-						if (str2float(v_speed.valueA) > p_speed) {
+						if (str2float(v_speed.valueA) >= p_speed) {
 							v_ret := pass;
 						} else {
 							v_ret := fail;
@@ -231,33 +236,75 @@ module Car2X_Functions {
 		filterPort.send(m_Filter_ignitionState_Stop);
 	}
 
-	function f_TP_DOOR_STATUS(DoorStatus p_door, boolean p_status,
-							  float p_intervall) runs on TesterComponentType  {
-
-		t_TC_Global.start(p_intervall);
+	function f_TP_TRANSMISSION_GEAR_STATUS(TransmissionGear gear,
+										   float p_interval)
+		runs on TesterComponentType  {
+		t_TC_Global.start(p_interval);
 
 		while (t_TC_Global.running) {
-			f_TP_DOOR_STATUS_SUB(p_door, p_status);
+			f_TP_TRANSMISSION_GEAR_STATUS_SUB(gear, 1.0);
 			if (v_ret == pass) {
 				t_TC_Global.stop;
 			}
 		}
 		if (v_ret != pass) {
-			f_tearDown();
 			setverdict(v_ret);
 			// send verdict
 			f_tearDown();
 		}
 	}
 
-	function f_TP_DOOR_STATUS_SUB(DoorStatus p_door, boolean p_status)
+	function f_TP_TRANSMISSION_GEAR_STATUS_SUB(TransmissionGear gear,
+											   float p_interval) runs on TesterComponentType{
+		var template FilterResponse v_gearStatus;
+
+		filterPort.send(m_Filter_transmissionGear_Start);
+		t_TC.start(p_interval);
+
+		alt {
+			[] filterPort.receive(mw_Filter_Response_tG) -> value v_gearStatus {
+				if (gearStatus2Str(v_gearStatus) == v_gearStatus.valueA) {
+					v_ret := pass;
+				}
+			}
+			[] filterPort.receive {
+				t_TC.stop;
+				v_ret := fail;
+			}
+			[] t_TC.timeout {
+				v_ret := inconc;
+			}
+		}
+		filterPort.send(m_Filter_transmissionGear_Stop);
+	}
+
+	function f_TP_DOOR_STATUS(DoorStatus p_door, boolean p_status,
+							  float p_interval) runs on TesterComponentType  {
+
+		t_TC_Global.start(p_interval);
+
+		while (t_TC_Global.running) {
+			f_TP_DOOR_STATUS_SUB(p_door, p_status, 1.0);
+			if (v_ret == pass) {
+				t_TC_Global.stop;
+			}
+		}
+		if (v_ret != pass) {
+			setverdict(v_ret);
+			// send verdict
+			f_tearDown();
+		}
+	}
+
+	function f_TP_DOOR_STATUS_SUB(DoorStatus p_door, boolean p_status,
+								  float p_interval)
 		runs on TesterComponentType  {
 
 		var template FilterResponse v_doorStatus;
 
 		filterPort.send(m_Filter_doorStatus_Start);
 
-		t_TC.start(1.0);
+		t_TC.start(p_interval);
 
 		alt {
 			[] filterPort.receive(mw_Filter_Response_dS) -> value v_doorStatus {
@@ -284,6 +331,7 @@ module Car2X_Functions {
 	 *   		 Maps the port of the tester to the system port.
 	 */
 	function f_setUp() runs on TesterComponentType  {
+
 
 
 
@@ -356,6 +404,47 @@ module Car2X_Functions {
 			}
 		}
 	}
+	
+	function gearStatus2Str(TransmissionGear gear) return charstring  {
+			select (gear) {
+			case (e_first) {
+				return "first";
+			}
+			case (e_second) {
+				return "second";
+			}
+			case (e_third) {
+				return "third";
+			}
+			case (e_fourth) {
+				return "fourth";
+			}
+			case (e_fifth) {
+				return "fifth";
+			}
+			case (e_sixth) {
+				return "sixth";
+			}
+			case (e_seventh) {
+				return "seventh";
+			}
+			case (e_eighth) {
+				return "first";
+			}
+			case (e_ninth) {
+				return "ninth";
+			}
+			case (e_tenth) {
+				return "tenth";
+			}
+			case (e_reverse) {
+				return "reverse";
+			}
+			case (e_neutral) {
+				return "neutral";
+			}
+			}
+		}
 
 	/**
 	 * @desc Function to set the verdict and communicate via the action statment

@@ -65,6 +65,21 @@ module Car2X_Types {
 		e_rear_left,
 		e_rear_right
 	};
+	
+	type enumerated TransmissionGear {
+		e_first,
+		e_second,
+		e_third,
+		e_fourth,
+		e_fifth,
+		e_sixth,
+		e_seventh,
+		e_eighth,
+		e_ninth,
+		e_tenth,
+		e_reverse,
+		e_neutral
+	}
 } 
 with {
   encode "blubb";
