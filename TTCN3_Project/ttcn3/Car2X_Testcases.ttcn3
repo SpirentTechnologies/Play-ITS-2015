@@ -8,12 +8,12 @@ module Car2X_Testcases {
 
 	import from Car2X_Functions {
 		function
+			f_IGNITION_STATUS,
 			f_TP_STEERING_WHEEL_ANGLE,
 			f_TP_VEHICLE_SPEED_OVER_50_10_SEC,
-			f_ignitionStatus,
 			f_setUp,
-			f_tearDown,
-			f_verdictToInt;
+			f_set_verdict_and_stage,
+			f_tearDown;
 	}
 	import from Car2X_ConfigSystem {
 		type SystemComponentType, TesterComponentType;
@@ -54,9 +54,6 @@ module Car2X_Testcases {
 		filterPort.send(m_Filter_vehicleSpeed_Stop);
 		setverdict(v_ret);
 
-		// send verdict
-		action("verdict:" & int2str(f_verdictToInt(v_ret)));
-
 		// tear down configuration
 		f_tearDown();
 	}
@@ -81,9 +78,6 @@ module Car2X_Testcases {
 
 		while (t_TC_Global.running) {}
 		setverdict(v_ret);
-
-		// send verdict
-		action("verdict:" & int2str(f_verdictToInt(v_ret)));
 	}
 
 
@@ -99,34 +93,21 @@ module Car2X_Testcases {
 		action("stage:" & int2str(v_stage));
 
 		// executing stage 1
-		v_ret := f_ignitionStatus(e_accessory);
-
-		// send stage information
-		v_stage := v_stage + 1;
-		action("stage:" & int2str(v_stage));
+		v_ret := f_IGNITION_STATUS(e_accessory);
+		v_stage := f_set_verdict_and_stage(v_ret, v_stage);
 
 		// executing stage 2
 		v_ret := f_TP_STEERING_WHEEL_ANGLE(- 600.0, 50.0);
-
-		setverdict(v_ret);
-		v_stage := v_stage + 1;
-		// send stage information
-		action("stage:" & int2str(v_stage));
+		v_stage := f_set_verdict_and_stage(v_ret, v_stage);
 
 		// 	executing stage 3
 		v_ret := f_TP_STEERING_WHEEL_ANGLE(600.0, 50.0);
-
-		setverdict(v_ret);
-		v_stage := v_stage + 1;
-		// send stage information
-		action("stage:" & int2str(v_stage));
+		v_stage := f_set_verdict_and_stage(v_ret, v_stage);
 
 		// 	executing stage 4
 		v_ret := f_TP_STEERING_WHEEL_ANGLE(0.0, 50.0);
 
 		setverdict(v_ret);
-		// send verdict
-		action("verdict:" & int2str(f_verdictToInt(v_ret)));
 
 		// tear down configuration
 		f_tearDown();

@@ -67,10 +67,7 @@ module Car2X_Functions {
 			}
 		}				
 		if(v_ret != pass){
-			f_tearDown();
 			setverdict(v_ret);
-			// send verdict
-			action("verdict:" & int2str(f_verdictToInt(v_ret)));
 			f_tearDown();
 		}
 		return v_ret;
@@ -113,13 +110,13 @@ module Car2X_Functions {
 		}
 
 
-	function f_ignitionStatus(IgnitionStatus ignitionStatus)
+	function f_IGNITION_STATUS(IgnitionStatus ignitionStatus)
 		runs on TesterComponentType return verdicttype{
 			
 		var verdicttype v_ret := pass;
 		t_TC_Global.start;
 		while (t_TC_Global.running) {
-			v_ret := f_ignitionStatus_SUB(ignitionStatus, 0.5);
+			v_ret := f_IGNITION_STATUS_SUB(ignitionStatus, 0.5);
 			if (v_ret == pass) {
 				t_TC_Global.stop;
 			}
@@ -127,7 +124,7 @@ module Car2X_Functions {
 		return v_ret;
 	}
 
-	function f_ignitionStatus_SUB(IgnitionStatus ignitionStatus, float interval)
+	function f_IGNITION_STATUS_SUB(IgnitionStatus ignitionStatus, float interval)
 		runs on TesterComponentType return verdicttype{
 			
 		var template FilterResponse v_ignitionStatus;
@@ -162,18 +159,6 @@ module Car2X_Functions {
 		filterPort.send(m_Filter_ignitionState_Stop);
 		
 		return v_ret;
-	}
-
-	function f_verdictToInt(verdicttype p_verdict)
-		runs on TesterComponentType return integer  {
-
-		if (p_verdict == pass) {
-			return 1;
-		} else if (p_verdict == fail) {
-			return 0;
-		} else {
-			return (- 1);
-		}
 	}
 
 	/**
@@ -212,7 +197,7 @@ module Car2X_Functions {
 	 * @desc Auxiliary function to cast the ignitionStatus to charstring.
 	 * 		 We cannot compare an enum type with a charstring that is
 	 * 		 needed for the function @see f_ignitionStatus_SUB
-	 * @param ignitionStatus
+	 * @param ignitionStatus 
 	 * @return charstring Ignition status as string
 	 */
 	function ignitionStatus2str(IgnitionStatus ignitionStatus) return charstring{
@@ -222,6 +207,22 @@ module Car2X_Functions {
 			case(e_run){return "run"}
 			case(e_start){return "start"}
 		}			
+	}
+	
+	/**
+	 * 
+	 * @desc Function to set the verdict and communicate via the action statment with TTman.
+	 * 		 Furthermore, increment the stage for the test case.
+	 * @param verdict Verdicttype for the given stage.
+	 * @param stage Stage Current stage.
+	 * @return integer The new stage.
+	 */
+	function f_set_verdict_and_stage(verdicttype verdict, integer stage) return integer{
+		setverdict(verdict);
+		stage := stage + 1;
+		// send stage information
+		action("stage:" & int2str(stage));
+		return stage;
 	}
 
 	/**
