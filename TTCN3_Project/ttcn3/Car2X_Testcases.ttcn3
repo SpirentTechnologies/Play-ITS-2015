@@ -8,7 +8,7 @@ module Car2X_Testcases {
 
 	import from Car2X_Functions {
 		function
-			f_IGNITION_STATUS,
+			f_TP_IGNITION_STATUS,
 			f_TP_STEERING_WHEEL_ANGLE,
 			f_TP_VEHICLE_SPEED_OVER_50_10_SEC,
 			f_setUp,
@@ -88,7 +88,7 @@ module Car2X_Testcases {
 		action("stage:" & int2str(v_stage));
 
 		// executing stage 1
-		f_IGNITION_STATUS(e_accessory);
+		f_TP_IGNITION_STATUS(e_accessory);
 		f_set_verdict_and_stage(v_ret, v_stage);
 
 		// executing stage 2

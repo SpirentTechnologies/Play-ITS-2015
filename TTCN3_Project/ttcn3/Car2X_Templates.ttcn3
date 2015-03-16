@@ -56,7 +56,17 @@ module Car2X_Templates {
 	template FilterRequest m_Filter_doorStatus_Stop() :={
 			reqType := "stop",
 			reqData := {{key := c_door_status, interval := 1000}}
+	}
+	
+	template FilterRequest m_Filter_headLampStatus_Start() :={
+					reqType := "start",
+					reqData := {{key := c_headlamp_status, interval := 1000}}
 		}
+	
+	template FilterRequest m_Filter_headLampStatus_Stop() :={
+				reqType := "stop",
+				reqData := {{key := c_headlamp_status, interval := 1000}}
+	}	
 
 	template FilterRequest m_Filter_ignitionState_Start() := {
 		reqType := "start",
@@ -95,6 +105,10 @@ module Car2X_Templates {
 		respTimestamp := ?
 	}
 	
+	/**
+	 * template for ignition status response
+	 * @desc 
+	 */
 	template FilterResponse mw_Filter_Response_iS() := {
 		OpenXCKey := c_ignition_status,
 		OBD2Key := ?,
