@@ -5,14 +5,17 @@
  *   		 tear down configurations to reuse.
  */
 module Car2X_Functions {
-	import from Car2X_Types {type FilterResponse, IgnitionStatus;}
+	import from Car2X_Types {type DoorStatus, FilterResponse, IgnitionStatus;}
 
 	import from Car2X_Templates {
 		template
+			m_Filter_doorStatus_Start,
+			m_Filter_doorStatus_Stop,
 			m_Filter_ignitionState_Start,
 			m_Filter_ignitionState_Stop,
 			m_Filter_steeringWheel_Start,
 			m_Filter_steeringWheel_Stop,
+			mw_Filter_Response_dS,
 			mw_Filter_Response_iS,
 			mw_Filter_Response_sW,
 			mw_Filter_Response_vS;
@@ -55,9 +58,9 @@ module Car2X_Functions {
 		}
 		return (v_ret);
 	}
-	
+
 	function f_TP_STEERING_WHEEL_ANGLE(float targetAngle, float variance)
-	runs on TesterComponentType return verdicttype{
+		runs on TesterComponentType return verdicttype  {
 		var verdicttype v_ret := pass;
 		t_TC_Global.start;
 		while (t_TC_Global.running) {
@@ -65,54 +68,57 @@ module Car2X_Functions {
 			if (v_ret == pass) {
 				t_TC_Global.stop;
 			}
-		}				
-		if(v_ret != pass){
+		}
+		if (v_ret != pass) {
 			setverdict(v_ret);
 			f_tearDown();
 		}
 		return v_ret;
 	}
 
-	function f_TP_STEERING_WHEEL_ANGLE_SUB(float targetAngle, float variance, float interval)
+	function f_TP_STEERING_WHEEL_ANGLE_SUB(float targetAngle, float variance,
+										   float interval)
 		runs on TesterComponentType return verdicttype  {
-			var template FilterResponse v_angle;
-			var verdicttype v_ret := pass;
-			
-			//start steering Wheel request
-			filterPort.send(m_Filter_steeringWheel_Start);
-			
-			t_TC.start(interval);
-			
-			alt {
-				[] filterPort.receive(mw_Filter_Response_sW)-> value v_angle {
-					if(max(targetAngle-variance,-600.0) <= v_angle.valueA.floatValue and
-					 v_angle.valueA.floatValue <= min(targetAngle+variance,600.0)){
-						v_ret := pass;
-						t_TC.stop;
-					}else {
-						v_ret := fail;
-						t_TC.stop;
-					}					
-				}
-				[] filterPort.receive {
+		var template FilterResponse v_angle;
+		var verdicttype v_ret := pass;
+
+		// start steering Wheel request
+		filterPort.send(m_Filter_steeringWheel_Start);
+
+		t_TC.start(interval);
+
+		alt {
+			[] filterPort.receive(mw_Filter_Response_sW) -> value v_angle {
+				if (max(targetAngle - variance, - 600.0) <=
+					v_angle.valueA.floatValue and
+					v_angle.valueA.floatValue <=
+					min(targetAngle + variance, 600.0)) {
+					v_ret := pass;
+					t_TC.stop;
+				} else {
 					v_ret := fail;
-					t_TC.stop;					
-				}		
-				[] t_TC.timeout{
-					v_ret := inconc;
+					t_TC.stop;
 				}
-			};
-			
-			//stop steering wheel request
-			filterPort.send(m_Filter_steeringWheel_Stop);
-			
-			return v_ret;
+			}
+			[] filterPort.receive {
+				v_ret := fail;
+				t_TC.stop;
+			}
+			[] t_TC.timeout {
+				v_ret := inconc;
+			}
 		}
+
+		// stop steering wheel request
+		filterPort.send(m_Filter_steeringWheel_Stop);
+
+		return v_ret;
+	}
 
 
 	function f_IGNITION_STATUS(IgnitionStatus ignitionStatus)
-		runs on TesterComponentType return verdicttype{
-			
+		runs on TesterComponentType return verdicttype  {
+
 		var verdicttype v_ret := pass;
 		t_TC_Global.start;
 		while (t_TC_Global.running) {
@@ -120,25 +126,59 @@ module Car2X_Functions {
 			if (v_ret == pass) {
 				t_TC_Global.stop;
 			}
-		}		
+		}
 		return v_ret;
 	}
-
-	function f_IGNITION_STATUS_SUB(IgnitionStatus ignitionStatus, float interval)
-		runs on TesterComponentType return verdicttype{
+	
+	function f_TP_DOOR_STATUS_SUB(DoorStatus door, boolean status)
+		runs on TesterComponentType return verdicttype  {
 			
+		var template FilterResponse v_doorStatus;
+		var verdicttype v_ret := pass;
+
+		filterPort.send(m_Filter_doorStatus_Start);
+
+		t_TC.start(1.0);
+
+		alt {
+			[] filterPort.receive(mw_Filter_Response_dS)-> value v_doorStatus {
+				if(doorStatus2Str(door) == v_doorStatus.valueA.stringValue
+				and status == v_doorStatus.valueB ){
+					v_ret := pass;
+				}
+			}
+			[] filterPort.receive {
+							t_TC.stop;
+							v_ret := fail;
+						}
+			[] t_TC.timeout {
+				v_ret := inconc;
+			}
+		}
+		
+		filterPort.send(m_Filter_doorStatus_Stop);
+		return v_ret;
+	}
+	
+
+	function f_IGNITION_STATUS_SUB(IgnitionStatus ignitionStatus,
+								   float interval)
+		runs on TesterComponentType return verdicttype  {
+
 		var template FilterResponse v_ignitionStatus;
 		var verdicttype v_ret := pass;
 
-		//start ignition status request
+		// start ignition status request
 		filterPort.send(m_Filter_ignitionState_Start);
-			
+
 		t_TC.start(interval);
-		
+
 		alt {
 			// store received template into value
-			[] filterPort.receive(mw_Filter_Response_iS) -> value v_ignitionStatus {
-				if(ignitionStatus2str(ignitionStatus) == v_ignitionStatus.valueA.stringValue){
+			[] filterPort.receive(mw_Filter_Response_iS) ->
+			   value v_ignitionStatus {
+				if (ignitionStatus2str(ignitionStatus) ==
+					v_ignitionStatus.valueA.stringValue) {
 					v_ret := pass;
 				} else {
 					v_ret := fail;
@@ -153,11 +193,10 @@ module Car2X_Functions {
 				v_ret := inconc;
 			}
 		}
-		
 
-		//stop ignition status request
+		// stop ignition status request
 		filterPort.send(m_Filter_ignitionState_Stop);
-		
+
 		return v_ret;
 	}
 
@@ -168,6 +207,7 @@ module Car2X_Functions {
 	 */
 	function f_setUp() runs on TesterComponentType  {
 
+
 		// create an instance of the tester
 		var TesterComponentType Tester;
 		Tester := TesterComponentType.create;
@@ -175,49 +215,98 @@ module Car2X_Functions {
 		// map the tester port to the system port
 		map(self:filterPort, system:filterPort);
 	}
-	
-	function max(float valueA, float valueB) return float{
-		if(valueA > valueB){
+
+	function max(float valueA, float valueB) return float  {
+		if (valueA > valueB) {
 			return valueA;
-		}else{
+		} else {
 			return valueB;
 		}
 	}
-	
-	function min(float valueA, float valueB) return float{
-		if(valueA < valueB){
+
+	function min(float valueA, float valueB) return float  {
+		if (valueA < valueB) {
 			return valueA;
-		}else{
+		} else {
 			return valueB;
 		}
 	}
-	
+
+
+	function f_TP_DOOR_STATUS(DoorStatus door, boolean status, float intervall)
+		runs on TesterComponentType return verdicttype  {
+			
+		var verdicttype v_ret := pass;
+		t_TC_Global.start(intervall);
+		while (t_TC_Global.running) {
+			v_ret := f_TP_DOOR_STATUS_SUB(door, status);
+			if (v_ret == pass) {
+				t_TC_Global.stop;
+			}
+		}
+		if (v_ret != pass) {
+			f_tearDown();
+			setverdict(v_ret);
+			// send verdict
+			f_tearDown();
+		}
+		return v_ret;
+	}
+
 	/**
-	 * 
 	 * @desc Auxiliary function to cast the ignitionStatus to charstring.
-	 * 		 We cannot compare an enum type with a charstring that is
-	 * 		 needed for the function @see f_ignitionStatus_SUB
-	 * @param ignitionStatus 
+	 *   		 We cannot compare an enum type with a charstring that is
+	 *   		 needed for the function
+	 * @see f_ignitionStatus_SUB
+	 * @param ignitionStatus
 	 * @return charstring Ignition status as string
 	 */
-	function ignitionStatus2str(IgnitionStatus ignitionStatus) return charstring{
-		select(ignitionStatus){
-			case(e_off){return "off"}
-			case(e_accessory){return "accessory"}
-			case(e_run){return "run"}
-			case(e_start){return "start"}
-		}			
+	function ignitionStatus2str(IgnitionStatus ignitionStatus)
+		return charstring  {
+		select (ignitionStatus) {
+			case (e_off) {
+				return "off";
+			}
+			case (e_accessory) {
+				return "accessory";
+			}
+			case (e_run) {
+				return "run";
+			}
+			case (e_start) {
+				return "start";
+			}
+		}
 	}
 	
+	function doorStatus2Str(DoorStatus doorStatus) return charstring{
+		select (doorStatus) {
+			case (e_driver) {
+				return "driver";
+			}
+			case (e_passenger) {
+				return "passener";
+			}
+			case (e_rear_left){
+				return "rear_left";
+			}
+			case (e_rear_right){
+				return "rear_right";
+			}
+		}
+		
+	}
+
 	/**
-	 * 
-	 * @desc Function to set the verdict and communicate via the action statment with TTman.
-	 * 		 Furthermore, increment the stage for the test case.
+	 * @desc Function to set the verdict and communicate via the action statment
+	 *   with TTman.
+	 *   		 Furthermore, increment the stage for the test case.
 	 * @param verdict Verdicttype for the given stage.
 	 * @param stage Stage Current stage.
 	 * @return integer The new stage.
 	 */
-	function f_set_verdict_and_stage(verdicttype verdict, integer stage) return integer{
+	function f_set_verdict_and_stage(verdicttype verdict, integer stage)
+		return integer  {
 		setverdict(verdict);
 		stage := stage + 1;
 		// send stage information
@@ -234,5 +323,4 @@ module Car2X_Functions {
 		unmap(self:filterPort, system:filterPort);
 		stop;
 	}
-	
 }

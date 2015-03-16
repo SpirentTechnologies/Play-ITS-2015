@@ -5,6 +5,7 @@
 module Car2X_Templates {
 	import from Car2X_ModuleParameters {
 		const
+			c_door_status,
 			c_headlamp_status,
 			c_ignition_status,
 			c_modePrefix_01,
@@ -44,8 +45,18 @@ module Car2X_Templates {
 
 	template FilterRequest m_Filter_steeringWheel_Start() := {
 		reqType := "start",
-		reqData := {{key := c_steering_wheel_angle, interval := 1500}}
+		reqData := {{key := c_steering_wheel_angle, interval := 1000}}
 	}
+	
+	template FilterRequest m_Filter_doorStatus_Start() :={
+		reqType := "start",
+		reqData := {{key := c_door_status, interval := 1000}}
+	}
+	
+	template FilterRequest m_Filter_doorStatus_Stop() :={
+			reqType := "stop",
+			reqData := {{key := c_door_status, interval := 1000}}
+		}
 
 	template FilterRequest m_Filter_ignitionState_Start() := {
 		reqType := "start",
@@ -68,6 +79,17 @@ module Car2X_Templates {
 	 */
 	template FilterResponse mw_Filter_Response_sW() := {
 		OpenXCKey := c_steering_wheel_angle,
+		OBD2Key := ?,
+		valueA := {floatValue := ?},
+		respTimestamp := ?
+	}
+	
+	/**
+	 * template for door status reponse
+	 * @desc 
+	 */
+	template FilterResponse mw_Filter_Response_dS() :={
+		OpenXCKey := c_door_status,
 		OBD2Key := ?,
 		valueA := {floatValue := ?},
 		respTimestamp := ?

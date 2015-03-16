@@ -73,6 +73,13 @@ module Car2X_Types {
 		e_run,
 		e_start
 	};
+	
+	type enumerated DoorStatus {
+		e_driver,
+		e_passenger,
+		e_rear_left,
+		e_rear_right
+	};
 } 
 with {
   encode "blubb";
