@@ -16,6 +16,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <Button
+            android:id="@+id/button_start"
             android:text="@string/button_start"
             android:layout_width="0dp"
             android:layout_weight="14"
@@ -26,9 +27,11 @@
             android:layout_height="0dp"
             android:layout_weight="1"/>
         <Button
+            android:id="@+id/button_stop"
             android:text="@string/button_stop"
             android:layout_weight="14"
             android:layout_width="0dp"
+            android:enabled="false"
             android:layout_height="wrap_content"
             android:onClick="stopTest"/>
     </LinearLayout>
