@@ -7,6 +7,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
@@ -15,6 +16,7 @@ import android.widget.TextView;
 public class TestRunnerActivity extends ActionBarActivity {
 
     private AnimationDrawable logoAnimation;
+    private SocketClient socketClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,20 +46,18 @@ public class TestRunnerActivity extends ActionBarActivity {
 
     public void startTest(View view) {
         TextView statusText = (TextView) findViewById(R.id.status_text);
-        statusText.setText(getString(R.string.textview_running));
-        logoAnimation.start();
-
         TextView socketConn = (TextView) findViewById(R.id.socket);
         ScrollView progress = (ScrollView) findViewById(R.id.progress);
         ProgressBar progressBar = (ProgressBar) findViewById(R.id.progressbar);
-
-        new SocketClient(socketConn, progress, progressBar, logoAnimation, statusText).execute();
+        Button btnStart = (Button) findViewById(R.id.button_start);
+        Button btnStop = (Button) findViewById(R.id.button_stop);
+        socketClient = new SocketClient(this, socketConn, progress, progressBar, logoAnimation,
+                statusText, btnStart, btnStop);
+        socketClient.execute();
     }
 
     public void stopTest(View view) {
-        TextView status = (TextView) findViewById(R.id.status_text);
-        status.setText(getString(R.string.textview_not_running));
-        logoAnimation.stop();
+        socketClient.cancel(true);
     }
 
     @Override

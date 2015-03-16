@@ -1,8 +1,10 @@
 package com.testingtech.car2x.hmi;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.AsyncTask;
+import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TableLayout;
@@ -15,6 +17,7 @@ import com.testingtech.car2x.hmi.messages.Message;
 import com.testingtech.car2x.hmi.messages.TestCase;
 import com.testingtech.car2x.hmi.messages.VerdictMessage;
 
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
@@ -22,26 +25,40 @@ import java.util.Date;
 
 public class SocketClient extends AsyncTask<Void, Message, Message> {
 
-    private TextView textview, statusRunning;
+    private Context context;
+    private TextView debugText, statusRunning;
     private ScrollView scrollview;
     private ProgressBar progressBar;
     private AnimationDrawable logoAnimation;
+    private Button btnStart, btnStop;
     private int stageNum = 0;
 
-    public SocketClient(TextView tv, ScrollView sv, ProgressBar pb, AnimationDrawable ad, TextView sr) {
-        this.textview = tv;
+    public SocketClient(Context con, TextView tv, ScrollView sv, ProgressBar pb, AnimationDrawable ad, TextView sr, Button start, Button stop) {
+        this.context = con;
+        this.debugText = tv;
         this.scrollview = sv;
         this.logoAnimation = ad;
         this.statusRunning = sr;
         this.progressBar = pb;
+        this.btnStart = start;
+        this.btnStop = stop;
+    }
+
+    @Override
+    protected void onPreExecute(){
+        statusRunning.setText(context.getString(R.string.textview_running));
+        logoAnimation.start();
+        btnStart.setEnabled(false);
+        btnStop.setEnabled(true);
     }
 
     @Override
     protected Message doInBackground(Void... params) {
         ControlMessage controlMessage;
         Message message = null;
+        Socket mySocket = null;
         try {
-            Socket mySocket = new Socket("10.0.2.2", 30000);
+            mySocket = new Socket("10.0.2.2", 30000);
 
             ObjectOutputStream oos = new ObjectOutputStream(mySocket.getOutputStream());
             ObjectInputStream ois = new ObjectInputStream(mySocket.getInputStream());
@@ -55,15 +72,27 @@ public class SocketClient extends AsyncTask<Void, Message, Message> {
             oos.flush();
 
             message = (Message) ois.readObject();
-            while(!(message instanceof VerdictMessage)) {
+            while(!(message instanceof VerdictMessage) && !isCancelled()) {
                 publishProgress(message);
                 message = (Message) ois.readObject();
             }
-
-            mySocket.close();
-
+            if(isCancelled()){
+                controlMessage = new ControlMessage(
+                        TestCase.TC_VEHICLE_SPEED_OVER_50,
+                        new Date(),
+                        TestCaseCommand.STOP
+                );
+                oos.writeObject(controlMessage);
+                oos.flush();
+            }
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            try {
+                mySocket.close();
+            }catch (IOException | NullPointerException ioe){
+                ioe.printStackTrace();
+            }
         }
         return message;
     }
@@ -72,11 +101,11 @@ public class SocketClient extends AsyncTask<Void, Message, Message> {
     protected void onProgressUpdate(Message... progress) {
         super.onProgressUpdate(progress);
         if(progress[0] instanceof ProgressMessage) {
-            textview.setText(((ProgressMessage) progress[0]).progress.toString());
+            debugText.setText(((ProgressMessage) progress[0]).progress.toString());
         } else if(progress[0] instanceof ControlMessage) {
-            textview.setText(((ControlMessage) progress[0]).command.toString());
+            debugText.setText(((ControlMessage) progress[0]).command.toString());
         } else if(progress[0] instanceof VerdictMessage) {
-            textview.setText(((VerdictMessage) progress[0]).verdict.toString());
+            debugText.setText(((VerdictMessage) progress[0]).verdict.toString());
         }
         // get the table as child of the scrollview
         TableLayout table = (TableLayout) scrollview.getChildAt(0);
@@ -102,17 +131,37 @@ public class SocketClient extends AsyncTask<Void, Message, Message> {
 
     @Override
     protected void onPostExecute(Message result) {
-        if(result instanceof VerdictMessage)
-            textview.setText(((VerdictMessage) result).verdict.toString());
-        else
-            textview.setText(result.toString());
+        if(result != null) {
+            if (result instanceof VerdictMessage)
+                debugText.setText(((VerdictMessage) result).verdict.toString());
+            else
+                debugText.setText(result.toString());
+        }
         // get the table as child of the scrollview
         TableLayout table = (TableLayout) scrollview.getChildAt(0);
         // get the last textview as child of the table
         TextView oldText = (TextView) table.getChildAt(table.getChildCount() - 1);
         // change color back to white
         oldText.setBackgroundColor(Color.TRANSPARENT);
-        statusRunning.setText("Test is not running.");
+        statusRunning.setText(context.getString(R.string.textview_not_running));
         logoAnimation.stop();
+        btnStart.setEnabled(true);
+        btnStop.setEnabled(false);
+    }
+
+    @Override
+    protected void onCancelled(){
+        // get the table as child of the scrollview
+        TableLayout table = (TableLayout) scrollview.getChildAt(0);
+        if(stageNum > 0) {
+            // get the last textview as child of the table
+            TextView oldText = (TextView) table.getChildAt(stageNum - 1);
+            // change color back to white
+            oldText.setBackgroundColor(Color.TRANSPARENT);
+        }
+        statusRunning.setText(context.getString(R.string.textview_not_running));
+        logoAnimation.stop();
+        btnStart.setEnabled(true);
+        btnStop.setEnabled(false);
     }
 }
