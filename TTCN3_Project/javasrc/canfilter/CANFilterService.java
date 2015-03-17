@@ -33,6 +33,7 @@ import java.lang.Thread.State;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.Hashtable;
 import java.util.Scanner;
 
@@ -42,61 +43,26 @@ import org.json.JSONObject;
 
 public class CANFilterService {
 
-	private static final int DEFAULT_TCP_PORT = 7000;
-	int portNumber = DEFAULT_TCP_PORT;
-	String iface = "localhost";
 	static Hashtable<String, Car2XEntry> car2xEntries = new Hashtable<>();
+	static Car2xEntryUpdater entryUpdater;
+	static TimeoutResponder timeoutResponder;
 
 	public static void main(String[] args) {
-
 		InetSocketAddress address = new InetSocketAddress(args[0], new Integer(
 				args[1]).intValue());
 
-		Socket client = null;
-
-		ServerSocket sock = null;
+		Socket socket = null;
+		ServerSocket serverSocket = null;
 		Scanner scanner = null;
-
+		timeoutResponder = new TimeoutResponder(socket, car2xEntries);
 		try {
-			// establish the socket
-			sock = new ServerSocket();
-			sock.setReuseAddress(true);
-			sock.bind(address);
-
-			System.out.println("TCP echo server listening on "
-					+ address.getHostName() + ":" + address.getPort());
-
-			TimeoutResponder timeoutResponder = null;
-			Car2xEntryUpdater canSimulatorReader = null;
-
-			/**
-			 * listen for new connection requests. when a request arrives,
-			 * service it and resume listening for more requests.
-			 */
+			serverSocket = createServerSocket(address);
 			while (true) {
-				client = sock.accept();
-				scanner = new Scanner(client.getInputStream());
-				JSONObject jsonObject = new JSONObject(scanner.next());
-				JSONArray data = jsonObject.getJSONArray("reqData");
-				switch (jsonObject.getString("reqType")) {
-				case "start":
-					addEntry(data);
-					if (canSimulatorReader == null || canSimulatorReader.getState() != State.RUNNABLE) {
-						canSimulatorReader = new Car2xEntryUpdater(car2xEntries);
-						canSimulatorReader.start();
-					}
-					if (timeoutResponder == null || timeoutResponder.getState() != State.RUNNABLE) {
-						timeoutResponder = new TimeoutResponder(car2xEntries, client);
-						timeoutResponder.start();
-					}
-					break;
-				case "stop":
-					removeEntry(data);
-					break;
-				default:
-					System.err.println("Unsupported request");
-					break;
-				}
+				socket = serverSocket.accept();
+				scanner = new Scanner(socket.getInputStream());
+				JSONObject request = new JSONObject(scanner.next());
+				handleRequest(request);
+				scanner.close();
 			}
 
 		} catch (IOException ioe) {
@@ -105,45 +71,64 @@ public class CANFilterService {
 		} catch (JSONException e) {
 			e.printStackTrace();
 		} finally {
-			if (sock != null)
+			if (serverSocket != null)
 				try {
-					sock.close();
+					serverSocket.close();
 				} catch (IOException e) {
 				}
 			scanner.close();
 		}
 	}
 
-	synchronized public Car2XEntry[] getFromDataTable(String[] str) {
-		Car2XEntry[] stringArray = new Car2XEntry[str.length];
-		for (int i = 0; i < str.length; i++) {
-			stringArray[i] = car2xEntries.get(str);
-		}
-		return stringArray;
+	private static ServerSocket createServerSocket(InetSocketAddress address)
+			throws IOException, SocketException {
+		ServerSocket serverSocket = new ServerSocket();
+		serverSocket.setReuseAddress(true);
+		serverSocket.bind(address);
+		System.out.println("TCP echo server listening on "
+				+ address.getHostName() + ":" + address.getPort());
+		return serverSocket;
 	}
 
-	static void addEntry(JSONArray jsonArray) {
+	private static void handleRequest(JSONObject request) throws IOException,
+			JSONException {
+		JSONArray data = request.getJSONArray("reqData");
+		switch (request.getString("reqType")) {
+		case "start":
+			addEntries(data);
+			break;
+		case "stop":
+			removeEntries(data);
+			break;
+		default:
+			System.err.println("Unsupported request");
+			break;
+		}
+	}
+
+	private static void addEntries(JSONArray jsonArray) throws JSONException {
 		for (int i = 0; i < jsonArray.length(); i++) {
-			JSONObject obj;
-			try {
-				obj = jsonArray.getJSONObject(i);
-				Car2XEntry car2xEntry = new Car2XEntry(obj.getInt("interval"));
-				car2xEntries.put(obj.getString("key"), car2xEntry);
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
-
+			JSONObject jsonObject = jsonArray.getJSONObject(i);
+			addEntry(jsonObject.getString("key"), jsonObject.getInt("interval"));
 		}
 	}
 
-	static void removeEntry(JSONArray jsonArray) {
-		for (int i = 0; i < jsonArray.length(); i++) {
-			try {
-				car2xEntries.remove(jsonArray.getString(i));
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
+	private static void addEntry(String key, int interval) {
+		car2xEntries.put(key, new Car2XEntry());
+		if (entryUpdater == null || entryUpdater.getState() != State.RUNNABLE) {
+			entryUpdater = new Car2xEntryUpdater(car2xEntries);
+			entryUpdater.start();
 		}
+		timeoutResponder.addTimer(key, interval);
 	}
 
+	private static void removeEntries(JSONArray jsonArray) throws JSONException {
+		for (int i = 0; i < jsonArray.length(); i++)
+			removeEntry(jsonArray.getString(i));
+	}
+
+	private static void removeEntry(String key) {
+		car2xEntries.remove(key);
+		timeoutResponder.removeTimer(key);
+	}
 }

@@ -54,7 +54,7 @@ public class Car2xEntryUpdater extends Thread {
 	}
 
 	public void run() {
-		System.out.println("TCPClient started");
+		System.out.println("Entry updater started.");
 		Socket sock = null;
 		Scanner scanner = null;
 
@@ -62,7 +62,7 @@ public class Car2xEntryUpdater extends Thread {
 			// establish the socket
 			sock = new Socket();
 			sock.connect(address);
-			System.out.println("TCPClient connected to host : "
+			System.out.println("Entry updater connected to host : "
 					+ address.getHostName() + " on local port "
 					+ address.getPort());
 
@@ -70,13 +70,14 @@ public class Car2xEntryUpdater extends Thread {
 
 			while (!car2xEntries.isEmpty()) {
 				JSONObject jsonObject = new JSONObject(scanner.next() + "}");
-				Car2XEntry car2xEntry = car2xEntries.get(jsonObject.get("name"));
+				Car2XEntry car2xEntry = car2xEntries
+						.get(jsonObject.get("name"));
 				if (car2xEntry != null)
 					updateEntry(car2xEntry, jsonObject);
 			}
 
 		} catch (SocketTimeoutException e) {
-			System.out.println("Timeout could not connect to "
+			System.out.println("[Timeout] Could not connect to "
 					+ address.getHostName() + ":" + address.getPort());
 		} catch (IOException ioe) {
 			ioe.printStackTrace();
@@ -91,15 +92,17 @@ public class Car2xEntryUpdater extends Thread {
 				}
 			if (scanner != null)
 				scanner.close();
+			System.out.println("Entry updater stopped.");
 		}
 	}
 
 	// TODO add obd2 key
-	private void updateEntry(Car2XEntry car2xEntry, JSONObject jsonObject) throws JSONException {
-			car2xEntry.setTimestamp(new Date().getTime());
-			car2xEntry.setValueA(jsonObject.get("value").toString());
-			String event = jsonObject.getString("event");
-			if (event != null)
-				car2xEntry.setValueB(event);
+	private void updateEntry(Car2XEntry car2xEntry, JSONObject jsonObject)
+			throws JSONException {
+		car2xEntry.setTimestamp(new Date().getTime());
+		car2xEntry.setValueA(jsonObject.get("value").toString());
+		String event = jsonObject.getString("event");
+		if (event != null)
+			car2xEntry.setValueB(event);
 	}
 }

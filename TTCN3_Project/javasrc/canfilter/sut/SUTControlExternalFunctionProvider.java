@@ -12,6 +12,8 @@ import org.etsi.ttcn.tci.BooleanValue;
 import org.etsi.ttcn.tci.CharstringValue;
 import org.etsi.ttcn.tci.IntegerValue;
 
+import canfilter.CANFilterService;
+
 import com.testingtech.ttcn.annotation.ExternalFunction;
 import com.testingtech.ttcn.tri.AnnotationsExternalFunctionPlugin;
 import com.testingtech.util.UUID;
@@ -22,50 +24,16 @@ public class SUTControlExternalFunctionProvider extends
 
 	private ProcessMap processMap = ProcessMap.getInstance();
 
-	// external function start_Server_SUT(in charstring host, in integer
-	// portNumber) return charstring;
-	@ExternalFunction(name = "start_Server_SUT", module = "SUT_Control")
-	public CharstringValue start_Server_SUT(CharstringValue host,
+	@ExternalFunction(name = "start_Filter", module = "Car2X_Control")
+	public CharstringValue start_Filter(CharstringValue host,
 			IntegerValue portNumber) {
-		return start_SUT(
-				"canfilter.CANFilterServer",
+		return start_Filter(
+				CANFilterService.class.getCanonicalName(),
 				new String[] { host.getString(),
-						String.valueOf(portNumber.getInt()) },
-				"TCP server listening on ");
+						String.valueOf(portNumber.getInt()) });
 	}
 
-	// external function start_Client_SUT(in charstring host, in integer
-	// portNumber) return charstring;
-	@ExternalFunction(name = "start_Client_SUT", module = "SUT_Control")
-	public CharstringValue start_Client_SUT(CharstringValue host,
-			IntegerValue portNumber) {
-		return start_SUT(
-				"canfilter.CANFilterClient",
-				new String[] { host.getString(),
-						String.valueOf(portNumber.getInt()) }, null);
-	}
-	
-	//external function stop_SUT(in charstring sutId) return boolean;
-		@ExternalFunction(name = "stop_SUT", module = "SUT_Control")
-		public BooleanValue stop_SUT(CharstringValue sutId) {
-			logInfo("Stopping SUT " + sutId.getString());
-			
-			Process p = processMap.get(sutId.getString());
-			if (p != null) {
-				p.destroy();
-				try {
-					p.waitFor();
-				} catch (InterruptedException e) {
-					// nothing to do just continue
-				}
-				processMap.remove(sutId.getString());
-			}
-
-			return newBooleanValue(true);
-		}
-
-	private CharstringValue start_SUT(String mainClass, String[] parameters,
-			String blockUntilMessage) {
+	private CharstringValue start_Filter(String mainClass, String[] parameters) {
 		String processId = UUID.randomUUID().toString();
 
 		logInfo("Starting " + mainClass + " with parameters: \""
@@ -77,11 +45,6 @@ public class SUTControlExternalFunctionProvider extends
 							+ join(parameters, " "));
 			processMap.put(processId, p);
 
-			if (blockUntilMessage != null) {
-				waitForMessage(blockUntilMessage, p.getInputStream(),
-						System.out);
-			}
-
 			new StreamForwarder(p.getInputStream(), System.out).start();
 			new StreamForwarder(p.getErrorStream(), System.err).start();
 		} catch (IOException e) {
@@ -90,27 +53,6 @@ public class SUTControlExternalFunctionProvider extends
 		}
 
 		return newCharstringValue(processId);
-	}
-
-	/**
-	 * Wait until a line of output from in matches blockUntilMessage. Forward
-	 * read lines to out.
-	 */
-	private void waitForMessage(String blockUntilMessage, InputStream in,
-			PrintStream out) {
-		BufferedReader r = new BufferedReader(new InputStreamReader(in));
-
-		String line;
-		try {
-			while ((line = r.readLine()) != null) {
-				out.println(line);
-
-				if (line.startsWith(blockUntilMessage)) {
-					break;
-				}
-			}
-		} catch (IOException e) {
-		}
 	}
 
 	private String join(String[] strings, String delimiter) {
@@ -126,6 +68,24 @@ public class SUTControlExternalFunctionProvider extends
 		}
 
 		return sb.toString();
+	}
+
+	@ExternalFunction(name = "stop_Filter", module = "Car2X_Control")
+	public BooleanValue stop_Filter(CharstringValue sutId) {
+		logInfo("Stopping Filter " + sutId.getString());
+
+		Process p = processMap.get(sutId.getString());
+		if (p != null) {
+			p.destroy();
+			try {
+				p.waitFor();
+			} catch (InterruptedException e) {
+				// nothing to do just continue
+			}
+			processMap.remove(sutId.getString());
+		}
+
+		return newBooleanValue(true);
 	}
 }
 

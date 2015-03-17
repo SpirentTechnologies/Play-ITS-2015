@@ -1,89 +1,48 @@
 package canfilter.tests;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.net.SocketTimeoutException;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.Hashtable;
-import java.util.Scanner;
+import java.util.List;
 
-import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 
 import canfilter.Car2XEntry;
 
+@RunWith(Parameterized.class)
 public class CANFilterTest {
 
-	@Test
-	public void getXcSimDataTest() {
-		String serverHost = "localhost";
-		int serverPort = 50001;
-		Socket sock = null;
-		try {
-			// establish the socket
-			sock = new Socket();
-			sock.setSoLinger(true, 0);
-			sock.connect(new InetSocketAddress(serverHost, serverPort), 50001);
-			Scanner inputStream = new Scanner(sock.getInputStream()).useDelimiter("}");
-			String str = new String();
-			str = inputStream.next() + "}";
-			assertTrue(str.startsWith("{") || str.endsWith("}"));
-		} catch (SocketTimeoutException e) {
-			fail("Timeout could not connect to " + serverHost+ ":" + serverPort);
-		} catch (IOException ioe) {
-			ioe.printStackTrace();
-		} finally {
-			if (sock != null) {
-				try {
-					sock.close();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-		}
+	private Hashtable<String, Car2XEntry> car2xValues = new Hashtable<String, Car2XEntry>();
+	private int duration;
+	private int expectedTimeouts;
+	private long startTime;
+	private long currentTime;
+
+	public void setUp() {
+		car2xValues.put("vehicle_speed", new Car2XEntry());
+		car2xValues.put("door_status", new Car2XEntry());
+		car2xValues.put("engine_speed", new Car2XEntry());
+		car2xValues.put("headlamp_status", new Car2XEntry());
+		car2xValues.put("hanbreak_status", new Car2XEntry());
 	}
-	
-	@Test
-	public void putToHashTableTest(){
-		Hashtable<String, Car2XEntry> hashTable = new Hashtable<String, Car2XEntry>();
-		Car2XEntry tabledata = new Car2XEntry(1500);
-		hashTable.put("vehicle_speed", tabledata);
-        assertTrue(tabledata.equals(hashTable.get("vehicle_speed")));  
+
+	public CANFilterTest(int duration, int expectedTimeouts) {
+		setUp();
+		startTime = new Date().getTime();
+		currentTime = startTime;
+		this.duration = duration;
+		car2xValues.get("vehicle_speed");
+		this.expectedTimeouts = expectedTimeouts;
 	}
-	
-	@Test
-	public void receiveMessageAsServerTest(){
-		int portNumber = 50005;
-		String iface = "localhost";
-		ServerSocket sockS = null;
-		Socket sockC = null;
-		try {
-			// establish the socket
-			InetAddress ifaceAddr = InetAddress.getByName(iface);
-			sockS = new ServerSocket();
-			sockC = new Socket();
-			sockS.setReuseAddress(true);
-			sockS.bind(new InetSocketAddress(ifaceAddr, portNumber));
-			sockC.connect(new InetSocketAddress(iface, portNumber), portNumber);
-			assertTrue(!sockC.isClosed());
-		}
-		catch (IOException ioe) {
-			System.err.println("Error listening on port: "+portNumber+": "+ioe);
-		}
-		finally {
-			if (sockS != null)
-				try {
-					sockS.close();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-		}
+
+	@Parameters
+	public static List<Object[]> data() {
+		return Arrays.asList(new Object[][] { 
+				{ 499, 500, 0 }, { 999, 500, 1 }, { 1000, 500, 2 },
+				{ 1499, 1500, 0 }, { 1500, 1500, 1 }, { 1501, 1500, 1 }, { 3000, 1500, 2 },
+				});
 	}
 
 }

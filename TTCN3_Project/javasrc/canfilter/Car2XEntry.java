@@ -6,11 +6,6 @@ public class Car2XEntry {
 	private String valueA;
 	private String valueB;
 	private long timestamp;
-	private int interval;
-
-	public Car2XEntry(int interval) {
-		this.interval = interval;
-	}
 
 	public String getObd2key() {
 		return obd2key;
@@ -46,13 +41,5 @@ public class Car2XEntry {
 
 	public void setValueB(String str) {
 		this.valueB = str;
-	}
-
-	public int getInterval() {
-		return this.interval;
-	}
-
-	public void setInterval(int interval) {
-		this.interval = interval;
 	}
 }
