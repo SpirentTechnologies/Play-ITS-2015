@@ -13,10 +13,17 @@
     <string name="title_activity_door_test">Open right front door</string>
     <string name="title_activity_break_test">Activate hand break</string>
 
+    <!-- Test Stages -->
+    <string name="stage_start_engine">Start engine</string>
+    <string name="stage_drive_50">Drive 50 km/h</string>
+    <string name="stage_down_to_30">Slow down to 30 km/h</string>
+    <string name="stage_roll_halt">Let the car roll to a halt</string>
+
     <!-- Test Runner Activity -->
     <string name="button_start">Start</string>
     <string name="button_stop">Stop</string>
     <string name="textview_not_running">Test is not running.</string>
+    <string name="textview_loading">Test is loading &#8230;</string>
     <string name="textview_running">Test is running &#8230;</string>
 
     <!-- Drive Test Activity -->
