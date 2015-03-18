@@ -4,6 +4,8 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.AsyncTask;
+import android.os.Build;
+import android.speech.tts.TextToSpeech;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
@@ -20,6 +22,7 @@ import com.testingtech.car2x.hmi.messages.VerdictMessage;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.Date;
 
@@ -31,9 +34,13 @@ public class SocketClient extends AsyncTask<Void, Message, Message> {
     private ProgressBar progressBar;
     private AnimationDrawable logoAnimation;
     private Button btnStart, btnStop;
+    private TextToSpeech ttobj;
     private int stageNum = 0;
+    private Socket mySocket = null;
 
-    public SocketClient(Context con, TextView tv, ScrollView sv, ProgressBar pb, AnimationDrawable ad, TextView sr, Button start, Button stop) {
+    public SocketClient(Context con, TextView tv, ScrollView sv, ProgressBar pb,
+                        AnimationDrawable ad, TextView sr, Button start,
+                        Button stop, TextToSpeech tts) {
         this.context = con;
         this.debugText = tv;
         this.scrollview = sv;
@@ -42,11 +49,12 @@ public class SocketClient extends AsyncTask<Void, Message, Message> {
         this.progressBar = pb;
         this.btnStart = start;
         this.btnStop = stop;
+        this.ttobj = tts;
     }
 
     @Override
     protected void onPreExecute(){
-        statusRunning.setText(context.getString(R.string.textview_running));
+        statusRunning.setText(context.getString(R.string.textview_loading));
         logoAnimation.start();
         btnStart.setEnabled(false);
         btnStop.setEnabled(true);
@@ -56,9 +64,10 @@ public class SocketClient extends AsyncTask<Void, Message, Message> {
     protected Message doInBackground(Void... params) {
         ControlMessage controlMessage;
         Message message = null;
-        Socket mySocket = null;
         try {
-            mySocket = new Socket("10.0.2.2", 30000);
+            mySocket = new Socket();
+            mySocket.connect(new InetSocketAddress("10.0.2.2", 30000), 2000);
+            statusRunning.setText(context.getString(R.string.textview_running));
 
             ObjectOutputStream oos = new ObjectOutputStream(mySocket.getOutputStream());
             ObjectInputStream ois = new ObjectInputStream(mySocket.getInputStream());
@@ -100,12 +109,36 @@ public class SocketClient extends AsyncTask<Void, Message, Message> {
     @Override
     protected void onProgressUpdate(Message... progress) {
         super.onProgressUpdate(progress);
+        String status = "";
         if(progress[0] instanceof ProgressMessage) {
-            debugText.setText(((ProgressMessage) progress[0]).progress.toString());
+            status = ((ProgressMessage) progress[0]).progress.toString();
         } else if(progress[0] instanceof ControlMessage) {
-            debugText.setText(((ControlMessage) progress[0]).command.toString());
+            status = ((ControlMessage) progress[0]).command.toString();
         } else if(progress[0] instanceof VerdictMessage) {
-            debugText.setText(((VerdictMessage) progress[0]).verdict.toString());
+            status = ((VerdictMessage) progress[0]).verdict.toString();
+        }
+        debugText.setText(status);
+        String toSpeak;
+        switch(stageNum){
+            case 0:
+                toSpeak = context.getString(R.string.stage_start_engine);
+                break;
+            case 1:
+                toSpeak = context.getString(R.string.stage_drive_50);
+                break;
+            case 2:
+                toSpeak = context.getString(R.string.stage_down_to_30);
+                break;
+            case 3:
+                toSpeak = context.getString(R.string.stage_roll_halt);
+                break;
+            default:
+                toSpeak = "";
+        }
+        if(Build.VERSION.SDK_INT < 21){
+            ttobj.speak(toSpeak, TextToSpeech.QUEUE_FLUSH, null);
+        } else{
+            ttobj.speak(toSpeak, TextToSpeech.QUEUE_FLUSH, null, "speak");
         }
         // get the table as child of the scrollview
         TableLayout table = (TableLayout) scrollview.getChildAt(0);
@@ -137,20 +170,15 @@ public class SocketClient extends AsyncTask<Void, Message, Message> {
             else
                 debugText.setText(result.toString());
         }
-        // get the table as child of the scrollview
-        TableLayout table = (TableLayout) scrollview.getChildAt(0);
-        // get the last textview as child of the table
-        TextView oldText = (TextView) table.getChildAt(table.getChildCount() - 1);
-        // change color back to white
-        oldText.setBackgroundColor(Color.TRANSPARENT);
-        statusRunning.setText(context.getString(R.string.textview_not_running));
-        logoAnimation.stop();
-        btnStart.setEnabled(true);
-        btnStop.setEnabled(false);
+        finish();
     }
 
     @Override
     protected void onCancelled(){
+        finish();
+    }
+
+    private void finish(){
         // get the table as child of the scrollview
         TableLayout table = (TableLayout) scrollview.getChildAt(0);
         if(stageNum > 0) {
@@ -163,5 +191,15 @@ public class SocketClient extends AsyncTask<Void, Message, Message> {
         logoAnimation.stop();
         btnStart.setEnabled(true);
         btnStop.setEnabled(false);
+        closeSocket();
+    }
+
+    public void closeSocket(){
+        try {
+            if(mySocket != null)
+                mySocket.close();
+        }catch(IOException ioe){
+            ioe.printStackTrace();
+        }
     }
 }
