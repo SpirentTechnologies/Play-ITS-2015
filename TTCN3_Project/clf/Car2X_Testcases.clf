@@ -7,12 +7,42 @@
     </testadapter>
     <module Name="Car2X_Testcases" File="ttcn3build/Car2X_Testcases.jar" Package="generated_ttcn"/>
     <testcase Name="TC_VEHICLE_SPEED_OVER_50_10_SEC" Alias="" Module="Car2X_Testcases" Retries="0" Runs="1" ActionOnFail="continue" Selection="false" Status="stopped" Verdict="fail">
-      <description></description>
+      <description> Checks that the vehicle speed is greater 50km/h. </description>
+      <metadata>
+        <comment>/**
+	 * @desc Checks that the vehicle speed is greater 50km/h.
+	 * @verdict pass Successfully received vehicle speed.
+	 * @verdict fail Not received anything.
+	 * @verdict inconclusive Timer ran out.
+	 */</comment>
+      </metadata>
     </testcase>
     <testcase Name="TC_VEHICLE_SPEED_SIMULATED" Alias="" Module="Car2X_Testcases" Retries="0" Runs="1" ActionOnFail="continue" Selection="false" Status="stopped" Verdict="fail">
-      <description></description>
+      <description> Simulated test case; no conection to canfilter;  
+ </description>
+      <metadata>
+        <comment>/**
+	 * 
+	 * @desc Simulated test case; no conection to canfilter;  
+	 * @verdict 
+	 */</comment>
+      </metadata>
     </testcase>
     <testcase Name="TC_STEERING_WHEEL_ANGLE" Alias="" Module="Car2X_Testcases" Retries="0" Runs="1" ActionOnFail="continue" Selection="false" Status="stopped" Verdict="fail">
+      <description> For this testcase, the stering wheel must turn most left, most right and to the middle 
+ </description>
+      <metadata>
+        <comment>/**
+	 * 
+	 * @desc For this testcase, the stering wheel must turn most left, most right and to the middle 
+	 * @verdict 
+	 */</comment>
+      </metadata>
+    </testcase>
+    <testcase Name="TC_OPEN_DOOR_AT_SPEED_50" Alias="" Module="Car2X_Testcases" Retries="0" Runs="1" ActionOnFail="continue" Selection="false" Status="stopped" Verdict="fail">
+      <description></description>
+    </testcase>
+    <testcase Name="TC_HEADLAMP_STATUS" Alias="" Module="Car2X_Testcases" Retries="0" Runs="1" ActionOnFail="continue" Selection="false" Status="stopped" Verdict="fail">
       <description></description>
     </testcase>
   </campaign>
