@@ -73,19 +73,19 @@
             android:stretchColumns="1"
             android:background="@drawable/rectangle_border_white">
             <TextView
-                android:text="Start engine"
+                android:text="@string/stage_start_engine"
                 android:gravity="center"
                 android:textSize="28sp" />
             <TextView
-                android:text="Drive 50 km/h"
+                android:text="@string/stage_drive_50"
                 android:gravity="center"
                 android:textSize="28sp" />
             <TextView
-                android:text="Slow down to 30 km/h"
+                android:text="@string/stage_down_to_30"
                 android:gravity="center"
                 android:textSize="28sp" />
             <TextView
-                android:text="Let the car roll to a halt"
+                android:text="@string/stage_roll_halt"
                 android:gravity="center"
                 android:textSize="28sp" />
         </TableLayout>
