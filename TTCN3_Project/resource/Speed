@@ -1,1 +1,1 @@
-{"OpenXCKey":"vehicle_speed", "OBD2Key":"0D", "valueA": "55.2", "respTimestamp":3535464457} 
+{"OpenXCKey":"ignition_status", "OBD2Key":"0D", "valueA": "start", "respTimestamp":3535464457} 

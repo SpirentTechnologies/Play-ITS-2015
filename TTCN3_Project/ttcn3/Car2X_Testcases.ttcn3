@@ -39,7 +39,6 @@ module Car2X_Testcases {
 		f_setUp();
 
 		// start value request for TC
-		filterPort.send(m_Filter_vehicleSpeed_Start);
 
 		// send stage information
 		action("stage:" & int2str(v_stage));
@@ -52,7 +51,6 @@ module Car2X_Testcases {
 		}
 
 		// stop value request
-		filterPort.send(m_Filter_vehicleSpeed_Stop);
 		setverdict(v_ret);
 
 		// tear down configuration

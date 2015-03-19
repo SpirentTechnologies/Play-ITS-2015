@@ -4,12 +4,21 @@
     <plugin id="com.testingtech.ttcn.XTestAdapter.builtin.tci.codecs">
       <parameter id="class" value="com.testingtech.ttcn.tci.codec.plugin.BitBaseCodecPluginProvider"/>
     </plugin>
-    <parameter id="default" value="true"/>
   </codec>
-  <codec encode="blubb">
-    <plugin id="com.testingtech.ttcn.tci.codec.generated.Car2X_Types">
-      <parameter id="class" value="com.testingtech.generated.codec.Car2X_Types.TabularCar2X_TypesCodecProvider"/>
+  <codec encode="json">
+    <plugin id="com.testingtech.ttworkbench.json.rt">
+      <parameter id="class" value="com.testingtech.ttworkbench.json.rt.JSONCodecPlugin"/>
     </plugin>
+    <parameter id="taParams">
+      <parameter id="pretty-print">
+        <value>
+          <Values:boolean xmlns:Values="Values.xsd" type="boolean">
+            <Values:value>true</Values:value>
+          </Values:boolean>
+        </value>
+      </parameter>
+    </parameter>
+    <parameter id="default" value="true"/>
   </codec>
   <port>
     <plugin id="com.testingtech.ttworkbench.tt3rt.tcp.port.TcpPortPlugin">
@@ -69,5 +78,6 @@
       </parameter>
     </parameter>
     <parameter id="portType" value="Car2X_ConfigSystem.FilterPortType"/>
+    <parameter id="default" value="true"/>
   </port>
 </testadapter>

@@ -9,6 +9,8 @@ module Car2X_Functions {
 		template
 			m_Filter_doorStatus_Start,
 			m_Filter_doorStatus_Stop,
+			m_Filter_engineSpeed_Start,
+			m_Filter_engineSpeed_Stop,
 			m_Filter_headLampStatus_Start,
 			m_Filter_headLampStatus_Stop,
 			m_Filter_ignitionState_Start,
@@ -17,7 +19,10 @@ module Car2X_Functions {
 			m_Filter_steeringWheel_Stop,
 			m_Filter_transmissionGear_Start,
 			m_Filter_transmissionGear_Stop,
+			m_Filter_vehicleSpeed_Start,
+			m_Filter_vehicleSpeed_Stop,
 			mw_Filter_Response_dS,
+			mw_Filter_Response_eS,
 			mw_Filter_Response_hL,
 			mw_Filter_Response_iS,
 			mw_Filter_Response_sW,
@@ -32,7 +37,7 @@ module Car2X_Functions {
 	import from Car2X_ConfigSystem {type TesterComponentType;}
 
 	/**
-	 * @desc function to measure speed for a defined period of time
+	 * @desc function to measure vehicle speed for a defined period of time
 	 * @param p_speed target speed (in km/h)
 	 * @param p_holding_time time with target speed (in sec)
 	 * @param p_variance variance range around the targetAngle (in km/h)
@@ -69,7 +74,8 @@ module Car2X_Functions {
 		var template FilterResponse v_speed;
 		timer t_holding;
 		var float speed;
-
+		
+		filterPort.send(m_Filter_vehicleSpeed_Start);
 		// start the timer
 		t_TC.start(p_interval);
 		alt {
@@ -78,8 +84,8 @@ module Car2X_Functions {
 				t_TC.stop;
 				// check whether vehicle speed is greater than given speed
 				speed := str2float(v_speed.valueA);
-				if (max(p_speed - p_variance, 0.0) <= speed and
-					speed >= min(p_speed + p_variance, 655.0)) {
+				if (f_max(p_speed - p_variance, 0.0) <= speed and
+					speed >= f_min(p_speed + p_variance, 655.0)) {
 					t_holding.start(p_holding_time);
 					while (t_holding.running and v_ret == pass) {
 						filterPort.receive(mw_Filter_Response_vS) ->
@@ -102,6 +108,81 @@ module Car2X_Functions {
 				v_ret := inconc;
 			}
 		}
+
+		filterPort.send(m_Filter_vehicleSpeed_Stop);
+	}
+
+	/**
+	 * @desc function to measure engine speed for a defined period of time
+	 * @param p_engine_speed target engine speed (in rpm)
+	 * @param p_holding_time time with this engine speed (in sec)
+	 * @param p_variance variance range around target engine speed (in rpm)
+	 * @param p_time_out time until timeout (in sec)
+	 * @verdict
+	 */
+	function f_TP_ENGINE_SPEED(float p_engine_speed, float p_holding_time,
+							   float p_variance, float p_time_out)
+		runs on TesterComponentType  {
+		t_TC_Global.start;
+		while (t_TC_Global.running) {
+			f_TP_ENGINE_SPEED_SUB(p_engine_speed, p_variance,p_holding_time, 1.0);
+			if (v_ret == pass) {
+				t_TC_Global.stop;
+			}
+		}
+	}
+
+	/**
+	 * 
+	 * @desc request engine speed from can filter
+	 * @param p_engine_speed target engine speed to reach (in rpm)
+	 * @param p_variance variance around the target speed
+	 * @param p_holding_time time with target speed (in sec)
+	 * @param p_interval time until timeout (in sec)
+	 * @verdict 
+	 */
+	function f_TP_ENGINE_SPEED_SUB(float p_engine_speed, float p_variance, float p_holding_time,
+								   float p_interval)
+		runs on TesterComponentType  {
+		var template FilterResponse v_speed;
+		timer t_holding;
+		var float speed;
+		
+
+		filterPort.send(m_Filter_engineSpeed_Start);
+		// start the timer
+		t_TC.start(p_interval);
+		alt {
+			// store received template into value
+			[] filterPort.receive(mw_Filter_Response_eS) -> value v_speed {
+				t_TC.stop;
+				// check whether vehicle speed is greater than given speed
+				speed := str2float(v_speed.valueA);
+				if (f_max(p_engine_speed - p_variance, 0.0) <= speed and
+					speed >= f_min(p_engine_speed + p_variance, 16382.0)) {
+					t_holding.start(p_holding_time);
+					while (t_holding.running and v_ret == pass) {
+						filterPort.receive(mw_Filter_Response_eS) ->
+						value v_speed;
+						if (str2float(v_speed.valueA) >= p_engine_speed) {
+							v_ret := pass;
+						} else {
+							v_ret := fail;
+						}
+					}
+				} else {
+					v_ret := fail;
+				}
+			}
+			[] filterPort.receive {
+				t_TC.stop;
+				v_ret := fail;
+			}
+			[] t_TC.timeout {
+				v_ret := inconc;
+			}
+		}
+		filterPort.send(m_Filter_engineSpeed_Stop);		
 	}
 
 	/**
@@ -146,10 +227,10 @@ module Car2X_Functions {
 
 		alt {
 			[] filterPort.receive(mw_Filter_Response_sW) -> value v_angle {
-				if (max(targetAngle - variance, - 600.0) <=
+				if (f_max(targetAngle - variance, - 600.0) <=
 					str2float(v_angle.valueA) and
 					str2float(v_angle.valueA) <=
-					min(targetAngle + variance, 600.0)) {
+					f_min(targetAngle + variance, 600.0)) {
 					v_ret := pass;
 					t_TC.stop;
 				} else {
@@ -212,7 +293,7 @@ module Car2X_Functions {
 			// store received template into value
 			[] filterPort.receive(mw_Filter_Response_hL) ->
 			   value v_headLampStatus {
-				if (p_Status == str2bool(v_headLampStatus.valueA)) {
+				if (p_Status == f_str2bool(v_headLampStatus.valueA)) {
 					v_ret := pass;
 				} else {
 					v_ret := fail;
@@ -272,13 +353,13 @@ module Car2X_Functions {
 			// store received template into value
 			[] filterPort.receive(mw_Filter_Response_iS) ->
 			   value v_ignitionStatus {
-				if (ignitionStatus2str(ignitionStatus) ==
+				t_TC.stop;
+				if (f_ignitionStatus2str(ignitionStatus) ==
 					v_ignitionStatus.valueA) {
 					v_ret := pass;
 				} else {
 					v_ret := fail;
 				}
-				t_TC.stop;
 			}
 			[] filterPort.receive {
 				t_TC.stop;
@@ -334,7 +415,7 @@ module Car2X_Functions {
 
 		alt {
 			[] filterPort.receive(mw_Filter_Response_tG) -> value v_gearStatus {
-				if (gearStatus2Str(gear) == v_gearStatus.valueA) {
+				if (f_gearStatus2Str(gear) == v_gearStatus.valueA) {
 					v_ret := pass;
 				}
 			}
@@ -397,7 +478,7 @@ module Car2X_Functions {
 
 		alt {
 			[] filterPort.receive(mw_Filter_Response_dS) -> value v_doorStatus {
-				if (doorStatus2Str(p_door) == v_doorStatus.valueA and
+				if (f_doorStatus2Str(p_door) == v_doorStatus.valueA and
 					p_status == v_doorStatus.valueB) {
 					v_ret := pass;
 				}
@@ -420,8 +501,7 @@ module Car2X_Functions {
 	 *   		 Maps the port of the tester to the system port.
 	 */
 	function f_setUp() runs on TesterComponentType  {
-
-
+		
 		// create an instance of the tester
 		var TesterComponentType Tester;
 		Tester := TesterComponentType.create;
@@ -440,11 +520,11 @@ module Car2X_Functions {
 	 * @return
 	 * @verdict
 	 */
-	function max(float valueA, float valueB) return float  {
-		if (valueA > valueB) {
-			return valueA;
+	function f_max(float p_valueA, float p_valueB) return float  {
+		if (p_valueA > p_valueB) {
+			return p_valueA;
 		} else {
-			return valueB;
+			return p_valueB;
 		}
 	}
 
@@ -455,11 +535,11 @@ module Car2X_Functions {
 	 * @return
 	 * @verdict
 	 */
-	function min(float valueA, float valueB) return float  {
-		if (valueA < valueB) {
-			return valueA;
+	function f_min(float p_valueA, float p_valueB) return float  {
+		if (p_valueA < p_valueB) {
+			return p_valueA;
 		} else {
-			return valueB;
+			return p_valueB;
 		}
 	}
 
@@ -471,9 +551,9 @@ module Car2X_Functions {
 	 * @param ignitionStatus
 	 * @return charstring Ignition status as string
 	 */
-	function ignitionStatus2str(IgnitionStatus ignitionStatus)
+	function f_ignitionStatus2str(IgnitionStatus p_ignitionStatus)
 		return charstring  {
-		select (ignitionStatus) {
+		select (p_ignitionStatus) {
 			case (e_off) {
 				return "off";
 			}
@@ -495,8 +575,8 @@ module Car2X_Functions {
 	 * @return
 	 * @verdict
 	 */
-	function doorStatus2Str(DoorStatus doorStatus) return charstring  {
-		select (doorStatus) {
+	function f_doorStatus2Str(DoorStatus p_doorStatus) return charstring  {
+		select (p_doorStatus) {
 			case (e_driver) {
 				return "driver";
 			}
@@ -518,8 +598,8 @@ module Car2X_Functions {
 	 * @return
 	 * @verdict
 	 */
-	function gearStatus2Str(TransmissionGear gear) return charstring  {
-		select (gear) {
+	function f_gearStatus2Str(TransmissionGear p_gear) return charstring  {
+		select (p_gear) {
 			case (e_first) {
 				return "first";
 			}
@@ -591,7 +671,7 @@ module Car2X_Functions {
 	 *   <b>false</b> else
 	 * @verdict
 	 */
-	function str2bool(template charstring p_str) return boolean  {
+	function f_str2bool(template charstring p_str) return boolean  {
 		if (p_str == "true" or p_str == "True" or p_str == "TRUE" or
 			p_str == "1") {
 			return true;

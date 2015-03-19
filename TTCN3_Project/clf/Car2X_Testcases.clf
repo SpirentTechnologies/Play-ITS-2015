@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE campaignloader PUBLIC "-//TESTING TECH//DTD MLF//2.0" "mlf.dtd">
 <campaignloader>
-  <campaign Name="Car2X_Testcases.clf" Control="false">
+  <campaign Name="Car2X_Testcases" Control="false">
     <testadapter Name="com.testingtech.ttcn.tri.PluginTestAdapter" File="">
       <description></description>
     </testadapter>
@@ -40,7 +40,15 @@
       </metadata>
     </testcase>
     <testcase Name="TC_OPEN_DOOR_AT_SPEED_50" Alias="" Module="Car2X_Testcases" Retries="0" Runs="1" ActionOnFail="continue" Selection="false" Status="stopped" Verdict="fail">
-      <description></description>
+      <description> For these testcase to driver should speed up to over 50 and then open the driver door.  
+ </description>
+      <metadata>
+        <comment>/**
+	 * 
+	 * @desc For these testcase to driver should speed up to over 50 and then open the driver door.  
+	 * @verdict 
+	 */</comment>
+      </metadata>
     </testcase>
     <testcase Name="TC_HEADLAMP_STATUS" Alias="" Module="Car2X_Testcases" Retries="0" Runs="1" ActionOnFail="continue" Selection="false" Status="stopped" Verdict="fail">
       <description></description>

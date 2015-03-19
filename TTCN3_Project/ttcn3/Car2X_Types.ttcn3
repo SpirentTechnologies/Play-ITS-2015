@@ -82,6 +82,5 @@ module Car2X_Types {
 	}
 } 
 with {
-  encode "blubb";
-  variant "GenCodec";
+  encode "json";
 };
