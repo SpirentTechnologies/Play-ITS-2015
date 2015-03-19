@@ -14,6 +14,8 @@ import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.testingtech.car2x.hmi.driver.Driver;
+
 import java.util.Locale;
 
 public class TestRunnerActivity extends ActionBarActivity {
@@ -32,6 +34,9 @@ public class TestRunnerActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_test_runner);
+
+        // TODO remove (just for testing)
+        Driver.start();
 
         Intent intent = getIntent();
         String testName = intent.getStringExtra(TestSelectorActivity.TEST_NAME);

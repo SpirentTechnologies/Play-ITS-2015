@@ -1,4 +1,4 @@
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -9,34 +9,9 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.testingtech.car2x.hmi.TestSelectorActivity">
 
-    <TableLayout
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:stretchColumns="1">
+<ExpandableListView
+    android:id="@+id/listView"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"/>
 
-        <Button
-            android:onClick="startDriveTest"
-            android:text="@string/title_activity_drive_test" />
-
-        <Button android:text="Test steering wheel angle sensor" />
-
-        <Button android:text="Test headlamp status" />
-
-        <Button android:text="Test engine rotation speed" />
-
-        <Button android:text="Test full brake with speed over 60 km/h" />
-
-        <Button android:text="Test open door with speed over 50 km/h" />
-
-        <Button android:text="Activate hand brake" />
-
-        <Button android:text="Speed up to 50 and slow down to 30 km/h" />
-
-        <Button android:text="Speed up to 30 and stop" />
-
-        <Button android:text="Drive in reverse" />
-
-        <Button android:text="Test Brakes' efficiency" />
-
-    </TableLayout>
-</ScrollView>
+</LinearLayout>
