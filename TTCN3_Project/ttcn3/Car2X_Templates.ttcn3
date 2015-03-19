@@ -3,6 +3,10 @@
  * @desc Here we define our templates.
  */
 module Car2X_Templates {
+	
+
+	import from Car2X_Functions {function f_bool2str, f_ignitionStatus2str;}
+
 	import from Car2X_ModuleParameters {
 		const
 			c_door_status,
@@ -15,7 +19,12 @@ module Car2X_Templates {
 			c_vehicle_speed;
 	}
 	import from Car2X_Types {
-		type ElmRequest, ElmResponse, FilterRequest, FilterResponse;
+		type
+			ElmRequest,
+			ElmResponse,
+			FilterRequest,
+			FilterResponse,
+			IgnitionStatus;
 	}
 
 	/**
@@ -139,13 +148,25 @@ module Car2X_Templates {
 	/**
 	 * @desc template for ignition status response
 	 */
-	template FilterResponse mw_Filter_Response_iS() := {
+	template FilterResponse mw_Filter_Response_iS(IgnitionStatus status) := {
 		OpenXCKey := c_ignition_status,
 		OBD2Key := ?,
-		valueA := ?,
+		valueA := f_ignitionStatus2str(status),
 		respTimestamp := ?
 	}
-
+	
+//	template FilterResponse mw_Filter_Response_iS_run() modifies mw_Filter_Response_iS := {
+//		valueA := f_ignitionStatus2str(e_run)
+//	}
+//	
+//	template FilterResponse mw_Filter_Response_iS_off() modifies mw_Filter_Response_iS := {
+//			valueA := f_ignitionStatus2str(e_off)
+//	}
+//
+//	template FilterResponse mw_Filter_Response_iS_accessory() modifies mw_Filter_Response_iS := {
+//			valueA := f_ignitionStatus2str(e_accessory)
+//	}
+	
 	/**
 	 * @desc template for vehicle Speed response
 	 */
@@ -170,10 +191,10 @@ module Car2X_Templates {
 	  * 
 	  * @desc template for head lamp status response 
 	  */
-	template FilterResponse mw_Filter_Response_hL() := {
+	template FilterResponse mw_Filter_Response_hL(boolean p_Status) := {
 		OpenXCKey := c_headlamp_status,
 		OBD2Key := ?,
-		valueA := ?,
+		valueA := f_bool2str(p_Status),
 		respTimestamp := ?
 	}
 }

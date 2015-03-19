@@ -195,12 +195,19 @@ module Car2X_Functions {
 	function f_TP_STEERING_WHEEL_ANGLE(float targetAngle, float variance)
 		runs on TesterComponentType  {
 		t_TC_Global.start;
+		// start steering Wheel request
+		filterPort.send(m_Filter_steeringWheel_Start);
+		
 		while (t_TC_Global.running) {
 			f_TP_STEERING_WHEEL_ANGLE_SUB(- 600.0, 50.0, 2.0);
 			if (v_ret == pass) {
 				t_TC_Global.stop;
 			}
 		}
+
+		// stop steering wheel request
+		filterPort.send(m_Filter_steeringWheel_Stop);
+		
 		if (v_ret != pass) {
 			setverdict(v_ret);
 			f_tearDown();
@@ -220,11 +227,7 @@ module Car2X_Functions {
 		runs on TesterComponentType  {
 		var template FilterResponse v_angle;
 
-		// start steering Wheel request
-		filterPort.send(m_Filter_steeringWheel_Start);
-
 		t_TC.start(interval);
-
 		alt {
 			[] filterPort.receive(mw_Filter_Response_sW) -> value v_angle {
 				if (f_max(targetAngle - variance, - 600.0) <=
@@ -246,8 +249,6 @@ module Car2X_Functions {
 				v_ret := inconc;
 			}
 		}
-		// stop steering wheel request
-		filterPort.send(m_Filter_steeringWheel_Stop);
 	}
 
 	/**
@@ -258,14 +259,20 @@ module Car2X_Functions {
 	 */
 	function f_TP_HEADLAMP_STATUS(boolean p_Status, float p_timeout)
 		runs on TesterComponentType  {
-
+		// start ignition status request
+		filterPort.send(m_Filter_headLampStatus_Start);
 		t_TC_Global.start(p_timeout);
+		
 		while (t_TC_Global.running) {
 			f_TP_HEADLAMP_STATUS_SUB(p_Status, 0.8);
 			if (v_ret == pass) {
 				t_TC_Global.stop;
 			}
 		}
+
+		// stop ignition status request
+		filterPort.send(m_Filter_headLampStatus_Stop);		
+		
 		// stage failed -> end whole TC
 		if (v_ret != pass) {
 			setverdict(v_ret);
@@ -284,21 +291,13 @@ module Car2X_Functions {
 		runs on TesterComponentType  {
 		var template FilterResponse v_headLampStatus;
 
-		// start ignition status request
-		filterPort.send(m_Filter_headLampStatus_Start);
-
 		t_TC.start(p_interval);
 
 		alt {
 			// store received template into value
-			[] filterPort.receive(mw_Filter_Response_hL) ->
-			   value v_headLampStatus {
-				if (p_Status == f_str2bool(v_headLampStatus.valueA)) {
-					v_ret := pass;
-				} else {
-					v_ret := fail;
-				}
+			[] filterPort.receive(mw_Filter_Response_hL(p_Status)) {
 				t_TC.stop;
+				v_ret := pass;
 			}
 			[] filterPort.receive {
 				t_TC.stop;
@@ -308,9 +307,6 @@ module Car2X_Functions {
 				v_ret := inconc;
 			}
 		}
-
-		// stop ignition status request
-		filterPort.send(m_Filter_headLampStatus_Stop);
 	}
 
 	/**
@@ -321,13 +317,19 @@ module Car2X_Functions {
 	function f_TP_IGNITION_STATUS(IgnitionStatus ignitionStatus)
 		runs on TesterComponentType  {
 
-		t_TC_Global.start;
+		t_TC_Global.start;	
+		// start ignition status request
+		filterPort.send(m_Filter_ignitionState_Start);
+		
 		while (t_TC_Global.running) {
 			f_TP_IGNITION_STATUS_SUB(ignitionStatus, 0.5);
 			if (v_ret == pass) {
 				t_TC_Global.stop;
 			}
-		}
+		}		
+
+		// stop ignition status request
+		filterPort.send(m_Filter_ignitionState_Stop);
 	}
 
 	/**
@@ -343,23 +345,13 @@ module Car2X_Functions {
 		runs on TesterComponentType  {
 
 		var template FilterResponse v_ignitionStatus;
-
-		// start ignition status request
-		filterPort.send(m_Filter_ignitionState_Start);
-
 		t_TC.start(interval);
 
 		alt {
 			// store received template into value
-			[] filterPort.receive(mw_Filter_Response_iS) ->
-			   value v_ignitionStatus {
+			[] filterPort.receive(mw_Filter_Response_iS(e_run)) {
 				t_TC.stop;
-				if (f_ignitionStatus2str(ignitionStatus) ==
-					v_ignitionStatus.valueA) {
-					v_ret := pass;
-				} else {
-					v_ret := fail;
-				}
+				v_ret := pass;
 			}
 			[] filterPort.receive {
 				t_TC.stop;
@@ -369,9 +361,6 @@ module Car2X_Functions {
 				v_ret := inconc;
 			}
 		}
-
-		// stop ignition status request
-		filterPort.send(m_Filter_ignitionState_Stop);
 	}
 
 	/**
@@ -677,6 +666,14 @@ module Car2X_Functions {
 			return true;
 		} else {
 			return false;
+		}
+	}
+	
+	function f_bool2str(boolean status)return charstring{
+		if(status){
+			return "true";
+		}else {
+			return "false";
 		}
 	}
 }
