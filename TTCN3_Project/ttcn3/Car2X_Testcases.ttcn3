@@ -140,6 +140,21 @@ module Car2X_Testcases {
 		// tear down configuration
 		f_tearDown();				
 	}
+	
+	testcase TC_IGNITION_STATE_DUMMY() runs on TesterComponentType system SystemComponentType {
+		// set up configuration
+		f_setUp();
+
+		// send stage information
+		action("stage:" & int2str(v_stage));
+		
+//		executing stage 1
+		 f_TP_IGNITION_STATUS(e_accessory);
+		
+		setverdict(v_ret);
+		// tear down configuration
+		f_tearDown();				
+	}
 
 	/**
 	 * 

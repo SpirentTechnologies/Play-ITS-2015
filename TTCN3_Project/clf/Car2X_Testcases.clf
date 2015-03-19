@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE campaignloader PUBLIC "-//TESTING TECH//DTD MLF//2.0" "mlf.dtd">
 <campaignloader>
-  <campaign Name="Car2X_Testcases" Control="false">
+  <campaign Name="Car2X_Testcases.clf" Control="false">
     <testadapter Name="com.testingtech.ttcn.tri.PluginTestAdapter" File="">
       <description></description>
     </testadapter>
@@ -51,6 +51,9 @@
       </metadata>
     </testcase>
     <testcase Name="TC_HEADLAMP_STATUS" Alias="" Module="Car2X_Testcases" Retries="0" Runs="1" ActionOnFail="continue" Selection="false" Status="stopped" Verdict="fail">
+      <description></description>
+    </testcase>
+    <testcase Name="TC_IGNITION_STATE_DUMMY" Alias="" Module="Car2X_Testcases" Retries="0" Runs="1" ActionOnFail="continue" Selection="false" Status="stopped" Verdict="fail">
       <description></description>
     </testcase>
   </campaign>
