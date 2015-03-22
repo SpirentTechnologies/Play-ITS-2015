@@ -47,7 +47,9 @@ module Car2X_Functions {
 	function f_TP_VEHICLE_SPEED(float p_speed, float p_holding_time,
 								float p_variance, float p_interval)
 		runs on TesterComponentType  {
-		t_TC_Global.start;
+			
+		t_TC_Global.start;		
+		filterPort.send(m_Filter_vehicleSpeed_Start);
 		while (t_TC_Global.running) {
 			f_TP_VEHICLE_SPEED_SUB(p_speed, p_holding_time, p_variance,
 								   p_interval);
@@ -55,6 +57,8 @@ module Car2X_Functions {
 				t_TC_Global.stop;
 			}
 		}
+		filterPort.send(m_Filter_vehicleSpeed_Stop);
+		
 		if (v_ret != pass) {
 			setverdict(v_ret);
 			f_tearDown();
@@ -75,7 +79,6 @@ module Car2X_Functions {
 		timer t_holding;
 		var float speed;
 		
-		filterPort.send(m_Filter_vehicleSpeed_Start);
 		// start the timer
 		t_TC.start(p_interval);
 		alt {
@@ -108,8 +111,6 @@ module Car2X_Functions {
 				v_ret := inconc;
 			}
 		}
-
-		filterPort.send(m_Filter_vehicleSpeed_Stop);
 	}
 
 	/**
@@ -124,11 +125,18 @@ module Car2X_Functions {
 							   float p_variance, float p_time_out)
 		runs on TesterComponentType  {
 		t_TC_Global.start;
+		filterPort.send(m_Filter_engineSpeed_Start);
 		while (t_TC_Global.running) {
 			f_TP_ENGINE_SPEED_SUB(p_engine_speed, p_variance,p_holding_time, 1.0);
 			if (v_ret == pass) {
 				t_TC_Global.stop;
 			}
+		}
+		filterPort.send(m_Filter_engineSpeed_Stop);		
+		
+		if (v_ret != pass) {
+			setverdict(v_ret);
+			f_tearDown();
 		}
 	}
 
@@ -148,8 +156,6 @@ module Car2X_Functions {
 		timer t_holding;
 		var float speed;
 		
-
-		filterPort.send(m_Filter_engineSpeed_Start);
 		// start the timer
 		t_TC.start(p_interval);
 		alt {
@@ -182,7 +188,6 @@ module Car2X_Functions {
 				v_ret := inconc;
 			}
 		}
-		filterPort.send(m_Filter_engineSpeed_Stop);		
 	}
 
 	/**
@@ -269,7 +274,6 @@ module Car2X_Functions {
 				t_TC_Global.stop;
 			}
 		}
-
 		// stop ignition status request
 		filterPort.send(m_Filter_headLampStatus_Stop);		
 		
@@ -327,9 +331,14 @@ module Car2X_Functions {
 				t_TC_Global.stop;
 			}
 		}		
-
 		// stop ignition status request
 		filterPort.send(m_Filter_ignitionState_Stop);
+		
+		// stage failed -> end whole TC
+		 if (v_ret != pass) {
+			 setverdict(v_ret);
+			 f_tearDown();
+		 }
 	}
 
 	/**
@@ -373,6 +382,7 @@ module Car2X_Functions {
 										   float p_interval)
 		runs on TesterComponentType  {
 		t_TC_Global.start(p_interval);
+		filterPort.send(m_Filter_transmissionGear_Start);
 
 		while (t_TC_Global.running) {
 			f_TP_TRANSMISSION_GEAR_STATUS_SUB(gear, 1.0);
@@ -380,6 +390,8 @@ module Car2X_Functions {
 				t_TC_Global.stop;
 			}
 		}
+		filterPort.send(m_Filter_transmissionGear_Stop);
+		
 		if (v_ret != pass) {
 			setverdict(v_ret);
 			// send verdict
@@ -399,7 +411,6 @@ module Car2X_Functions {
 		runs on TesterComponentType  {
 		var template FilterResponse v_gearStatus;
 
-		filterPort.send(m_Filter_transmissionGear_Start);
 		t_TC.start(p_interval);
 
 		alt {
@@ -416,7 +427,6 @@ module Car2X_Functions {
 				v_ret := inconc;
 			}
 		}
-		filterPort.send(m_Filter_transmissionGear_Stop);
 	}
 
 	/**
@@ -432,6 +442,7 @@ module Car2X_Functions {
 							  float p_interval) runs on TesterComponentType  {
 
 		t_TC_Global.start(p_interval);
+		filterPort.send(m_Filter_doorStatus_Start);
 
 		while (t_TC_Global.running) {
 			f_TP_DOOR_STATUS_SUB(p_door, p_status, 1.0);
@@ -439,6 +450,8 @@ module Car2X_Functions {
 				t_TC_Global.stop;
 			}
 		}
+		filterPort.send(m_Filter_doorStatus_Stop);
+		
 		if (v_ret != pass) {
 			setverdict(v_ret);
 			// send verdict
@@ -461,7 +474,6 @@ module Car2X_Functions {
 
 		var template FilterResponse v_doorStatus;
 
-		filterPort.send(m_Filter_doorStatus_Start);
 
 		t_TC.start(p_interval);
 
@@ -480,8 +492,6 @@ module Car2X_Functions {
 				v_ret := inconc;
 			}
 		}
-
-		filterPort.send(m_Filter_doorStatus_Stop);
 	}
 
 	/**
