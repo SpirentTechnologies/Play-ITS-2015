@@ -1,45 +1,82 @@
 package canfilter;
 
 public class Car2XEntry {
-	// Attributes
-	private String obd2key;
-	private String valueA;
-	private String valueB;
-	private long timestamp;
+  // Attributes
+  private String obd2key;
+  private String valueA;
+  private String valueB;
+  private long timestamp;
 
-	public String getObd2key() {
-		return obd2key;
-	}
+  /**
+   * Backup key for communicating with ELM327
+   * @return hexadecimal obd-2 key
+   */
+  public String getObd2key() {
+    return obd2key;
+  }
 
-	public long getTimestamp() {
-		return timestamp;
-	}
+  /**
+   * Date in millis according to the last time 
+   * valueA and valueB where updated.
+   * @return a timestamp
+   */
+  public long getTimestamp() {
+    return timestamp;
+  }
 
-	public String getValueA() {
-		return valueA;
-	}
+  /**
+   * Each key has a valueA, respresented as String
+   * @return first value of a given key
+   */
+  public String getValueA() {
+    return valueA;
+  }
 
-	public String getValueB() {
-		return valueB;
-	}
+  /**
+   * Optional value representing true or false in case of an event
+   * @return true or false coded as String
+   */
+  public String getValueB() {
+    return valueB;
+  }
 
-	public void setOpenxckey(String str) {
-		this.obd2key = str;
-	}
+  /**
+   * Name of valueA read from openXC simulator 
+   * @param key two byte hexadecimal String
+   */
+  public void setOpenxckey(String key) {
+    this.obd2key = key;
+  }
 
-	public void setObds2key(String str) {
-		this.obd2key = str;
-	}
+  /**
+   * Backup key for communicating with ELM327
+   * @param key two byte hexadecimal String
+   */
+  public void setObd2key(String key) {
+    this.obd2key = key;
+  }
 
-	public void setTimestamp(long ts) {
-		this.timestamp = ts;
-	}
+  /**
+   * Date of last update of valueA and valueB
+   * @param timestamp milliseconds.
+   */
+  public void setTimestamp(long timestamp) {
+    this.timestamp = timestamp;
+  }
 
-	public void setValueA(String str) {
-		this.valueA = str;
-	}
+  /**
+   * Actual value of car2x entry.
+   * @param valueA String or String representation of a number
+   */
+  public void setValueA(String valueA) {
+    this.valueA = valueA;
+  }
 
-	public void setValueB(String str) {
-		this.valueB = str;
-	}
+  /**
+   * Optional value representing state of the key
+   * @param str Either true or false represented as a String
+   */
+  public void setValueB(String str) {
+    this.valueB = str;
+  }
 }
