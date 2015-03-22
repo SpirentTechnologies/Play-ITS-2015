@@ -1,5 +1,4 @@
 module Car2X_Types {
-	// add types here
 	
 	type record ElmRequest {
 		charstring modePrefix length(2),
@@ -10,4 +9,78 @@ module Car2X_Types {
 		charstring response
 	}
 	
-}
+	/**
+	 * 
+	 * @desc Type for filter requests.
+	 * @member reqType Determine the type of the request.
+	 * 				   'start' to start receiving requested data.
+	 * 				   'stop' to stop receiving requested data.
+	 * @member reqData @see ReqData
+	 */
+	type record FilterRequest {
+		charstring reqType,
+		record of ReqData reqData
+	}
+	
+	/**
+	 * 
+	 * @desc The data structure that is requested from the server.
+	 * 		 It is used for 'start' and 'stop' requests.
+	 * @member key Determines the key. All key are listed here  @url https://github.com/TestingTechnologies/Play-ITS-2015/wiki/Filter#data-table
+	 * @member interval Determines the interval in which the given data is received.
+	 */
+	type record ReqData {
+		charstring key,
+		integer interval optional
+	}
+	
+	/**
+     * 
+     * @desc Type for the filter response.
+     * 		 For more information @url https://github.com/TestingTechnologies/Play-ITS-2015/wiki/TTWorkbench#response
+     * @member OpenXCKey Key for given OpenXC value.
+     * @member OBD2Key Key for given OBD2 value.
+     * @member valueA First value of the requested data (@see UnionValue)
+     * @member valueB An optional value for some OpenXC statements.
+     * @member myTimestamp Timestamp of the response.
+     */
+	type record FilterResponse {
+		charstring OpenXCKey,
+		charstring OBD2Key,
+		charstring valueA ,
+		boolean valueB optional,
+		integer respTimestamp
+	}
+	
+	type enumerated IgnitionStatus {
+		e_off,
+		e_accessory,
+		e_run,
+		e_start
+	};
+	
+	type enumerated DoorStatus {
+		e_driver,
+		e_passenger,
+		e_rear_left,
+		e_rear_right
+	};
+	
+	type enumerated TransmissionGear {
+		e_first,
+		e_second,
+		e_third,
+		e_fourth,
+		e_fifth,
+		e_sixth,
+		e_seventh,
+		e_eighth,
+		e_ninth,
+		e_tenth,
+		e_reverse,
+		e_neutral
+	}
+} 
+with {
+  encode "json";
+};

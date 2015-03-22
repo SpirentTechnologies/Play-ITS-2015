@@ -1,15 +1,203 @@
+/**
+ * @author Christian Damm, Sascha Kretzschmann
+ * @desc Here we define our templates.
+ */
 module Car2X_Templates {
-	import from Car2X_ModuleParameters all;
-	import from Car2X_Types {type ElmRequest, ElmResponse;}
-	
-	template ElmRequest m_vehicleSpeed() := {
-	  modePrefix := c_modePrefix_01,
-	  parameterID := "0D"
-	}
 	
 
-	template ElmResponse mw_vehicleSpeed() := {
-	  response := ?
+	import from Car2X_Functions {function f_bool2str, f_ignitionStatus2str;}
+
+	import from Car2X_ModuleParameters {
+		const
+			c_door_status,
+			c_engine_speed,
+			c_headlamp_status,
+			c_ignition_status,
+			c_modePrefix_01,
+			c_steering_wheel_angle,
+			c_transmission_gear_position,
+			c_vehicle_speed;
+	}
+	import from Car2X_Types {
+		type
+			ElmRequest,
+			ElmResponse,
+			FilterRequest,
+			FilterResponse,
+			IgnitionStatus;
 	}
 
+	/**
+	 * @desc Request template to communicate with ELM.
+	 */
+	template ElmRequest m_Elm_vehicleSpeed() := {
+		modePrefix := c_modePrefix_01, parameterID := "0D"
+	}
+
+	/**
+	 * @desc Response template receiving from ELM.
+	 */
+	template ElmResponse mw_Elm_vehicleSpeed() := {response := ?}
+
+
+
+	template FilterRequest m_Filter_vehicleSpeed_Start() := {
+		reqType := "start",
+		reqData := {
+			{key := c_vehicle_speed, interval := 1500},
+			{key := c_headlamp_status, interval := 500}
+		}
+	}
+
+	template FilterRequest m_Filter_vehicleSpeed_Stop() := {
+		reqType := "stop",
+		reqData := {{key := c_vehicle_speed}, {key := c_headlamp_status}}
+	}
+
+	template FilterRequest m_Filter_steeringWheel_Start() := {
+		reqType := "start",
+		reqData := {{key := c_steering_wheel_angle, interval := 1000}}
+	}
+
+	template FilterRequest m_Filter_doorStatus_Start() := {
+		reqType := "start",
+		reqData := {{key := c_door_status, interval := 1000}}
+	}
+
+	template FilterRequest m_Filter_doorStatus_Stop() := {
+		reqType := "stop", reqData := {{key := c_door_status, interval := 1000}}
+	}
+
+	template FilterRequest m_Filter_transmissionGear_Start() := {
+		reqType := "start",
+		reqData := {{key := c_transmission_gear_position, interval := 1000}}
+	}
+
+	template FilterRequest m_Filter_transmissionGear_Stop() := {
+		reqType := "stop",
+		reqData := {{key := c_transmission_gear_position, interval := 1000}}
+	}
+
+
+	template FilterRequest m_Filter_headLampStatus_Start() := {
+		reqType := "start",
+		reqData := {{key := c_headlamp_status, interval := 1000}}
+	}
+
+	template FilterRequest m_Filter_headLampStatus_Stop() := {
+		reqType := "stop",
+		reqData := {{key := c_headlamp_status, interval := 1000}}
+	}
+
+	template FilterRequest m_Filter_ignitionState_Start() := {
+		reqType := "start",
+		reqData := {{key := c_ignition_status, interval := 500}}
+	}
+
+	template FilterRequest m_Filter_steeringWheel_Stop() := {
+		reqType := "stop", reqData := {{key := c_steering_wheel_angle}}
+	}
+
+	template FilterRequest m_Filter_ignitionState_Stop() := {
+		reqType := "stop", reqData := {{key := c_ignition_status}}
+	}
+
+	template FilterRequest m_Filter_engineSpeed_Start() := {
+		reqType := "start",
+		reqData := {{key := c_engine_speed, interval := 500}}
+	}
+
+	template FilterRequest m_Filter_engineSpeed_Stop() := {
+		reqType := "stop", reqData := {{key := c_engine_speed}}
+	}
+
+
+
+	/**
+	 * @desc template for steering wheel angle response
+	 */
+	template FilterResponse mw_Filter_Response_sW() := {
+		OpenXCKey := c_steering_wheel_angle,
+		OBD2Key := ?,
+		valueA := ?,
+		respTimestamp := ?
+	}
+
+	/**
+	 * @desc template for door status reponse
+	 */
+	template FilterResponse mw_Filter_Response_dS() := {
+		OpenXCKey := c_door_status,
+		OBD2Key := ?,
+		valueA := ?,
+		respTimestamp := ?
+	}
+
+	/**
+	 * @desc template for transmission gear reponse
+	 */
+	template FilterResponse mw_Filter_Response_tG() := {
+		OpenXCKey := c_transmission_gear_position,
+		OBD2Key := ?,
+		valueA := ?,
+		respTimestamp := ?
+	}
+
+
+
+	/**
+	 * @desc template for ignition status response
+	 */
+	template FilterResponse mw_Filter_Response_iS(IgnitionStatus status) := {
+		OpenXCKey := c_ignition_status,
+		OBD2Key := ?,
+		valueA := f_ignitionStatus2str(status),
+		respTimestamp := ?
+	}
+	
+//	template FilterResponse mw_Filter_Response_iS_run() modifies mw_Filter_Response_iS := {
+//		valueA := f_ignitionStatus2str(e_run)
+//	}
+//	
+//	template FilterResponse mw_Filter_Response_iS_off() modifies mw_Filter_Response_iS := {
+//			valueA := f_ignitionStatus2str(e_off)
+//	}
+//
+//	template FilterResponse mw_Filter_Response_iS_accessory() modifies mw_Filter_Response_iS := {
+//			valueA := f_ignitionStatus2str(e_accessory)
+//	}
+	
+	/**
+	 * @desc template for vehicle Speed response
+	 */
+	template FilterResponse mw_Filter_Response_vS() := {
+		OpenXCKey := c_vehicle_speed,
+		OBD2Key := "0D",
+		valueA := ?,
+		respTimestamp := ?
+	} 
+
+	/**
+	 * @desc template for engine speed response
+	 */
+	template FilterResponse mw_Filter_Response_eS() := {
+		OpenXCKey := c_vehicle_speed,
+		OBD2Key := "0D",
+		valueA := ?,
+		respTimestamp := ?
+	}
+
+	 /**
+	  * 
+	  * @desc template for head lamp status response 
+	  */
+	template FilterResponse mw_Filter_Response_hL(boolean p_Status) := {
+		OpenXCKey := c_headlamp_status,
+		OBD2Key := ?,
+		valueA := f_bool2str(p_Status),
+		respTimestamp := ?
+	}
+}
+with {
+	encode "blubb";
 }

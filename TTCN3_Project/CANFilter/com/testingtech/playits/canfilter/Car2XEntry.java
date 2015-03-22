@@ -1,4 +1,4 @@
-package canfilter;
+package com.testingtech.playits.canfilter;
 
 public class Car2XEntry {
   // Attributes

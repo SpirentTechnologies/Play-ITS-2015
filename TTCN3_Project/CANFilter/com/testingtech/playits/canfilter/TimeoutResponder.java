@@ -1,4 +1,4 @@
-package canfilter;
+package com.testingtech.playits.canfilter;
 
 import java.net.Socket;
 import java.util.Hashtable;

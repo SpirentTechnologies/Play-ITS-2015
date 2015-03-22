@@ -1,4 +1,4 @@
-package canfilter.sut;
+package com.testingtech.playits.canfilter;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -12,21 +12,19 @@ import org.etsi.ttcn.tci.BooleanValue;
 import org.etsi.ttcn.tci.CharstringValue;
 import org.etsi.ttcn.tci.IntegerValue;
 
-import canfilter.CANFilterService;
-
 import com.testingtech.ttcn.annotation.ExternalFunction;
 import com.testingtech.ttcn.tri.AnnotationsExternalFunctionPlugin;
 import com.testingtech.util.UUID;
 
-@ExternalFunction.Definitions(SUTControlExternalFunctionProvider.class)
-public class SUTControlExternalFunctionProvider extends
+@ExternalFunction.Definitions(Car2XControlExternalFunctionProvider.class)
+public class Car2XControlExternalFunctionProvider extends
     AnnotationsExternalFunctionPlugin {
 
-  private ProcessMap processMap = ProcessMap.getInstance();
+  private Process serviceProcess;
 
-  /**
+/**
    * starts the CAN filter service with a host and port
-   * @param host hostname
+   * @param host host name
    * @param portNumber port
    * @return process id
    */
@@ -34,7 +32,8 @@ public class SUTControlExternalFunctionProvider extends
   public CharstringValue start_Filter(CharstringValue host,
       IntegerValue portNumber) {
     return start_Filter(
-        CANFilterService.class.getCanonicalName(),
+    	// CANFilterService.class.getCanonicalName()
+        "com.testingtech.playits.canfilter.CANFilterService",
         new String[] { host.getString(),
             String.valueOf(portNumber.getInt()) });
   }
@@ -46,15 +45,15 @@ public class SUTControlExternalFunctionProvider extends
         + join(parameters, "\" \"") + "\"");
 
     try {
-      final Process p = Runtime.getRuntime().exec(
-          "java -classpath build/SUT " + mainClass + " "
-              + join(parameters, " "));
-      processMap.put(processId, p);
+      String string = "java -classpath build/CANFilter;libs/java-json.jar " + mainClass + " "
+              + join(parameters, " ");
+	serviceProcess = Runtime.getRuntime().exec(
+          string);
 
-      new StreamForwarder(p.getInputStream(), System.out).start();
-      new StreamForwarder(p.getErrorStream(), System.err).start();
+      new StreamForwarder(serviceProcess.getInputStream(), System.out).start();
+      new StreamForwarder(serviceProcess.getErrorStream(), System.err).start();
     } catch (IOException e) {
-      logError("Could not start SUT: " + e.getMessage());
+      logError("Could not start CAN filter service: " + e.getMessage());
       return newCharstringValue("");
     }
 
@@ -77,26 +76,22 @@ public class SUTControlExternalFunctionProvider extends
   }
 
   /**
-   * Stopps the CAN filter service by providing an id.
+   * Stops the CAN filter service by providing an id.
    * @param id of the service to stop
-   * @return true 
+   * @return true (service could successfully be stopped)
    */
   @ExternalFunction(name = "stop_Filter", module = "Car2X_Control")
-  public BooleanValue stop_Filter(CharstringValue id) {
-    logInfo("Stopping Filter " + id.getString());
+  public BooleanValue stop_Filter() {
+    logInfo("Stopping CAN service filter.");
 
-    Process process = processMap.get(id.getString());
-    if (process != null) {
-      process.destroy();
+    if (serviceProcess != null) {
+      serviceProcess.destroy();
       try {
-        process.waitFor();
+        serviceProcess.waitFor();
       } catch (InterruptedException e) {
         // nothing to do just continue
-      } finally {
-        processMap.remove(id.getString());
       }
     }
-
     return newBooleanValue(true);
   }
 }

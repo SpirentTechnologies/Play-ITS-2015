@@ -26,7 +26,7 @@
  *  OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
  * ----------------------------------------------------------------------------
  */
-package canfilter;
+package com.testingtech.playits.canfilter;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;

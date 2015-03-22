@@ -1,4 +1,4 @@
-package canfilter.tests;
+package com.testingtech.playits.canfilter.tests;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -9,7 +9,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-import canfilter.Car2XEntry;
+import com.testingtech.playits.canfilter.Car2XEntry;
 
 @RunWith(Parameterized.class)
 public class CANFilterTest {

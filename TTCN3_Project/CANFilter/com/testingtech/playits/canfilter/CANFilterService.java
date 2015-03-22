@@ -26,7 +26,7 @@
  *  OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
  * ----------------------------------------------------------------------------
  */
-package canfilter;
+package com.testingtech.playits.canfilter;
 
 import java.io.IOException;
 import java.lang.Thread.State;
@@ -43,19 +43,33 @@ import org.json.JSONObject;
 
 public class CANFilterService {
 
-  static Hashtable<String, Car2XEntry> car2xEntries = new Hashtable<>();
-  static Car2xEntryUpdater entryUpdater;
-  static TimeoutResponder timeoutResponder;
+  private static final int DEFAULT_SERVER_PORT = 7070;
+  private static final String DEFAULT_SERVER_HOST = "localhost";
+  
+  private static Hashtable<String, Car2XEntry> car2xEntries = new Hashtable<>();
+  private static Car2xEntryUpdater entryUpdater;
+  private static TimeoutResponder timeoutResponder;
 
   /**
-   * If provided with host and portname, starts entry updater to update a 
-   * hashtable with openXC simulator values and timeout responder timer 
-   * tasks to periodically send back updates values from said hashtable.
+   * If provided with host and port name, starts entry updater to update a 
+   * hash table with openXC simulator values and timeout responder timer 
+   * tasks to periodically send back updates values from said hash table.
    * @param args host, port
    */
   public static void main(String[] args) {
-    InetSocketAddress address = new InetSocketAddress(args[0], new Integer(
-        args[1]).intValue());
+    String host = DEFAULT_SERVER_HOST;
+    int port = DEFAULT_SERVER_PORT;
+    
+    if (args.length != 2) {
+      System.err.println("Usage: java CANFilterService <Server host>  <Server Port Number>");
+      System.err.println("  ... using default server host "+ DEFAULT_SERVER_HOST + " default server port " + DEFAULT_SERVER_PORT);
+    }
+    else {
+      host = args[0];
+      port = extractPortNumber(args, 1, DEFAULT_SERVER_PORT); 
+    }
+    
+    InetSocketAddress address = new InetSocketAddress(host, port);
 
     Socket socket = null;
     ServerSocket serverSocket = null;
@@ -84,7 +98,9 @@ public class CANFilterService {
           System.err.println("Could not close server socket: " + e.getMessage());
         }
       }
-      scanner.close();
+      if (scanner != null) {
+        scanner.close();
+      }
     }
   }
 
@@ -139,5 +155,19 @@ public class CANFilterService {
   private static void removeEntry(String key) {
     car2xEntries.remove(key);
     timeoutResponder.removeTimer(key);
+  }
+  
+  private static int extractPortNumber(String[] args, int pos, int defaultValue) {
+    int portNumber = defaultValue;
+
+    try {
+      if (args.length > pos) {
+        portNumber = Integer.parseInt(args[pos]);
+      }
+    } catch (NumberFormatException e) {
+      System.err.println("Wrong port format (" + args[pos] + ") using " + defaultValue);
+    }
+    
+    return portNumber;
   }
 }

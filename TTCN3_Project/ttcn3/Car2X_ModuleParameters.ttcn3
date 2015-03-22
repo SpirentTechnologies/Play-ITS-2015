@@ -1,4 +1,74 @@
+/**
+ * @author Christian Damm, Sascha Kretzschmann
+ * @desc Define parameters we use within our project.
+ */
 module Car2X_ModuleParameters {
 	
+	// CAN MODE 01
 	const charstring c_modePrefix_01 := "01";
+	
+	// keys for data table
+	const charstring c_steering_wheel_angle := "steering_wheel_angle";
+	const charstring c_torque_at_transmission := "torque_at_transmission";
+	const charstring c_engine_speed := "engine_speed";
+	const charstring c_vehicle_speed := "vehicle_speed";
+	const charstring c_accelerator_pedal_position := "accelerator_pedal_position";
+	const charstring c_parking_brake_status := "parking_brake_status";
+	const charstring c_brake_pedal_status := "brake_pedal_status";
+	const charstring c_transmission_gear_position := "transmission_gear_position";
+	const charstring c_gear_lever_position := "gear_lever_position";
+	const charstring c_odometer := "odometer";
+	const charstring c_ignition_status := "ignition_status";
+	const charstring c_fuel_level := "fuel_level";
+	const charstring c_fuel_consumed_since_restar := "fuel_consumed_since_restar";
+	const charstring c_door_status := "door_status";
+	const charstring c_headlamp_status := "headlamp_status";
+	const charstring c_high_beam_status := "high_beam_status";
+	const charstring c_windshield_wiper_status := "windshield_wiper_status";
+	const charstring c_latitude := "latitude";
+	const charstring c_longitude := "longitude";
+	
+	//key for testcases
+	
+	//vehicle Speed
+	const float c_vehicle_speed_max := 655.0;
+	const float c_vehicle_speed_50 := 50.0;
+	const float c_vehicle_speed_30 := 30.0;
+	const float c_vehicle_speed_10 := 10.0;
+	const float c_vehicle_speed_min := 0.0;
+	
+	//vehicle Speed variance
+	const float c_vehicle_speed_var_15 := 15.0;
+	const float c_vehicle_speed_var_10 := 10.0;
+	const float c_vehicle_speed_var_5 := 5.0;
+	const float c_vehicle_speed_var_0 := 0.0;
+	
+	//engine speed
+	const float c_engine_speed_max := 16382.0;
+	const float c_engine_speed_5000 := 5000.0;
+	const float c_engine_speed_4000 := 4000.0;
+	const float c_engine_speed_3000 := 3000.0;
+	const float c_engine_speed_2500 := 2500.0;
+	const float c_engine_speed_2000 := 2000.0;
+	const float c_engine_speed_1000 := 1000.0;
+	const float c_engine_speed_500 := 500.0;
+	const float c_engine_speed_min := 0.0;
+	
+	//engine speed variance
+	const float c_engine_speed_var_500 := 500.0;
+	const float c_engine_speed_var_250 := 250.0;
+	const float c_engine_speed_var_100 := 100.0;
+	const float c_engine_speed_var_50 := 50.0;
+	const float c_engine_speed_var_0 := 0.0;
+	
+	//
+	/**
+	 * @desc Host used to bind to when the Test Environment acts as a server 
+	 */
+	modulepar charstring TCP_LOCAL_HOST := "localhost";
+
+	/**
+	 * @desc Port used to bind to when the Test Environment acts as a server  
+	 */
+	modulepar integer TCP_LOCAL_PORT := 7070;	
 }

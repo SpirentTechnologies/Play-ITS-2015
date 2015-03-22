@@ -1,4 +1,4 @@
-package canfilter;
+package com.testingtech.playits.canfilter;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -45,8 +45,8 @@ public class ResponderTask extends TimerTask {
     response.put("Timestamp", car2xEntry.getTimestamp());
     response.put("OpenXCKey", key);
     response.put("OBD2Key", car2xEntry.getObd2key());
-    response.put("ValueA", car2xEntry.getValueA());
-    response.put("ValueB", car2xEntry.getValueB());
+    response.put("valueA", car2xEntry.getValueA());
+    response.put("valueB", car2xEntry.getValueB());
     return response;
   }
 

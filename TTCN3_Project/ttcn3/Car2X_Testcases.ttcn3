@@ -1,2 +1,192 @@
+/**
+ * @author Christian Damm, Sascha Kretzschmann
+ * @desc Some simple test cases to start with.
+ * @remark This class needs to be extended sophistically.
+ */
 module Car2X_Testcases {
+	import from Car2X_Functions {
+		function
+			f_TP_DOOR_STATUS,
+			f_TP_HEADLAMP_STATUS,
+			f_TP_IGNITION_STATUS,
+			f_TP_STEERING_WHEEL_ANGLE,
+			f_TP_VEHICLE_SPEED,
+			f_setUp,
+			f_set_verdict_and_stage,
+			f_tearDown;
+	}
+
+	import from Car2X_Types {type DoorStatus, IgnitionStatus;}
+
+	import from Car2X_ConfigSystem {
+		type SystemComponentType, TesterComponentType;
+	}
+
+	import from Car2X_Templates {
+		template m_Filter_vehicleSpeed_Start, m_Filter_vehicleSpeed_Stop;
+	}
+
+	/**
+	 * @desc Checks that the vehicle speed is greater 50km/h.
+	 * @verdict pass Successfully received vehicle speed.
+	 * @verdict fail Not received anything.
+	 * @verdict inconclusive Timer ran out.
+	 */
+	testcase TC_VEHICLE_SPEED_OVER_50_10_SEC()
+		runs on TesterComponentType system SystemComponentType {
+			
+		// set up configuration
+		f_setUp();
+
+		// start value request for TC
+
+		// send stage information
+		action("stage:" & int2str(v_stage));
+		t_TC_Global.start(10.0);
+
+		// loop to check if speed is over 50 the whole time
+		while (t_TC_Global.running) {
+			// test body
+			f_TP_VEHICLE_SPEED(50.0, 10.0, 5.0, 2.0);
+		}
+
+		// stop value request
+		setverdict(v_ret);
+
+		// tear down configuration
+		f_tearDown();
+	}
+
+	/**
+	 * 
+	 * @desc Simulated test case; no conection to canfilter;  
+	 * @verdict 
+	 */
+	testcase TC_VEHICLE_SPEED_SIMULATED()
+		runs on TesterComponentType system SystemComponentType {
+
+		// set up configuration
+		f_setUp();
+		action("stage:" & int2str(v_stage));
+
+		t_TC_Global.start(5.0);
+
+		while (t_TC_Global.running) {}
+		v_stage := 2;
+		action("stage:" & int2str(v_stage));
+		// 		setverdict(inconc);
+		// 		stop;
+		t_TC_Global.start(5.0);
+
+		while (t_TC_Global.running) {}
+		setverdict(v_ret);
+	}
+	
+	/**
+	 * 
+	 * @desc For these testcase to driver should speed up to over 50 and then open the driver door.  
+	 * @verdict 
+	 */
+	testcase TC_OPEN_DOOR_AT_SPEED_50() runs on TesterComponentType system SystemComponentType{		
+		// set up configuration
+		f_setUp();
+
+		// send stage information
+		action("stage:" & int2str(v_stage));
+
+		// executing stage 1 - start engine
+		f_TP_IGNITION_STATUS(e_start);
+		f_set_verdict_and_stage(v_ret, v_stage);
+
+		// executing stage 2 - speed up o 50
+		f_TP_VEHICLE_SPEED(50.0,1.0,2.0,1.0);
+		f_set_verdict_and_stage(v_ret, v_stage);
+
+		// 	executing stage 3 - open driver door
+		f_TP_DOOR_STATUS(e_driver, true, 1.0);
+		f_set_verdict_and_stage(v_ret, v_stage);
+
+		// 	executing stage 4 - close driver door
+		f_TP_DOOR_STATUS(e_driver, false, 1.0);
+
+		setverdict(v_ret);
+
+		// tear down configuration
+		f_tearDown();
+	}
+	
+	testcase TC_HEADLAMP_STATUS() runs on TesterComponentType system SystemComponentType{		
+		// set up configuration
+		f_setUp();
+		// send stage information
+		action("stage:" & int2str(v_stage));
+
+		// executing stage 1 - engine to start
+		f_TP_IGNITION_STATUS(e_run);
+		f_set_verdict_and_stage(v_ret, v_stage);
+
+		// executing stage 2 - turn off head lamp (optional)
+		f_TP_HEADLAMP_STATUS(false, 10.0);
+		f_set_verdict_and_stage(v_ret, v_stage);
+
+		// executing stage 3 - turn on head lamp
+		f_TP_HEADLAMP_STATUS(true, 10.0);
+		f_set_verdict_and_stage(v_ret, v_stage);
+
+		// executing stage 4 - turn off head lamp
+		f_TP_HEADLAMP_STATUS(false, 10.0);
+
+		setverdict(v_ret);
+		// tear down configuration
+		f_tearDown();				
+	}
+	
+	testcase TC_IGNITION_STATE_DUMMY() runs on TesterComponentType system SystemComponentType {
+		// set up configuration
+		f_setUp();
+
+		// send stage information
+//		action("stage:" & int2str(v_stage));
+		
+//		executing stage 1
+		 f_TP_IGNITION_STATUS(e_accessory);
+		
+		setverdict(v_ret);
+		// tear down configuration
+		f_tearDown();				
+	}
+
+	/**
+	 * 
+	 * @desc For this testcase, the stering wheel must turn most left, most right and to the middle 
+	 * @verdict 
+	 */
+	testcase TC_STEERING_WHEEL_ANGLE()
+		runs on TesterComponentType system SystemComponentType {
+
+		// set up configuration
+		f_setUp();
+
+		// send stage information
+		action("stage:" & int2str(v_stage));
+
+		// executing stage 1
+		f_TP_IGNITION_STATUS(e_accessory);
+		f_set_verdict_and_stage(v_ret, v_stage);
+
+		// executing stage 2
+		f_TP_STEERING_WHEEL_ANGLE(- 600.0, 50.0);
+		f_set_verdict_and_stage(v_ret, v_stage);
+
+		// 	executing stage 3
+		f_TP_STEERING_WHEEL_ANGLE(600.0, 50.0);
+		f_set_verdict_and_stage(v_ret, v_stage);
+
+		// 	executing stage 4
+		f_TP_STEERING_WHEEL_ANGLE(0.0, 50.0);
+
+		setverdict(v_ret);
+		// tear down configuration
+		f_tearDown();
+	}
 }
