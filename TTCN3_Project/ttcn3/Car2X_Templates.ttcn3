@@ -199,5 +199,5 @@ module Car2X_Templates {
 	}
 }
 with {
-	encode "blubb";
+	encode "json";
 }

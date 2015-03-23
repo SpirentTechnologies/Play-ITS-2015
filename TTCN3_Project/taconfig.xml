@@ -1,10 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testadapter>
-  <codec encode="">
-    <plugin id="com.testingtech.ttcn.XTestAdapter.builtin.tci.codecs">
-      <parameter id="class" value="com.testingtech.ttcn.tci.codec.plugin.BitBaseCodecPluginProvider"/>
-    </plugin>
-  </codec>
   <codec encode="json">
     <plugin id="com.testingtech.ttworkbench.json.rt">
       <parameter id="class" value="com.testingtech.ttworkbench.json.rt.JSONCodecPlugin"/>
