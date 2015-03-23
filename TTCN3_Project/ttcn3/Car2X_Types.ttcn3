@@ -1,10 +1,20 @@
 module Car2X_Types {
 	
+	/**
+	 * 
+	 * @desc currently not used 
+	 * @member modePrefix
+	 * @member parameterID
+	 */
 	type record ElmRequest {
 		charstring modePrefix length(2),
 		charstring parameterID length(2)
 	}
 	
+	/**
+	 * 
+	 * @desc currently not used
+	 */
 	type record ElmResponse {
 		charstring response
 	}
@@ -62,8 +72,8 @@ module Car2X_Types {
 	type enumerated DoorStatus {
 		e_driver,
 		e_passenger,
-		e_rear_left,
-		e_rear_right
+		e_rearLeft,
+		e_rearRight
 	};
 	
 	type enumerated TransmissionGear {

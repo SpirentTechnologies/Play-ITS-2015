@@ -23,7 +23,7 @@ module Car2X_Testcases {
 	}
 
 	import from Car2X_Templates {
-		template m_Filter_vehicleSpeed_Start, m_Filter_vehicleSpeed_Stop;
+		template m_FilterVehicleSpeedStart, m_FilterVehicleSpeedStop;
 	}
 
 	/**

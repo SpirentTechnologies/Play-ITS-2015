@@ -8,27 +8,33 @@ module Car2X_ModuleParameters {
 	const charstring c_modePrefix_01 := "01";
 	
 	// keys for data table
-	const charstring c_steering_wheel_angle := "steering_wheel_angle";
-	const charstring c_torque_at_transmission := "torque_at_transmission";
-	const charstring c_engine_speed := "engine_speed";
-	const charstring c_vehicle_speed := "vehicle_speed";
-	const charstring c_accelerator_pedal_position := "accelerator_pedal_position";
-	const charstring c_parking_brake_status := "parking_brake_status";
-	const charstring c_brake_pedal_status := "brake_pedal_status";
-	const charstring c_transmission_gear_position := "transmission_gear_position";
-	const charstring c_gear_lever_position := "gear_lever_position";
+	const charstring c_steeringWheelAngle := "steering_wheel_angle";
+	const charstring c_torqueAtTransmission := "torque_at_transmission";
+	const charstring c_engineSpeed := "engine_speed";
+	const charstring c_vehicleSpeed := "vehicle_speed";
+	const charstring c_acceleratorPedalPosition := "accelerator_pedal_position";
+	const charstring c_parkingBrakeStatus := "parking_brake_status";
+	const charstring c_brakePedalStatus := "brake_pedal_status";
+	const charstring c_transmissionGearPosition := "transmission_gear_position";
+	const charstring c_gearLeverPosition := "gear_lever_position";
 	const charstring c_odometer := "odometer";
-	const charstring c_ignition_status := "ignition_status";
-	const charstring c_fuel_level := "fuel_level";
-	const charstring c_fuel_consumed_since_restar := "fuel_consumed_since_restar";
-	const charstring c_door_status := "door_status";
-	const charstring c_headlamp_status := "headlamp_status";
-	const charstring c_high_beam_status := "high_beam_status";
-	const charstring c_windshield_wiper_status := "windshield_wiper_status";
+	const charstring c_ignitionStatus := "ignition_status";
+	const charstring c_fuelLevel := "fuel_level";
+	const charstring c_fuelConsumedSinceRestart := "fuel_consumed_since_restart";
+	const charstring c_doorStatus := "door_status";
+	const charstring c_headlampStatus := "headlamp_status";
+	const charstring c_highBeamStatus := "high_beam_status";
+	const charstring c_windshieldWiperStatus := "windshield_wiper_status";
 	const charstring c_latitude := "latitude";
 	const charstring c_longitude := "longitude";
 	
+	//key for start and stop request
+	const charstring c_startRequest := "start";
+	const charstring c_stopRequest := "stop";
+	
 	//key for testcases
+	
+	//TODO: camel case
 	
 	//vehicle Speed
 	const float c_vehicle_speed_max := 655.0;
@@ -61,6 +67,11 @@ module Car2X_ModuleParameters {
 	const float c_engine_speed_var_50 := 50.0;
 	const float c_engine_speed_var_0 := 0.0;
 	
-	//
+	//timer values in sec
+	const float c_timerTenSeconds := 10.0;
+	const float c_timerFiveSeconds := 5.0;
+	const float c_timerTwoSeconds := 2.0;
+	const float c_timerOneSecond := 1.0;
+	const float c_timerHalfSecond := 0.5;
 	
 }
