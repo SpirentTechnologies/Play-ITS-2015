@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.util.HashMap;
 import java.util.Vector;
 
 import javax.bluetooth.DeviceClass;
@@ -19,18 +20,21 @@ import javax.bluetooth.UUID;
 import javax.microedition.io.Connector;
 import javax.microedition.io.StreamConnection;
 
+
 public class ELMBluetooth implements DiscoveryListener {
   private static Object lock = new Object();
 
   private static Vector<RemoteDevice> remdevices = new Vector<RemoteDevice>();
 
   private static String connectionURL = null;
-
+  
+  public static HashMap<String, String> openXCToOBD2Map = new HashMap<String, String>();
   /**
    * @param String[]
    */
   public static void main(String[] args) throws IOException,
       InterruptedException {
+    initOpenXCToOBD2Map();
     BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
     ELMBluetooth obj = new ELMBluetooth();
@@ -106,7 +110,7 @@ public class ELMBluetooth implements DiscoveryListener {
           String command = br.readLine();
           pwriter.write(command + "\r");
           pwriter.flush();
-          System.out.println("command send: " + command);
+          System.out.println("command send: " + command + " = " + openXCToOBD2Map.get(command));
           Thread.sleep(500);
           byte bytes = 0;
           StringBuilder res = new StringBuilder();
@@ -188,125 +192,49 @@ public class ELMBluetooth implements DiscoveryListener {
         System.out.println("Unknown Response Code");
     }
   }
+  
+
   /**
    * 
    * @param cmd
    * @return
    */
-  public String getOBDIIKey(String cmd) {
-    String result;
-    switch (cmd) {
-      case "vehicle_speed":
-        result = "01 0D";
-        break;
-      case "engine_speed":
-        result = "01 0C";
-        break;
-      case "steering_wheel_angle":
-        result = "XX";
-        break;
-      case "torque_at_transmission":
-        result = "XX";
-        break;
-      case "accelerator_pedal_position":
-        result = "01 49"; // or 4A or 4B ?
-        break;
-      case "parking_brake_status":
-        result = "XX";
-        break;
-      case "brake_pedal_status":
-        result = "XX";
-        break;
-      case "transmission_gear_position":
-        result = "XX";
-        break;
-      case "gear_lever_position":
-        result = "XX";
-        break;
-      case "odometer":
-        result = "XX";
-        break;
-      case "ignition_status":
-        result = "XX";
-        break;
-      case "fuel_level":
-        result = "01 2F";
-        break;
-      case "fuel_consumed_since_restart":
-        result = "XX";
-        break;
-      case "door_status":
-        result = "XX";
-        break;
-      case "headlamp_status":
-        result = "XX";
-        break;
-      case "high_beam_status":
-        result = "XX";
-        break;
-      case "windshield_wiper_status":
-        result = "XX";
-        break;
-      case "latitude":
-        result = "XX";
-        break;
-      case "longitude":
-        result = "XX";
-        break;
-      case "battery_status":
-        result = "AT RV";
-        break;
-      case "absolute_load":
-        result = "01 43";
-        break;
-      case "runtime_since_last_start":
-        result = "01 1F";
-        break;
-      case "timing_advanced": // relative to #1 cylinder
-        result = "01 0E";
-        break;
-      case "engine_oil_temperature":
-        result = "01 5C";
-        break;
-      case "drivers_demand_engine": // percentage torque
-        result = "01 61";
-        break;
-      case "actual_engine": // percentage torque
-        result = "01 62";
-        break;
-      case "engine_reference": // torque Nm
-        result = "01 63";
-        break;
-      case "fuel_consumption_rate":
-        result = "01 5E";
-        break;
-      case "barometric_pressure":
-        result = "01 33";
-        break;
-      case "fuel_pressure":
-        result = "01 0A";
-        break;
-      case "Intake_manifold_absolute_pressure":
-        result = "01 0A";
-        break;
-      case "air_intake_temperature":
-        result = "01 0F";
-        break;
-      case "ambient_air_temperature":
-        result = "01 46";
-        break;
-      case "engine_coolant_temperature":
-        result = "01 05";
-        break;
-      case "throttle_position":
-        result = "01 11";
-        break;
-      default:
-        result = "XX";
-        break;
-    }
-
-    return result;
+  public static void initOpenXCToOBD2Map() {  
+    openXCToOBD2Map.put("vehicle_speed", "01 0D");
+    openXCToOBD2Map.put("engine_speed", "01 0C");
+    openXCToOBD2Map.put("steering_wheel_angle", "XX");
+    openXCToOBD2Map.put("torque_at_transmission", "XX");
+    openXCToOBD2Map.put("accelerator_pedal_position", "01 49"); //or 4A or 4B ?
+    openXCToOBD2Map.put("parking_brake_status", "XX");
+    openXCToOBD2Map.put("brake_pedal_status", "XX");
+    openXCToOBD2Map.put("transmission_gear_position", "XX");
+    openXCToOBD2Map.put("gear_lever_position", "XX");
+    openXCToOBD2Map.put("odometer", "XX");
+    openXCToOBD2Map.put("ignition_status", "XX");
+    openXCToOBD2Map.put("fuel_level", "01 2F");
+    openXCToOBD2Map.put("fuel_consumed_since_restart", "XX");
+    openXCToOBD2Map.put("door_status", "XX");
+    openXCToOBD2Map.put("headlamp_status", "XX");
+    openXCToOBD2Map.put("high_beam_status", "XX");
+    openXCToOBD2Map.put("windshield_wiper_status", "XX");
+    openXCToOBD2Map.put("latitude", "XX");
+    openXCToOBD2Map.put("longitude", "XX");
+    openXCToOBD2Map.put("battery_status", "AT RV");
+    openXCToOBD2Map.put("absolute_load", "01 43");
+    openXCToOBD2Map.put("runtime_since_last_start", "01 1F");
+    openXCToOBD2Map.put("timing_advanced", "01 0E"); // relative to #1 cylinder
+    openXCToOBD2Map.put("engine_oil_temperature", "01 5C");
+    openXCToOBD2Map.put("drivers_demand_engine", "01 61"); // percentage torque
+    openXCToOBD2Map.put("actual_engine", "01 62"); // percentage torque
+    openXCToOBD2Map.put("engine_reference", "01 63");  // torque Nm
+    openXCToOBD2Map.put("fuel_consumption_rate", "01 5E");
+    openXCToOBD2Map.put("barometric_pressure", "01 33");
+    openXCToOBD2Map.put("fuel_pressure", "01 0A");
+    openXCToOBD2Map.put("Intake_manifold_absolute_pressure", "01 0A");
+    openXCToOBD2Map.put("air_intake_temperature", "01 0F");
+    openXCToOBD2Map.put("ambient_air_temperature", "01 46");
+    openXCToOBD2Map.put("engine_coolant_temperature", "01 05");
+    openXCToOBD2Map.put("throttle_position", "01 11");
   }
   /**
    * 
@@ -314,7 +242,7 @@ public class ELMBluetooth implements DiscoveryListener {
    * @param reply
    * @return
    */
-  public String convertOBD2ReplyToOpenXC(String type, String reply) {
+  public static String convertOBD2ReplyToOpenXC(String type, String reply) {
     String result;
 
     String[] data = reply.split("\\s"); // cut first 4 bytes (response =
