@@ -648,7 +648,7 @@ module Car2X_Functions {
 		setverdict(p_verdict);
 		p_stage := p_stage + 1;
 		// send stage information
-		action("stage:" & int2str(p_stage) & "timeWindow:" & int2str(float2int(p_globalTimer)));
+		action("stage:" & int2str(p_stage) & ",timeWindow:" & int2str(float2int(p_globalTimer)));
 	}
 
 	/**

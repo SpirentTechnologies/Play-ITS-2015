@@ -41,7 +41,7 @@ module Car2X_Testcases {
 		t_TC_Global.start(v_timerValue);
 
 		// send stage information
-		action("stage:" & int2str(v_stage) & "timeWindow:" &
+		action("stage:" & int2str(v_stage) & ",timeWindow:" &
 			   int2str(float2int(v_timerValue)));
 
 		// loop to check if speed is over 50 the whole time
@@ -68,14 +68,14 @@ module Car2X_Testcases {
 
 		// set up configuration
 		f_setUp();
-		action("stage:" & int2str(v_stage) & "timeWindow:" &
+		action("stage:" & int2str(v_stage) & ",timeWindow:" &
 			   int2str(float2int(v_timerValue)));
 
 		t_TC_Global.start(v_timerValue);
 
 		while (t_TC_Global.running) {}
 		v_stage := 2;
-		action("stage:" & int2str(v_stage) & "timeWindow:" &
+		action("stage:" & int2str(v_stage) & ",timeWindow:" &
 			   int2str(float2int(v_timerValue)));
 		// 		setverdict(inconc);
 		// 		stop;
@@ -99,7 +99,7 @@ module Car2X_Testcases {
 		f_setUp();
 
 		// send stage information
-		action("stage:" & int2str(v_stage) & "timeWindow:" &
+		action("stage:" & int2str(v_stage) & ",timeWindow:" &
 			   int2str(float2int(v_timerValue)));
 
 		// executing stage 1 - start engine
@@ -131,7 +131,7 @@ module Car2X_Testcases {
 		// set up configuration
 		f_setUp();
 		// send stage information
-		action("stage:" & int2str(v_stage) & "timeWindow:" &
+		action("stage:" & int2str(v_stage) & ",timeWindow:" &
 			   int2str(float2int(v_timerValue)));
 
 		// executing stage 1 - engine to start
@@ -163,7 +163,7 @@ module Car2X_Testcases {
 		f_setUp();
 
 		// send stage information
-		action("stage:" & int2str(v_stage) & "timeWindow:" &
+		action("stage:" & int2str(v_stage) & ",timeWindow:" &
 			   int2str(float2int(v_timerValue)));
 
 		// 		executing stage 1
@@ -188,7 +188,7 @@ module Car2X_Testcases {
 		f_setUp();
 
 		// send stage information
-		action("stage:" & int2str(v_stage) & "timeWindow:" &
+		action("stage:" & int2str(v_stage) & ",timeWindow:" &
 			   int2str(float2int(v_timerValue)));
 
 		// executing stage 1
