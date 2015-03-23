@@ -5,6 +5,8 @@
  *   		 tear down configurations to reuse.
  */
 module Car2X_Functions {
+	import from Car2X_ModuleParameters {const c_timerHalfSecond;}
+
 	import from Car2X_Templates {
 		template
 			m_FilterDoorStatusStart,
@@ -37,21 +39,20 @@ module Car2X_Functions {
 	import from Car2X_ConfigSystem {type TesterComponentType;}
 
 	/**
-	 * @desc function to measure vehicle speed for a defined period of time
-	 * @param p_speed target speed (in km/h)
-	 * @param p_holding_time time with target speed (in sec)
-	 * @param p_variance variance range around the targetAngle (in km/h)
-	 * @param p_interval time until timeout (in sec)
-	 * @verdict
+	 * @desc Function to measure vehicle speed for a defined period of time.
+	 * @param p_speed Target speed (in km/h) as float
+	 * @param p_holding_time Time with target speed (in sec)
+	 * @param p_variance Variance range around the targetAngle (in km/h)
+	 * @param p_interval Time until timeout (in sec)
 	 */
-	function f_TP_VEHICLE_SPEED(float p_speed, float p_holding_time,
+	function f_VEHICLE_SPEED(float p_speed, float p_holding_time,
 								float p_variance, float p_interval)
 		runs on TesterComponentType  {
 
 		t_TC_Global.start;
 		filterPort.send(m_FilterVehicleSpeedStart);
 		while (t_TC_Global.running) {
-			f_TP_VEHICLE_SPEED_SUB(p_speed, p_holding_time, p_variance,
+			f_VehicleSpeedSub(p_speed, p_holding_time, p_variance,
 								   p_interval);
 			if (v_ret == pass) {
 				t_TC_Global.stop;
@@ -66,13 +67,12 @@ module Car2X_Functions {
 	}
 
 	/**
-	 * @desc Testbody function for
-	 * @see Car2X_Testcases.TC_VEHICLE_SPEED_OVER_50
-	 * @verdict pass The given speed ist greater than 50.0.
-	 * @verdict fail Due to invalid parameter.
-	 * @verdict inconc Due to a timeout.
+	 * @desc Testbody function for @see f_VEHICLE_SPEED
+	 * @verdict pass The given speed is greater than 50.0
+	 * @verdict fail Due to invalid parameter
+	 * @verdict inconc Due to a timeout
 	 */
-	function f_TP_VEHICLE_SPEED_SUB(float p_speed, float p_holding_time,
+	function f_VehicleSpeedSub(float p_speed, float p_holding_time,
 									float p_variance, float p_interval)
 		runs on TesterComponentType  {
 		var template FilterResponse v_speed;
@@ -117,20 +117,19 @@ module Car2X_Functions {
 	}
 
 	/**
-	 * @desc function to measure engine speed for a defined period of time
-	 * @param p_engine_speed target engine speed (in rpm)
-	 * @param p_holding_time time with this engine speed (in sec)
-	 * @param p_variance variance range around target engine speed (in rpm)
-	 * @param p_time_out time until timeout (in sec)
-	 * @verdict
+	 * @desc Function to measure engine speed for a defined period of time
+	 * @param p_engine_speed Target engine speed (in rpm) as integer
+	 * @param p_holding_time Time to hold this engine speed (in sec)
+	 * @param p_variance Variance for target engine speed (in rpm)
+	 * @param p_time_out Time until timeout (in sec)
 	 */
-	function f_TP_ENGINE_SPEED(float p_engine_speed, float p_holding_time,
+	function f_ENGINE_SPEED(float p_engine_speed, float p_holding_time,
 							   float p_variance, float p_time_out)
 		runs on TesterComponentType  {
 		t_TC_Global.start;
 		filterPort.send(m_FilterEngineSpeedStart);
 		while (t_TC_Global.running) {
-			f_TP_ENGINE_SPEED_SUB(p_engine_speed, p_variance, p_holding_time,
+			f_EngineSpeedSub(p_engine_speed, p_variance, p_holding_time,
 								  1.0);
 			if (v_ret == pass) {
 				t_TC_Global.stop;
@@ -145,14 +144,13 @@ module Car2X_Functions {
 	}
 
 	/**
-	 * @desc request engine speed from can filter
-	 * @param p_engine_speed target engine speed to reach (in rpm)
-	 * @param p_variance variance around the target speed
-	 * @param p_holding_time time with target speed (in sec)
-	 * @param p_interval time until timeout (in sec)
-	 * @verdict
+	 * @desc Requests engine speed from CAN filter. Test body for @see f_ENGINE_SPEED
+	 * @param p_engine_speed Target engine speed to reach (in rpm)
+	 * @param p_variance Variance of target speed
+	 * @param p_holding_time Time with target speed (in sec)
+	 * @param p_interval Time until timeout (in sec)
 	 */
-	function f_TP_ENGINE_SPEED_SUB(float p_engine_speed, float p_variance,
+	function f_EngineSpeedSub(float p_engine_speed, float p_variance,
 								   float p_holding_time, float p_interval)
 		runs on TesterComponentType  {
 		var template FilterResponse v_speed;
@@ -194,20 +192,19 @@ module Car2X_Functions {
 	}
 
 	/**
-	 * @desc function to measure steering wheel angle; calls
-	 *   f_TP_STEERING_WHEEL_SUB; range = -600 to 600
-	 * @param targetAngle angle which should be reached (in degree)
-	 * @param variance variance range around the targetAngle (in degree)
-	 * @verdict
+	 * @desc Function to measure steering wheel angle
+	 * @param p_targetAngle Angle which should be reached (in degree) as float
+	 * @param p_variance Variance of the target angle (in degree) as float
+	 * @param p_interval Time until timeout (in sec)
 	 */
-	function f_TP_STEERING_WHEEL_ANGLE(float targetAngle, float variance)
+	function f_STEERING_WHEEL_ANGLE(float p_targetAngle, float p_variance, float p_interval)
 		runs on TesterComponentType  {
 		t_TC_Global.start;
 		// start steering Wheel request
 		filterPort.send(m_FilterSteeringWheelStart);
 
 		while (t_TC_Global.running) {
-			f_TP_STEERING_WHEEL_ANGLE_SUB(- 600.0, 50.0, 2.0);
+			f_SteeringWheelAngleSub(p_targetAngle, p_variance, p_interval);
 			if (v_ret == pass) {
 				t_TC_Global.stop;
 			}
@@ -223,25 +220,24 @@ module Car2X_Functions {
 	}
 
 	/**
-	 * @desc function request steering wheel angle from the canfilter
-	 * @param targetAngle angle which should be reached
-	 * @param variance variance range around the targetAngle
+	 * @desc Requests steering wheel angle from the CAN filter. Test body of @see f_STEERING_WHEEL_ANGLE
+	 * @param p_targetAngle Angle which should be reached
+	 * @param p_variance Variance of the target angle
 	 * @param p_interval time until timeout; should be greater then the
 	 *   intervall time in m_Filter_doorStatus_Start
-	 * @verdict
 	 */
-	function f_TP_STEERING_WHEEL_ANGLE_SUB(float targetAngle, float variance,
-										   float interval)
+	function f_SteeringWheelAngleSub(float p_targetAngle, float p_variance,
+										   float p_interval)
 		runs on TesterComponentType  {
 		var template FilterResponse v_angle;
 
-		t_TC.start(interval);
+		t_TC.start(p_interval);
 		alt {
 			[] filterPort.receive(mw_FilterResponseSteeringWheel) -> value v_angle {
-				if (f_max(targetAngle - variance, - 600.0) <=
+				if (f_max(p_targetAngle - p_variance, - 600.0) <=
 					str2float(v_angle.valueA) and
 					str2float(v_angle.valueA) <=
-					f_min(targetAngle + variance, 600.0)) {
+					f_min(p_targetAngle + p_variance, 600.0)) {
 					v_ret := pass;
 					t_TC.stop;
 				} else {
@@ -260,19 +256,18 @@ module Car2X_Functions {
 	}
 
 	/**
-	 * @desc function to measure headlamp status; calls f_TP_HEADLAMP_STATUS_SUB
+	 * @desc Function to measure headlamp status.
 	 * @param p_Status <b>true</b> headlamp on; <b>false</b> headlamp off
 	 * @param p_timeout intervall until timeout (in sec)
-	 * @verdict
 	 */
-	function f_TP_HEADLAMP_STATUS(boolean p_Status, float p_timeout)
+	function f_HEADLAMP_STATUS(boolean p_Status, float p_timeout)
 		runs on TesterComponentType  {
 		// start ignition status request
 		filterPort.send(m_FilterHeadLampStatusStart);
 		t_TC_Global.start(p_timeout);
 
 		while (t_TC_Global.running) {
-			f_TP_HEADLAMP_STATUS_SUB(p_Status, 0.8);
+			f_HeadlampStatusSub(p_Status, 0.8);
 			if (v_ret == pass) {
 				t_TC_Global.stop;
 			}
@@ -288,16 +283,15 @@ module Car2X_Functions {
 	}
 
 	/**
-	 * @desc receive values from canfilter
-	 * @param p_Status target status of headlamp; <b>true</b> headlamp on;
+	 * @desc Receives values from CAN filter. Test body of @see f_HEADLAMP_STATUS
+	 * @param p_Status Target status of headlamp; <b>true</b> headlamp on;
 	 *   <b>false</b> headlamp off
-	 * @param p_interval time until timeout
-	 * @verdict
+	 * @param p_interval Time until timeout
 	 */
-	function f_TP_HEADLAMP_STATUS_SUB(boolean p_Status, float p_interval)
+	function f_HeadlampStatusSub(boolean p_Status, float p_interval)
 		runs on TesterComponentType  {
+			
 		var template FilterResponse v_headLampStatus;
-
 		t_TC.start(p_interval);
 
 		alt {
@@ -317,11 +311,10 @@ module Car2X_Functions {
 	}
 
 	/**
-	 * @desc measure the ignition status, calls f_TP_IGNITION_STATUS_SUB
-	 * @param ignitionStatus enum value of type IgnitionStatus
-	 * @verdict
+	 * @desc Measures the ignition status.
+	 * @param ignitionStatus Enum value of type IgnitionStatus
 	 */
-	function f_TP_IGNITION_STATUS(IgnitionStatus ignitionStatus)
+	function f_IGNITION_STATUS(IgnitionStatus p_ignitionStatus)
 		runs on TesterComponentType  {
 
 		t_TC_Global.start;
@@ -329,7 +322,7 @@ module Car2X_Functions {
 		filterPort.send(m_FilterIgnitionStateStart);
 
 		while (t_TC_Global.running) {
-			f_TP_IGNITION_STATUS_SUB(ignitionStatus, 0.5);
+			f_IgnitionStatusSub(p_ignitionStatus, c_timerHalfSecond);
 			if (v_ret == pass) {
 				t_TC_Global.stop;
 			}
@@ -345,14 +338,13 @@ module Car2X_Functions {
 	}
 
 	/**
-	 * @desc receive ignition status value from canfilter and compare with
-	 *   target status
-	 * @param ignitionStatus enum value of type IgnitionStatus
-	 * @param interval time until timeout; should be greater then inteval in
-	 *   m_Filter_ignitionState_Start
-	 * @verdict
+	 * @desc Receive ignition status value from CAN filter and compare with
+	 *   target status. Test body for @see f_IGNITION_STATUS.
+	 * @param ignitionStatus Enum value of type IgnitionStatus
+	 * @param interval Time until timeout. Should be greater then interval in
+	 *   m_filterIgnitionStateStart
 	 */
-	function f_TP_IGNITION_STATUS_SUB(IgnitionStatus ignitionStatus,
+	function f_IgnitionStatusSub(IgnitionStatus ignitionStatus,
 									  float interval)
 		runs on TesterComponentType  {
 
@@ -376,19 +368,19 @@ module Car2X_Functions {
 	}
 
 	/**
-	 * @desc measure transmission gear and campore with target state
-	 * @param gear target state; enum value of type TransmissionGear
+	 * @desc Measures transmission gear and compare with target state
+	 * @param gear Target state; enum value of type TransmissionGear
 	 * @param p_interval time until timeout
 	 * @verdict
 	 */
-	function f_TP_TRANSMISSION_GEAR_STATUS(TransmissionGear gear,
+	function f_TRANSMISSION_GEAR_STATUS(TransmissionGear gear,
 										   float p_interval)
 		runs on TesterComponentType  {
 		t_TC_Global.start(p_interval);
 		filterPort.send(m_FilterTransmissionGearStart);
 
 		while (t_TC_Global.running) {
-			f_TP_TRANSMISSION_GEAR_STATUS_SUB(gear, 1.0);
+			f_transmissionGearStatusSub(gear, 1.0);
 			if (v_ret == pass) {
 				t_TC_Global.stop;
 			}
@@ -403,17 +395,17 @@ module Car2X_Functions {
 	}
 
 	/**
-	 * @desc receive transmission gear from canfilter
-	 * @param gear traget gear; enum value of type TransmissionGear
-	 * @param p_interval time until timeout; should be geater then
-	 *   m_Filter_transmissionGear_Start
+	 * @desc Receive transmission gear from CAN filter. Test body for @see f_TRANSMISSION_GEAR_STATUS
+	 * @param gear The target gear
+	 * @param p_interval Time until timeout. Should be geater then
+	 *   m_FilterTransmissionGearStart
 	 * @verdict
 	 */
-	function f_TP_TRANSMISSION_GEAR_STATUS_SUB(TransmissionGear gear,
+	function f_transmissionGearStatusSub(TransmissionGear gear,
 											   float p_interval)
 		runs on TesterComponentType  {
+			
 		var template FilterResponse v_gearStatus;
-
 		t_TC.start(p_interval);
 
 		alt {
@@ -433,22 +425,21 @@ module Car2X_Functions {
 	}
 
 	/**
-	 * @desc  Function to get door status from canfilter; calls
-	 *   f_TP_DOORS_STATUS_SUB function
+	 * @desc  Function to get door status from CAN filer.
 	 * @param p_door Enumeration value to define which door
-	 * @param p_status    status of the door; <b>true</b> for open
+	 * @param p_status Status of the door; <b>true</b> for open
 	 *   door; <b>false</b> for close door
-	 * @param p_interval defines time until timeout (in sec)
+	 * @param p_interval Defines time until timeout (in sec)
 	 * @verdict
 	 */
-	function f_TP_DOOR_STATUS(DoorStatus p_door, boolean p_status,
+	function f_DOOR_STATUS(DoorStatus p_door, boolean p_status,
 							  float p_interval) runs on TesterComponentType  {
 
 		t_TC_Global.start(p_interval);
 		filterPort.send(m_FilterDoorStatusStart);
 
 		while (t_TC_Global.running) {
-			f_TP_DOOR_STATUS_SUB(p_door, p_status, 1.0);
+			f_doorStatusSub(p_door, p_status, 1.0);
 			if (v_ret == pass) {
 				t_TC_Global.stop;
 			}
@@ -463,21 +454,18 @@ module Car2X_Functions {
 	}
 
 	/**
-	 * @desc function receive door status from canfilter
+	 * @desc Function receive door status from canfilter. Test body @see f_DOOR_STATUS
 	 * @param p_door Enumeration value to define which door
-	 * @param p_status          status of the door; <b>true</b> for open door;
+	 * @param p_status Status of the door; <b>true</b> for open door;
 	 *   <b>false</b> for close door
-	 * @param p_interval time until timeout; should be greater then the
-	 *   intervall time in m_Filter_doorStatus_Start
-	 * @verdict
+	 * @param p_interval Time until timeout. Should be greater then the
+	 *   interval time in m_FilterDoorStatusStart
 	 */
-	function f_TP_DOOR_STATUS_SUB(DoorStatus p_door, boolean p_status,
+	function f_doorStatusSub(DoorStatus p_door, boolean p_status,
 								  float p_interval)
 		runs on TesterComponentType  {
 
 		var template FilterResponse v_doorStatus;
-
-
 		t_TC.start(p_interval);
 
 		alt {
@@ -520,8 +508,7 @@ module Car2X_Functions {
 	 * @desc Auxiliary function to find max value of two float values
 	 * @param valueA
 	 * @param valueB
-	 * @return
-	 * @verdict
+	 * @return The maximum value.
 	 */
 	function f_max(float p_valueA, float p_valueB) return float  {
 		if (p_valueA > p_valueB) {
@@ -535,8 +522,7 @@ module Car2X_Functions {
 	 * @desc Auxiliary function to find min value of two float values
 	 * @param valueA
 	 * @param valueB
-	 * @return
-	 * @verdict
+	 * @return The minimum value
 	 */
 	function f_min(float p_valueA, float p_valueB) return float  {
 		if (p_valueA < p_valueB) {
@@ -549,10 +535,9 @@ module Car2X_Functions {
 	/**
 	 * @desc Auxiliary function to cast the ignitionStatus to charstring.
 	 *   		 We cannot compare an enum type with a charstring that is
-	 *   		 needed for the function
-	 * @see f_ignitionStatus_SUB
-	 * @param ignitionStatus
-	 * @return charstring Ignition status as string
+	 *   		 needed for the function @see f_ignitionStatus_SUB
+	 * @param ignitionStatus Ignition status to cast.
+	 * @return charstring Ignition status as charstring
 	 */
 	function f_ignitionStatus2str(IgnitionStatus p_ignitionStatus)
 		return charstring  {
@@ -573,10 +558,9 @@ module Car2X_Functions {
 	}
 
 	/**
-	 * @desc Auxiliary function to cast enum value of DoorStatus to string
-	 * @param doorStatus
-	 * @return
-	 * @verdict
+	 * @desc Auxiliary function to cast enum value of DoorStatus to charstring
+	 * @param doorStatus The door status to cast
+	 * @return The door status as charstring
 	 */
 	function f_doorStatus2Str(DoorStatus p_doorStatus) return charstring  {
 		select (p_doorStatus) {
@@ -596,10 +580,9 @@ module Car2X_Functions {
 	}
 
 	/**
-	 * @desc Auxiliary function to cast enum value of TransmissionGear to string
-	 * @param gear
-	 * @return
-	 * @verdict
+	 * @desc Auxiliary function to cast enum value of TransmissionGear to charstring
+	 * @param gear The gear status to cast
+	 * @return The gear status as charstring
 	 */
 	function f_gearStatus2Str(TransmissionGear p_gear) return charstring  {
 		select (p_gear) {
@@ -625,10 +608,10 @@ module Car2X_Functions {
 				return "seventh";
 			}
 			case (e_eighth) {
-				return "first";
+				return "eighth";
 			}
-			case (e_ninth) {
-				return "ninth";
+			case (e_nineth) {
+				return "nineth";
 			}
 			case (e_tenth) {
 				return "tenth";
@@ -643,22 +626,6 @@ module Car2X_Functions {
 	}
 
 	/**
-	 * @desc Function to set the verdict and communicate via the action statment
-	 *   with TTman.
-	 *   		 Furthermore, increment the stage for the test case.
-	 * @param verdict Verdicttype for the given stage.
-	 * @param stage Stage Current stage.
-	 * @return integer The new stage.
-	 * TODO: new stage as return
-	 */
-	function f_set_verdict_and_stage(verdicttype verdict, integer stage, float globalTimer) runs on TesterComponentType{
-		setverdict(verdict);
-		stage := stage + 1;
-		// send stage information
-		action("stage:" & int2str(stage) & "timeWindow:" & int2str(float2int(globalTimer)));
-	}
-
-	/**
 	 * @desc Tear down the configuration for test cases running on
 	 * @see Car2X_ConfigSystem.TesterComponentType.
 	 *   		 UnMaps the ports.
@@ -667,9 +634,25 @@ module Car2X_Functions {
 		unmap(self:filterPort, system:filterPort);
 		stop;
 	}
+	
+	/**
+	 * @desc Function to set the verdict and communicate via the action statment
+	 *   with TTman.
+	 *   		 Furthermore, increment the stage for the test case.
+	 * @param verdict Verdicttype for the given stage.
+	 * @param stage Stage Current stage.
+	 * @return integer The new stage.
+	 * TODO: new stage as return
+	 */
+	function f_setVerdictAndStage(verdicttype p_verdict, integer p_stage, float p_globalTimer) runs on TesterComponentType{
+		setverdict(p_verdict);
+		p_stage := p_stage + 1;
+		// send stage information
+		action("stage:" & int2str(p_stage) & "timeWindow:" & int2str(float2int(p_globalTimer)));
+	}
 
 	/**
-	 * @desc Auxiliary function to cast a received strong to boolean
+	 * @desc Auxiliary function to cast a received charstring to boolean
 	 * @param p_str
 	 * @return <b>true</b> if p_str == "true" || "True" || "TRUE" || "1";
 	 *   <b>false</b> else
@@ -684,8 +667,14 @@ module Car2X_Functions {
 		}
 	}
 
-	function f_bool2str(boolean status) return charstring  {
-		if (status) {
+	/**
+	 * 
+	 * @desc Auxiliary function to cast a given boolean to a charstring
+	 * @param status The boolean you want to cast
+	 * @return The casted charstring
+	 */
+	function f_bool2str(boolean p_status) return charstring  {
+		if (p_status) {
 			return "true";
 		} else {
 			return "false";

@@ -12,19 +12,16 @@ module Car2X_Testcases {
 
 	import from Car2X_Functions {
 		function
-			f_TP_DOOR_STATUS,
-			f_TP_HEADLAMP_STATUS,
-			f_TP_IGNITION_STATUS,
-			f_TP_STEERING_WHEEL_ANGLE,
-			f_TP_VEHICLE_SPEED,
+			f_DOOR_STATUS,
+			f_HEADLAMP_STATUS,
+			f_IGNITION_STATUS,
+			f_STEERING_WHEEL_ANGLE,
+			f_VEHICLE_SPEED,
 			f_setUp,
-			f_set_verdict_and_stage,
+			f_setVerdictAndStage,
 			f_tearDown;
 	}
 
-	import from Car2X_Templates {
-		template m_FilterVehicleSpeedStart, m_FilterVehicleSpeedStop;
-	}
 
 	/**
 	 * @desc Checks that the vehicle speed is greater 50km/h.
@@ -50,7 +47,7 @@ module Car2X_Testcases {
 		// loop to check if speed is over 50 the whole time
 		while (t_TC_Global.running) {
 			// test body
-			f_TP_VEHICLE_SPEED(50.0, 10.0, 5.0, 2.0);
+			f_VEHICLE_SPEED(50.0, 10.0, 5.0, 2.0);
 		}
 
 		// stop value request
@@ -106,19 +103,19 @@ module Car2X_Testcases {
 			   int2str(float2int(v_timerValue)));
 
 		// executing stage 1 - start engine
-		f_TP_IGNITION_STATUS(e_start);
-		f_set_verdict_and_stage(v_ret, v_stage, v_timerValue);
+		f_IGNITION_STATUS(e_start);
+		f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
 
 		// executing stage 2 - speed up o 50
-		f_TP_VEHICLE_SPEED(50.0, 1.0, 2.0, 1.0);
-		f_set_verdict_and_stage(v_ret, v_stage, v_timerValue);
+		f_VEHICLE_SPEED(50.0, 1.0, 2.0, 1.0);
+		f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
 
 		// 	executing stage 3 - open driver door
-		f_TP_DOOR_STATUS(e_driver, true, 1.0);
-		f_set_verdict_and_stage(v_ret, v_stage, v_timerValue);
+		f_DOOR_STATUS(e_driver, true, 1.0);
+		f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
 
 		// 	executing stage 4 - close driver door
-		f_TP_DOOR_STATUS(e_driver, false, 1.0);
+		f_DOOR_STATUS(e_driver, false, 1.0);
 
 		setverdict(v_ret);
 
@@ -138,19 +135,19 @@ module Car2X_Testcases {
 			   int2str(float2int(v_timerValue)));
 
 		// executing stage 1 - engine to start
-		f_TP_IGNITION_STATUS(e_run);
-		f_set_verdict_and_stage(v_ret, v_stage, v_timerValue);
+		f_IGNITION_STATUS(e_run);
+		f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
 
 		// executing stage 2 - turn off head lamp (optional)
-		f_TP_HEADLAMP_STATUS(false, 10.0);
-		f_set_verdict_and_stage(v_ret, v_stage, v_timerValue);
+		f_HEADLAMP_STATUS(false, 10.0);
+		f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
 
 		// executing stage 3 - turn on head lamp
-		f_TP_HEADLAMP_STATUS(true, 10.0);
-		f_set_verdict_and_stage(v_ret, v_stage, v_timerValue);
+		f_HEADLAMP_STATUS(true, 10.0);
+		f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
 
 		// executing stage 4 - turn off head lamp
-		f_TP_HEADLAMP_STATUS(false, 10.0);
+		f_HEADLAMP_STATUS(false, 10.0);
 
 		setverdict(v_ret);
 		// tear down configuration
@@ -170,7 +167,7 @@ module Car2X_Testcases {
 			   int2str(float2int(v_timerValue)));
 
 		// 		executing stage 1
-		f_TP_IGNITION_STATUS(e_accessory);
+		f_IGNITION_STATUS(e_accessory);
 
 		setverdict(v_ret);
 		// tear down configuration
@@ -195,19 +192,19 @@ module Car2X_Testcases {
 			   int2str(float2int(v_timerValue)));
 
 		// executing stage 1
-		f_TP_IGNITION_STATUS(e_accessory);
-		f_set_verdict_and_stage(v_ret, v_stage, v_timerValue);
+		f_IGNITION_STATUS(e_accessory);
+		f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
 
 		// executing stage 2
-		f_TP_STEERING_WHEEL_ANGLE(- 600.0, 50.0);
-		f_set_verdict_and_stage(v_ret, v_stage, v_timerValue);
+		f_STEERING_WHEEL_ANGLE(- 600.0, 50.0, 2.0);
+		f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
 
 		// 	executing stage 3
-		f_TP_STEERING_WHEEL_ANGLE(600.0, 50.0);
-		f_set_verdict_and_stage(v_ret, v_stage, v_timerValue);
+		f_STEERING_WHEEL_ANGLE(600.0, 50.0, 2.0);
+		f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
 
 		// 	executing stage 4
-		f_TP_STEERING_WHEEL_ANGLE(0.0, 50.0);
+		f_STEERING_WHEEL_ANGLE(0.0, 50.0, 2.0);
 
 		setverdict(v_ret);
 		// tear down configuration

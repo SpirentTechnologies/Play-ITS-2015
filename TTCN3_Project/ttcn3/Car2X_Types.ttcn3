@@ -85,7 +85,7 @@ module Car2X_Types {
 		e_sixth,
 		e_seventh,
 		e_eighth,
-		e_ninth,
+		e_nineth,
 		e_tenth,
 		e_reverse,
 		e_neutral
