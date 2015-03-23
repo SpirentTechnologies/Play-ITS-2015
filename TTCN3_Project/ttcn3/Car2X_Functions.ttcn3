@@ -5,10 +5,18 @@
  *   		 tear down configurations to reuse.
  */
 module Car2X_Functions {
-	import from Car2X_ModuleParameters {const c_timerHalfSecond;}
+	import from Car2X_ModuleParameters {
+		const
+			c_engineSpeedMax,
+			c_engineSpeedMin,
+			c_timerHalfSecond,
+			c_vehicleSpeedMax,
+			c_vehicleSpeedMin;
+	}
 
 	import from Car2X_Templates {
 		template
+			interval,
 			m_FilterDoorStatusStart,
 			m_FilterDoorStatusStop,
 			m_FilterEngineSpeedStart,
@@ -83,27 +91,19 @@ module Car2X_Functions {
 		t_TC.start(p_interval);
 		alt {
 			// store received template into value
-//			[]filterPort.receive(mw_Filter_Response_vS:{valueA := decmatch interval(50.0,5.0)}){
-//				t_TC.stop;
-//			};
-			[] filterPort.receive(mw_FilterResponseVehicleSpeed) -> value v_speed {
+			[]filterPort.receive(mw_FilterResponseVehicleSpeed:{valueA := decmatch interval(p_speed,p_variance, 0.0, 100.0)}){
 				t_TC.stop;
-				// check whether vehicle speed is greater than given speed
-				speed := str2float(v_speed.valueA);
-				if (f_max(p_speed - p_variance, 0.0) <= speed and
-					speed >= f_min(p_speed + p_variance, 655.0)) {
-					t_holding.start(p_holding_time);
-					while (t_holding.running and v_ret == pass) {
-						filterPort.receive(mw_FilterResponseVehicleSpeed) ->
-						value v_speed;
-						if (str2float(v_speed.valueA) >= p_speed) {
+				t_holding.start(p_holding_time);
+				while (t_holding.running and v_ret == pass) {
+					alt{
+						[]filterPort.receive(mw_FilterResponseVehicleSpeed:{valueA := 
+							decmatch interval(p_speed,p_variance, c_vehicleSpeedMin, c_vehicleSpeedMax)}){
 							v_ret := pass;
-						} else {
+						}
+						[]filterPort.receive {
 							v_ret := fail;
 						}
 					}
-				} else {
-					v_ret := fail;
 				}
 			}
 			[] filterPort.receive {
@@ -161,24 +161,19 @@ module Car2X_Functions {
 		t_TC.start(p_interval);
 		alt {
 			// store received template into value
-			[] filterPort.receive(mw_FilterResponseEngineSpeed) -> value v_speed {
+			[] filterPort.receive(mw_FilterResponseEngineSpeed:{valueA := 
+				decmatch interval(p_engine_speed,p_variance, c_engineSpeedMin, c_engineSpeedMax)}){
 				t_TC.stop;
 				// check whether vehicle speed is greater than given speed
-				speed := str2float(v_speed.valueA);
-				if (f_max(p_engine_speed - p_variance, 0.0) <= speed and
-					speed >= f_min(p_engine_speed + p_variance, 16382.0)) {
-					t_holding.start(p_holding_time);
-					while (t_holding.running and v_ret == pass) {
-						filterPort.receive(mw_FilterResponseEngineSpeed) ->
-						value v_speed;
-						if (str2float(v_speed.valueA) >= p_engine_speed) {
-							v_ret := pass;
-						} else {
-							v_ret := fail;
-						}
+				t_holding.start(p_holding_time);
+				while (t_holding.running and v_ret == pass) {
+					filterPort.receive(mw_FilterResponseEngineSpeed) ->
+					value v_speed;
+					if (str2float(v_speed.valueA) >= p_engine_speed) {
+						v_ret := pass;
+					} else {
+						v_ret := fail;
 					}
-				} else {
-					v_ret := fail;
 				}
 			}
 			[] filterPort.receive {
@@ -233,6 +228,7 @@ module Car2X_Functions {
 
 		t_TC.start(p_interval);
 		alt {
+			
 			[] filterPort.receive(mw_FilterResponseSteeringWheel) -> value v_angle {
 				if (f_max(p_targetAngle - p_variance, - 600.0) <=
 					str2float(v_angle.valueA) and

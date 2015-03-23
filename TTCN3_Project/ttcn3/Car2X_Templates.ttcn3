@@ -202,7 +202,7 @@ module Car2X_Templates {
 							float p_min := - infinity, float p_max := infinity)
 		:=
 		(f_max(p_middle - p_variance, p_min) ..
-		 f_min(p_middle + p_variance, p_max));
+		 f_min(p_middle + p_variance, p_max)) with {encode "str2float"};
 
 	/**
 	 * @desc template for ignition status response
