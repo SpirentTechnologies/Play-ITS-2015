@@ -74,7 +74,6 @@ public class CANPortFilter extends PortFilter {
 	 *            Target of the send statement.
 	 * @param sendMessage
 	 *            The message to be send.
-	 * 
 	 */
 	public TriStatus triSend(TriComponentId componentId, TriPortId tsiPortId, TriAddress address, TriMessage sendMessage) {
 		System.out.println("PortFilter " + this + " receives following outgoing message: "
