@@ -651,11 +651,11 @@ module Car2X_Functions {
 	 * @return integer The new stage.
 	 * TODO: new stage as return
 	 */
-	function f_set_verdict_and_stage(verdicttype verdict, integer stage) {
+	function f_set_verdict_and_stage(verdicttype verdict, integer stage, float globalTimer) runs on TesterComponentType{
 		setverdict(verdict);
 		stage := stage + 1;
 		// send stage information
-		action("stage:" & int2str(stage));
+		action("stage:" & int2str(stage) & "timeWindow:" & int2str(float2int(globalTimer)));
 	}
 
 	/**
