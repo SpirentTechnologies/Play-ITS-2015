@@ -5,7 +5,8 @@
 module Car2X_ModuleParameters {
 	
 	// CAN MODE 01
-	const charstring c_modePrefix_01 := "01";
+	const charstring c_modePrefix01 := "01";
+	const charstring c_ElmVehicleSpeed := "0D";
 	
 	// keys for data table
 	const charstring c_steeringWheelAngle := "steering_wheel_angle";
@@ -32,40 +33,46 @@ module Car2X_ModuleParameters {
 	const charstring c_startRequest := "start";
 	const charstring c_stopRequest := "stop";
 	
+	//key for intervall times in ms
+	const integer c_FilterInterval2000 := 2000;
+	const integer c_FilterInterval1500 := 1500;
+	const integer c_FilterInterval1000 := 1000;
+	const integer c_FilterInterval500 := 500;
+	
 	//key for testcases
 	
 	//TODO: camel case
 	
 	//vehicle Speed
-	const float c_vehicle_speed_max := 655.0;
-	const float c_vehicle_speed_50 := 50.0;
-	const float c_vehicle_speed_30 := 30.0;
-	const float c_vehicle_speed_10 := 10.0;
-	const float c_vehicle_speed_min := 0.0;
+	const float c_vehicleSpeedMax := 655.0;
+	const float c_vehicleSpeed50 := 50.0;
+	const float c_vehicleSpeed30 := 30.0;
+	const float c_vehicleSpeed10 := 10.0;
+	const float c_vehicleSpeedMin := 0.0;
 	
 	//vehicle Speed variance
-	const float c_vehicle_speed_var_15 := 15.0;
-	const float c_vehicle_speed_var_10 := 10.0;
-	const float c_vehicle_speed_var_5 := 5.0;
-	const float c_vehicle_speed_var_0 := 0.0;
+	const float c_vehicleSpeedVar15 := 15.0;
+	const float c_vehicleSpeedVar10 := 10.0;
+	const float c_vehicleSpeedVar5 := 5.0;
+	const float c_vehicleSpeedVar0 := 0.0;
 	
 	//engine speed
-	const float c_engine_speed_max := 16382.0;
-	const float c_engine_speed_5000 := 5000.0;
-	const float c_engine_speed_4000 := 4000.0;
-	const float c_engine_speed_3000 := 3000.0;
-	const float c_engine_speed_2500 := 2500.0;
-	const float c_engine_speed_2000 := 2000.0;
-	const float c_engine_speed_1000 := 1000.0;
-	const float c_engine_speed_500 := 500.0;
-	const float c_engine_speed_min := 0.0;
+	const float c_engineSpeedMax := 16382.0;
+	const float c_engineSpeed5000 := 5000.0;
+	const float c_engineSpeed4000 := 4000.0;
+	const float c_engineSpeed3000 := 3000.0;
+	const float c_engineSpeed2500 := 2500.0;
+	const float c_engineSpeed2000 := 2000.0;
+	const float c_engineSpeed1000 := 1000.0;
+	const float c_engineSpeed500 := 500.0;
+	const float c_engineSpeedMin := 0.0;
 	
 	//engine speed variance
-	const float c_engine_speed_var_500 := 500.0;
-	const float c_engine_speed_var_250 := 250.0;
-	const float c_engine_speed_var_100 := 100.0;
-	const float c_engine_speed_var_50 := 50.0;
-	const float c_engine_speed_var_0 := 0.0;
+	const float c_engineSpeedVar500 := 500.0;
+	const float c_engineSpeedVar250 := 250.0;
+	const float c_engineSpeedVar100 := 100.0;
+	const float c_engineSpeedVar50 := 50.0;
+	const float c_engineSpeedVar0 := 0.0;
 	
 	//timer values in sec
 	const float c_timerTenSeconds := 10.0;
