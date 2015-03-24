@@ -39,71 +39,87 @@ import java.util.Scanner;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class Car2xEntryUpdater extends Thread {
+public class Car2XEntryUpdater extends Thread {
 
-  private static final String DEFAULT_TCP_SERVER_HOST = "localhost";
-  private static final int DEFAULT_TCP_SERVER_PORT = 50001;
+  private static final String DEFAULT_SIMULATOR_HOST = "localhost";
+  private static final int DEFAULT_SIMULATOR_PORT = 50001;
 
   private Hashtable<String, Car2XEntry> car2xEntries;
   private InetSocketAddress address;
 
   /**
-   * Updates openXC resp. obd2 values within a hashtable.
+   * Updates openXC respectively obd2 values within a hash table.
+   * 
    * @param car2xEntries
    */
-  public Car2xEntryUpdater(Hashtable<String, Car2XEntry> car2xEntries) {
+  public Car2XEntryUpdater(Hashtable<String, Car2XEntry> car2xEntries) {
     this.car2xEntries = car2xEntries;
-    this.address = new InetSocketAddress(DEFAULT_TCP_SERVER_HOST,
-        DEFAULT_TCP_SERVER_PORT);
+    this.address = new InetSocketAddress(DEFAULT_SIMULATOR_HOST,
+        DEFAULT_SIMULATOR_PORT);
   }
 
   /**
-   * Connects to the openXC simulator and updates values as long as the
-   *  hashtable has entries.
+   * Connects to the openXC simulator and updates values as long as the hash
+   * table has entries.
    */
   public void run() {
-    System.out.println("Entry updater started.");
-    Socket sock = null;
+    Socket socket = null;
     Scanner scanner = null;
-
     try {
       // establish the socket
-      sock = new Socket();
-      sock.connect(address);
-      System.out.println("Entry updater connected to host : "
+      socket = new Socket();
+      socket.connect(address);
+      System.out.println("[EntryUpdater] Connected to simulator at "
           + address.getHostName() + " on local port "
           + address.getPort());
 
-      scanner = new Scanner(sock.getInputStream()).useDelimiter("}");
+      scanner = new Scanner(socket.getInputStream()).useDelimiter(String
+          .valueOf((char) 0));
 
-      while (!car2xEntries.isEmpty()) {
-        JSONObject jsonObject = new JSONObject(scanner.next() + "}");
-        Car2XEntry car2xEntry = car2xEntries
-            .get(jsonObject.get("name"));
-        if (car2xEntry != null) {
-          updateEntry(car2xEntry, jsonObject);
-        }
+      while (car2xEntries.size() > 0) {
+        parseString(scanner.next());
       }
-
     } catch (SocketTimeoutException e) {
-      System.out.println("[Timeout] Could not connect to "
+      System.out.println("[EntryUpdater] Timeout: Could not connect to "
           + address.getHostName() + ":" + address.getPort());
     } catch (IOException ioe) {
-      ioe.printStackTrace();
-    } catch (JSONException e) {
-      e.printStackTrace();
+      System.err.println("[EntryUpdater] Could not connect to "
+          + address.getHostName() + " on port " + address.getPort());
     } finally {
-      if (sock != null) {
-        try {
-          sock.close();
-        } catch (IOException e) {
-          e.printStackTrace();
-        }
+      System.out.println("[EntryUpdater] No more entries to update. Shutting down.");
+      closeScanner(scanner);
+      closeSocket(socket);
+    }
+  }
+
+  private void closeScanner(Scanner scanner) {
+    if (scanner != null) {
+      scanner.close();
+    }
+  }
+
+  private void closeSocket(Socket socket) {
+    if (socket != null) {
+      try {
+        socket.close();
+      } catch (IOException e) {
+        System.out.println("[EntryUpdater] Could not close socket. "
+            + e.getMessage());
       }
-      if (scanner != null) {
-        scanner.close();
+    }
+  }
+
+  private void parseString(String jsonString) {
+    System.out.println("[EntryUpdater] Incoming object: " + jsonString);
+    try {
+      JSONObject jsonObject = new JSONObject(jsonString);
+      Car2XEntry car2xEntry = car2xEntries.get(jsonObject.get("name"));
+      if (car2xEntry != null) {
+        updateEntry(car2xEntry, jsonObject);
       }
-      System.out.println("Entry updater stopped.");
+    } catch (JSONException jsone) {
+      System.err.println("[EntryUpdater] Could not parse json string: "
+          + jsonString);
     }
   }
 
@@ -112,9 +128,11 @@ public class Car2xEntryUpdater extends Thread {
       throws JSONException {
     car2xEntry.setTimestamp(new Date().getTime());
     car2xEntry.setValueA(jsonObject.get("value").toString());
-    String event = jsonObject.getString("event");
-    if (event != null) {
+    try {
+      String event = jsonObject.get("event").toString();
       car2xEntry.setValueB(event);
+    } catch (JSONException jsonException) {
+      // ignore missing event
     }
   }
 }
