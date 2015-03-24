@@ -14,11 +14,11 @@ import com.testingtech.util.UUID;
 public class Car2XControlExternalFunctionProvider extends
     AnnotationsExternalFunctionPlugin {
 
-  private static Process serviceProcess;
+  private static Process process;
   private static String processId;
 
   /**
-   * starts the CAN filter service with a host and port
+   * Starts a CAN filter service process with specified host and port
    * 
    * @param host
    *            host name
@@ -37,7 +37,7 @@ public class Car2XControlExternalFunctionProvider extends
   }
 
   private CharstringValue start_Filter(String mainClass, String[] parameters) {
-    if (serviceProcess != null && serviceProcess.isAlive()) {
+    if (process != null && process.isAlive()) {
       return newCharstringValue(processId);
     }
     processId = UUID.randomUUID().toString();
@@ -46,13 +46,12 @@ public class Car2XControlExternalFunctionProvider extends
         + join(parameters, "\" \"") + "\"");
 
     try {
-      String string = "java -classpath build/CANFilter;libs/java-json.jar "
-          + mainClass + " " + join(parameters, " ");
-      serviceProcess = Runtime.getRuntime().exec(string);
+      process = Runtime.getRuntime().exec("java -classpath build/CANFilter;libs/java-json.jar "
+              + mainClass + " " + join(parameters, " "));
 
-      new StreamForwarder(serviceProcess.getInputStream(), System.out)
+      new StreamForwarder(process.getInputStream(), System.out)
           .start();
-      new StreamForwarder(serviceProcess.getErrorStream(), System.err)
+      new StreamForwarder(process.getErrorStream(), System.err)
           .start();
     } catch (IOException e) {
       logError("Could not start CAN filter service: " + e.getMessage());
@@ -78,17 +77,17 @@ public class Car2XControlExternalFunctionProvider extends
   }
 
   /**
-   * Stops the CAN filter service by providing an id.
+   * Stops the CAN filter service process.
    * @return true (service could successfully be stopped)
    */
   @ExternalFunction(name = "stop_Filter", module = "Car2X_Control")
   public BooleanValue stop_Filter() {
     logInfo("Stopping CAN service filter.");
 
-    if (serviceProcess != null) {
-      serviceProcess.destroy();
+    if (process != null) {
+      process.destroy();
       try {
-        serviceProcess.waitFor();
+        process.waitFor();
       } catch (InterruptedException e) {
         // nothing to do just continue
       }
