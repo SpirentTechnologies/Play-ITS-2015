@@ -44,14 +44,15 @@ module Car2X_Templates {
 	template FilterRequest m_Filter_vehicleSpeed_Start() := {
 		reqType := "start",
 		reqData := {
-			{key := c_vehicle_speed, interval := 1500},
-			{key := c_headlamp_status, interval := 500}
+			{key := c_vehicle_speed, interval := 1500}
+//			,
+//			{key := c_headlamp_status, interval := 500}
 		}
 	}
 
 	template FilterRequest m_Filter_vehicleSpeed_Stop() := {
 		reqType := "stop",
-		reqData := {{key := c_vehicle_speed}, {key := c_headlamp_status}}
+		reqData := {{key := c_vehicle_speed}}//, {key := c_headlamp_status}}
 	}
 
 	template FilterRequest m_Filter_steeringWheel_Start() := {
