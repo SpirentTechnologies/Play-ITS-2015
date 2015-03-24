@@ -66,7 +66,7 @@ public class SocketClient extends AsyncTask<Void, Message, Message> {
         Message message = null;
         try {
             mySocket = new Socket();
-            mySocket.connect(new InetSocketAddress("127.0.0.1", 30000), 2000);
+            mySocket.connect(new InetSocketAddress("192.168.87.148", 30000), 2000);
             statusRunning.setText(context.getString(R.string.textview_running));
 
             ObjectOutputStream oos = new ObjectOutputStream(mySocket.getOutputStream());
@@ -196,8 +196,11 @@ public class SocketClient extends AsyncTask<Void, Message, Message> {
 
     public void closeSocket(){
         try {
-            if(mySocket != null)
+            if(mySocket != null) {
+                mySocket.shutdownInput();
+                mySocket.shutdownOutput();
                 mySocket.close();
+            }
         }catch(IOException ioe){
             ioe.printStackTrace();
         }

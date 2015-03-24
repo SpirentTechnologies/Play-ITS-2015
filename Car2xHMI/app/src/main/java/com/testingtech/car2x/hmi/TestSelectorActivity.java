@@ -17,8 +17,8 @@ import java.util.Map;
 public class TestSelectorActivity extends ActionBarActivity {
 
     public final static String TEST_NAME = "drive";
-    ArrayList<String> groupList;
-    ArrayList<String> speedItems, doorItems, brakeItems, lightItems, engineItems, wheelItems;
+    List<String> groupList;
+    ArrayList<String>[] itemLists;
     Map<String, List<String>> collection;
     ExpandableListView expListView;
 
@@ -45,35 +45,31 @@ public class TestSelectorActivity extends ActionBarActivity {
         });
     }
 
-    private void createGroups() {
+    private void createGroups(){
         groupList = new ArrayList<String>();
-        groupList.add("Speed Tests");
-        groupList.add("Door Tests");
-        groupList.add("Break Tests");
-        groupList.add("Light Tests");
-        groupList.add("Engine Tests");
-        groupList.add("Steering Wheel Tests");
+        groupList.add(getString(R.string.speed_group));
+        groupList.add(getString(R.string.door_group));
+        groupList.add(getString(R.string.brake_group));
+        groupList.add(getString(R.string.light_group));
+        groupList.add(getString(R.string.engine_group));
+        groupList.add(getString(R.string.steering_group));
     }
 
-    private void createItems() {
-        speedItems = new ArrayList<>(Arrays.asList("Speed up to 50 & slow down to 30 km/h",
-                "Speed up to 30 & stop", "Drive in reverse"));
-        doorItems = new ArrayList<>(Arrays.asList("Test open door with speed over 50 km/h"));
-        brakeItems = new ArrayList<>(Arrays.asList("Test full brake with speed over 60 km/h",
-                "Activate hand brake", "Test Brakes' efficiency"));
-        lightItems = new ArrayList<>(Arrays.asList("Test headlamp status"));
-        engineItems = new ArrayList<>(Arrays.asList("Test engine rotation speed"));
-        wheelItems = new ArrayList<>(Arrays.asList("Test steering wheel angle"));
+    private void createItems(){
+        itemLists = new ArrayList[6];
+        itemLists[0] = new ArrayList<String>(Arrays.asList(getResources().getStringArray(R.array.speed_tests)));
+        itemLists[1] = new ArrayList<String>(Arrays.asList(getResources().getStringArray(R.array.door_tests)));
+        itemLists[2] = new ArrayList<String>(Arrays.asList(getResources().getStringArray(R.array.brake_tests)));
+        itemLists[3] = new ArrayList<String>(Arrays.asList(getResources().getStringArray(R.array.light_tests)));
+        itemLists[4] = new ArrayList<String>(Arrays.asList(getResources().getStringArray(R.array.engine_tests)));
+        itemLists[5] = new ArrayList<String>(Arrays.asList(getResources().getStringArray(R.array.steering_tests)));
     }
 
     private void createCollection(){
         collection = new LinkedHashMap<String, List<String>>();
-        collection.put(groupList.get(0), speedItems);
-        collection.put(groupList.get(1), doorItems);
-        collection.put(groupList.get(2), brakeItems);
-        collection.put(groupList.get(3), lightItems);
-        collection.put(groupList.get(4), engineItems);
-        collection.put(groupList.get(5), wheelItems);
+        for(int i = 0; i < 6; i++){
+            collection.put(groupList.get(i), itemLists[i]);
+        }
     }
 
     public void startDriveTest(){

@@ -36,7 +36,7 @@ public class TestRunnerActivity extends ActionBarActivity {
         setContentView(R.layout.activity_test_runner);
 
         // TODO remove (just for testing)
-        Driver.start();
+        //Driver.start();
 
         Intent intent = getIntent();
         String testName = intent.getStringExtra(TestSelectorActivity.TEST_NAME);
