@@ -61,14 +61,8 @@ module Car2X_ModuleParameters {
 	const float c_engine_speed_var_50 := 50.0;
 	const float c_engine_speed_var_0 := 0.0;
 	
-	//
-	/**
-	 * @desc Host used to bind to when the Test Environment acts as a server 
-	 */
 	modulepar charstring TCP_LOCAL_HOST := "localhost";
-
-	/**
-	 * @desc Port used to bind to when the Test Environment acts as a server  
-	 */
-	modulepar integer TCP_LOCAL_PORT := 7070;	
+	modulepar integer TCP_LOCAL_PORT := 7070;
+	modulepar charstring TCP_REMOTE_HOST := "localhost";
+	modulepar integer TCP_REMOTE_PORT := 7000;	
 }
