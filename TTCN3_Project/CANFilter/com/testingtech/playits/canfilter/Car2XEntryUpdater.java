@@ -48,7 +48,8 @@ public class Car2XEntryUpdater extends Thread {
   private InetSocketAddress address;
 
   /**
-   * Updates openXC respectively obd2 values within a hash table.
+   * Connects to the openXC simulator and updates openXC respectively 
+   * obd2 values within a hash table provided as a parameter.
    * 
    * @param car2xEntries
    */
@@ -59,19 +60,18 @@ public class Car2XEntryUpdater extends Thread {
   }
 
   /**
-   * Connects to the openXC simulator and updates values as long as the hash
-   * table has entries.
+   * Connects to the openXC simulator and updates values as long as there are
+   * updated requested (at least one entry exists).
    */
   public void run() {
     Socket socket = null;
     Scanner scanner = null;
     try {
-      // establish the socket
       socket = new Socket();
+      System.out.println("[EntryUpdater] Connecting to openXC simulator at "
+              + address.getHostName() + " on local port "
+              + address.getPort());
       socket.connect(address);
-      System.out.println("[EntryUpdater] Connected to simulator at "
-          + address.getHostName() + " on local port "
-          + address.getPort());
 
       scanner = new Scanner(socket.getInputStream()).useDelimiter(String
           .valueOf((char) 0));
@@ -87,30 +87,31 @@ public class Car2XEntryUpdater extends Thread {
           + address.getHostName() + " on port " + address.getPort());
     } finally {
       System.out.println("[EntryUpdater] No more entries to update. Shutting down.");
-      closeScanner(scanner);
-      closeSocket(socket);
+      close(scanner);
+      close(socket);
     }
   }
 
-  private void closeScanner(Scanner scanner) {
+  private void close(Scanner scanner) {
     if (scanner != null) {
       scanner.close();
     }
   }
 
-  private void closeSocket(Socket socket) {
+  private void close(Socket socket) {
     if (socket != null) {
       try {
         socket.close();
       } catch (IOException e) {
-        System.out.println("[EntryUpdater] Could not close socket. "
+        System.out.println("[EntryUpdater] Could not close socket: "
             + e.getMessage());
       }
     }
   }
 
   private void parseString(String jsonString) {
-    System.out.println("[EntryUpdater] Incoming object: " + jsonString);
+//    TODO enable to debug
+//    System.out.println("[EntryUpdater] Incoming object: " + jsonString); 
     try {
       JSONObject jsonObject = new JSONObject(jsonString);
       Car2XEntry car2xEntry = car2xEntries.get(jsonObject.get("name"));
