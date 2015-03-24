@@ -26,20 +26,71 @@
     <string name="textview_loading">Test is loading &#8230;</string>
     <string name="textview_running">Test is running &#8230;</string>
 
-    <!-- Drive Test Activity -->
-    <string name="textview_drive_results">The current speed is %s km/h.</string>
-    <string name="textview_drive_commands">Please %s.</string>
-
-    <!-- Drive Test Activity -->
-    <string name="textview_door_results">The right front door is %s.</string>
-    <string name="textview_door_commands">Please %s.</string>
-
-    <!-- Drive Test Activity -->
-    <string name="textview_break_results">The hand break is %s.</string>
-    <string name="textview_break_commands">Please %s.</string>
-
     <!-- colors -->
     <color name="red_background">#FBE9E9</color>
     <color name="white">#FFFFFF</color>
+
+    <!-- test cases in groups -->
+    <string name="speed_group">Speed Tests</string>
+        <string-array name="speed_tests">
+            <item>Speed up to 50 and slow down to 30 km/h</item>
+            <item>Speed up to 30 and stop</item>
+            <item>Drive in reverse</item>
+        </string-array>
+    <string name="door_group">Door Tests</string>
+        <string-array name="door_tests">
+            <item>Test open door with speed over 50 km/h</item>
+        </string-array>
+    <string name="brake_group">Brake Tests</string>
+        <string-array name="brake_tests">
+            <item>Test full brake with speed over 60 km/h</item>
+            <item>Activate hand brake</item>
+            <item>Test Brakes\' efficiency</item>
+        </string-array>
+    <string name="light_group">Light Tests</string>
+        <string-array name="light_tests">
+            <item>Test headlamp status</item>
+        </string-array>
+    <string name="engine_group">Engine Tests</string>
+        <string-array name="engine_tests">
+            <item>Test engine rotation speed</item>
+        </string-array>
+    <string name="steering_group">Steering Wheel Tests</string>
+        <string-array name="steering_tests">
+            <item>Test steering wheel angle</item>
+        </string-array>
+
+
+    <!-- stages of test cases -->
+    <string-array name="speed_test1_stages">
+        <item>Speed Tests</item>
+        <item>Speed Tests</item>
+        <item>Speed Tests</item>
+    </string-array>
+    <string-array name="door_test1_stages">
+        <item>Speed Tests</item>
+        <item>Speed Tests</item>
+        <item>Speed Tests</item>
+    </string-array>
+    <string-array name="brake_stages">
+        <item>Speed Tests</item>
+        <item>Speed Tests</item>
+        <item>Speed Tests</item>
+    </string-array>
+    <string-array name="light_stages">
+        <item>Speed Tests</item>
+        <item>Speed Tests</item>
+        <item>Speed Tests</item>
+    </string-array>
+    <string-array name="engine_stages">
+        <item>Speed Tests</item>
+        <item>Speed Tests</item>
+        <item>Speed Tests</item>
+    </string-array>
+    <string-array name="steering_stages">
+        <item>Speed Tests</item>
+        <item>Speed Tests</item>
+        <item>Speed Tests</item>
+    </string-array>
 
 </resources>
