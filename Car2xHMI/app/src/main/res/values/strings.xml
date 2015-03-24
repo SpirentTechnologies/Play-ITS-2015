@@ -63,55 +63,65 @@
 
     <!-- stages of test cases -->
     <string-array name="speed_test1_stages">
-        <item>Start engine</item>
-        <item>Drive 50 km/h</item>
-        <item>Slow down to 30 km/h</item>
-        <item>Let the car roll to a halt</item>
+        <item>Change ignition state to \"start\"</item>
+        <item>Speed up to 50 km/h</item>
+        <item>Slow down to under 30 km/h</item>
+        <item>Keep speed between 10 and 30 km/h for 5 seconds</item>
     </string-array>
     <string-array name="speed_test2_stages">
-        <item>Drive 50 km/h</item>
-        <item>Slow down to 30 km/h</item>
+        <item>Change ignition state to \"start\"</item>
+        <item>Speed up to 30 km/h</item>
+        <item>Slow down to 0 km/h</item>
+        <item>Activate parking brake</item>
     </string-array>
     <string-array name="speed_test3_stages">
-        <item>Drive 50 km/h</item>
-        <item>Slow down to 30 km/h</item>
-        <item>Let the car roll to a halt</item>
-        <item>Let the car roll to a halt</item>
+        <item>Change ignition state to \"start\"</item>
+        <item>Change to gear reverse</item>
+        <item>Speed up to about 10 km/h</item>
+        <item>Hold the speed for 10 sec</item>
+        <item>Slow down and stop</item>
+        <item>Activate parking brake</item>
     </string-array>
     <string-array name="door_test1_stages">
-        <item>Door Test Stage 1</item>
-        <item>Speed Tests</item>
-        <item>Speed Tests</item>
+        <item>Change ignition state to \"start\"</item>
+        <item>Speed up to over 50 km/h</item>
+        <item>Carefully open the door on driver side</item>
+        <item>Close the door</item>
     </string-array>
     <string-array name="brake_test1_stages">
-        <item>Brake 1</item>
-        <item>Hey what's up</item>
-        <item>How do you do</item>
+        <item>Change ignition state to \"start\"</item>
+        <item>Speed up to over 60 km/h</item>
+        <item>Full brake</item>
     </string-array>
     <string-array name="brake_test2_stages">
-        <item>Speed Tests</item>
-        <item>Speed Tests</item>
-        <item>Speed Tests</item>
+        <item>Change ignition state to \"accessory\"</item>
+        <item>Release parking brake</item>
+        <item>Activate parking brake</item>
     </string-array>
     <string-array name="brake_test3_stages">
-        <item>Speed Tests</item>
-        <item>Speed Tests</item>
-        <item>Speed Tests</item>
+        <item>Change ignition state to \"start\"</item>
+        <item>Speed up to 50 km/h</item>
+        <item>Hold the speed for 10 seconds</item>
+        <item>Brake fully to full stop</item>
+        <item>Check the distance</item>
     </string-array>
     <string-array name="light_test1_stages">
-        <item>Speed Tests</item>
-        <item>Speed Tests</item>
-        <item>Speed Tests</item>
+        <item>Change ignition state to \"run\"</item>
+        <item>Turn the headlamp off</item>
+        <item>Turn the headlamp on</item>
+        <item>Turn the headlamp off</item>
     </string-array>
     <string-array name="engine_test1_stages">
-        <item>Speed Tests</item>
-        <item>Speed Tests</item>
-        <item>Speed Tests</item>
+        <item>Change ignition state to \"start\"</item>
+        <item>Set transmission gear position to neutral</item>
+        <item>Press gas pedal, keep engine speed over 2500 rpm for more than 10 seconds</item>
+        <item>Release the gas pedal</item>
     </string-array>
     <string-array name="steering_test1_stages">
-        <item>Speed Tests</item>
-        <item>Speed Tests</item>
-        <item>Speed Tests</item>
+        <item>Change ignition state to \"accessory\"</item>
+        <item>Turn the wheel most left</item>
+        <item>Turn the wheel most right</item>
+        <item>Return the wheel to the middle state</item>
     </string-array>
 
 </resources>
