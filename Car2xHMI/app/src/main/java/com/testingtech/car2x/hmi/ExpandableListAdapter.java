@@ -12,6 +12,9 @@ import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.TextView;
 
+/**
+ * Class for handling the ExpandableListView functionality in the TestSelector Activity.
+ */
 public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
     private Activity context;
@@ -77,8 +80,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         if (convertView == null) {
             LayoutInflater infalInflater = (LayoutInflater) context
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = infalInflater.inflate(R.layout.group_item,
-                    null);
+            convertView = infalInflater.inflate(R.layout.group_item, null);
         }
         TextView item = (TextView) convertView.findViewById(R.id.laptop);
         item.setTypeface(null, Typeface.BOLD);

@@ -36,12 +36,12 @@ public class SocketClient extends AsyncTask<Void, Message, Message> {
     private AnimationDrawable logoAnimation;
     private Button btnStart, btnStop;
     private TextToSpeech speech;
-    private int stageNum = 0;
+    private int stageNum = 0, stageCount = 0;
     private Socket mySocket = null;
 
     public SocketClient(Context con, TextView tv, ScrollView sv, ProgressBar pb,
                         AnimationDrawable ad, TextView sr, Button start,
-                        Button stop, TextToSpeech tts) {
+                        Button stop, TextToSpeech tts, int stages) {
         this.context = con;
         this.debugText = tv;
         this.scrollview = sv;
@@ -51,6 +51,7 @@ public class SocketClient extends AsyncTask<Void, Message, Message> {
         this.btnStart = start;
         this.btnStop = stop;
         this.speech = tts;
+        this.stageCount = stages;
     }
 
     /**
@@ -81,11 +82,12 @@ public class SocketClient extends AsyncTask<Void, Message, Message> {
         ObjectOutputStream oos;
         ObjectInputStream ois;
         try {
-            mySocket.connect(new InetSocketAddress("192.168.87.148", 30000), 2000);
+            mySocket.connect(new InetSocketAddress("127.0.0.1", 30000), 2000);
+            //mySocket.connect(new InetSocketAddress("192.168.87.148", 30000), 2000);
             oos = new ObjectOutputStream(mySocket.getOutputStream());
             ois = new ObjectInputStream(mySocket.getInputStream());
         }catch(SocketTimeoutException ste) {
-            handleError("Connection failed after timeout. Try again.");
+            handleError("Connecting failed after timeout. Try again.");
             return null;
         }catch (IOException ioe) {
             handleError("Connecting failed: " + ioe.getMessage());
@@ -166,44 +168,28 @@ public class SocketClient extends AsyncTask<Void, Message, Message> {
             status = ((VerdictMessage) progress[0]).verdict.toString();
         }
         debugText.setText(status);
-        String toSpeak;
-        switch(stageNum){
-            case 0:
-                toSpeak = context.getString(R.string.stage_start_engine);
-                break;
-            case 1:
-                toSpeak = context.getString(R.string.stage_drive_50);
-                break;
-            case 2:
-                toSpeak = context.getString(R.string.stage_down_to_30);
-                break;
-            case 3:
-                toSpeak = context.getString(R.string.stage_roll_halt);
-                break;
-            default:
-                toSpeak = "";
-        }
+        // get the table as child of the scrollview
+        TableLayout table = (TableLayout) scrollview.getChildAt(0);
+        // get the current textview as child of the table
+        TextView text = (TextView) table.getChildAt(stageNum);
+        String toSpeak = text.getText().toString();
         if(Build.VERSION.SDK_INT < 21){
             speech.speak(toSpeak, TextToSpeech.QUEUE_FLUSH, null);
         } else{
             speech.speak(toSpeak, TextToSpeech.QUEUE_FLUSH, null, "speak");
         }
-        // get the table as child of the scrollview
-        TableLayout table = (TableLayout) scrollview.getChildAt(0);
         if(stageNum > 0) {
             // get the textview from the position above as child of the table
             TextView oldText = (TextView) table.getChildAt(stageNum - 1);
             // change color back to white
             oldText.setBackgroundColor(Color.TRANSPARENT);
         }
-        // get the current textview as child of the table
-        TextView text = (TextView) table.getChildAt(stageNum);
         // change color to red
         text.setBackgroundResource(R.drawable.rectangle_border_red);
         // scroll to current textview
         scrollview.smoothScrollTo(0, text.getTop());
         // update progress bar
-        progressBar.setProgress(((stageNum + 1) * 100) / 4);
+        progressBar.setProgress(((stageNum + 1) * 100) / stageCount);
         // next stage
         if(progress[0] instanceof ProgressMessage) {
             stageNum = ((ProgressMessage)progress[0]).progress.ordinal() + 1;
