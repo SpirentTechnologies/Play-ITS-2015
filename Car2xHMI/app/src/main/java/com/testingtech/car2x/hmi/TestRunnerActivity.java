@@ -31,7 +31,7 @@ public class TestRunnerActivity extends ActionBarActivity {
     private AnimationDrawable logoAnimation;
     private SocketClient socketClient;
     private TextToSpeech speech;
-    private int stageCount;
+    private int stageCount, testNumber;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +42,7 @@ public class TestRunnerActivity extends ActionBarActivity {
         Driver.start();
 
         Intent intent = getIntent();
+        testNumber = intent.getIntExtra(TestSelectorActivity.TEST_NUMBER, 0);
         String testTitle = intent.getStringExtra(TestSelectorActivity.TEST_TITLE);
         String[] testStages = intent.getStringArrayExtra(TestSelectorActivity.TEST_STAGES);
 
@@ -82,7 +83,7 @@ public class TestRunnerActivity extends ActionBarActivity {
      */
     public void startTest(View view) {
         socketClient = new SocketClient(this, socketConn, progress, progressBar, logoAnimation,
-                statusText, btnStart, btnStop, speech, stageCount);
+                statusText, btnStart, btnStop, speech, stageCount, testNumber);
         socketClient.execute();
     }
 

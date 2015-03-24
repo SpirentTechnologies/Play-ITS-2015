@@ -16,6 +16,7 @@ import java.util.Map;
 
 public class TestSelectorActivity extends ActionBarActivity {
 
+    public final static String TEST_NUMBER = "number";
     public final static String TEST_TITLE = "name";
     public final static String TEST_STAGES = "stages";
     List<String> groupList;
@@ -40,17 +41,21 @@ public class TestSelectorActivity extends ActionBarActivity {
             @Override
             public boolean onChildClick(ExpandableListView parent, View v,
                                         int groupPosition, int childPosition, long id) {
+                int testNo = 0;
                 String[] stages = {};
                 switch(groupPosition){
                     case 0:
                         switch(childPosition){
                             case 0:
+                                testNo = 0;
                                 stages = getResources().getStringArray(R.array.speed_test1_stages);
                                 break;
                             case 1:
+                                testNo = 1;
                                 stages = getResources().getStringArray(R.array.speed_test2_stages);
                                 break;
                             case 2:
+                                testNo = 2;
                                 stages = getResources().getStringArray(R.array.speed_test3_stages);
                                 break;
                         }
@@ -58,48 +63,55 @@ public class TestSelectorActivity extends ActionBarActivity {
                     case 1:
                         switch(childPosition) {
                             case 0:
+                                testNo = 3;
                                 stages = getResources().getStringArray(R.array.door_test1_stages);
                                 break;
                         }
                     case 2:
                         switch(childPosition) {
                             case 0:
+                                testNo = 4;
                                 stages = getResources().getStringArray(R.array.brake_test1_stages);
                                 break;
                             case 1:
+                                testNo = 5;
                                 stages = getResources().getStringArray(R.array.brake_test2_stages);
                                 break;
                             case 2:
+                                testNo = 6;
                                 stages = getResources().getStringArray(R.array.brake_test3_stages);
                                 break;
                         }
                     case 3:
                         switch(childPosition) {
                             case 0:
+                                testNo = 7;
                                 stages = getResources().getStringArray(R.array.light_test1_stages);
                                 break;
                         }
                     case 4:
                         switch(childPosition) {
                             case 0:
+                                testNo = 8;
                                 stages = getResources().getStringArray(R.array.engine_test1_stages);
                                 break;
                         }
                     case 5:
                         switch(childPosition) {
                             case 0:
+                                testNo = 9;
                                 stages = getResources().getStringArray(R.array.steering_test1_stages);
                                 break;
                         }
                 }
-                startTestRunnerActivity(itemLists[groupPosition].get(childPosition), stages);
+                startTestRunnerActivity(testNo, itemLists[groupPosition].get(childPosition), stages);
                 return true;
             }
         });
     }
 
     private void createGroups(){
-        groupList = new ArrayList<String>();
+        groupList = new ArrayList<>();
         groupList.add(getString(R.string.speed_group));
         groupList.add(getString(R.string.door_group));
         groupList.add(getString(R.string.brake_group));
@@ -110,12 +122,12 @@ public class TestSelectorActivity extends ActionBarActivity {
 
     private void createItems(){
         itemLists = new ArrayList[6];
-        itemLists[0] = new ArrayList<String>(Arrays.asList(getResources().getStringArray(R.array.speed_tests)));
-        itemLists[1] = new ArrayList<String>(Arrays.asList(getResources().getStringArray(R.array.door_tests)));
-        itemLists[2] = new ArrayList<String>(Arrays.asList(getResources().getStringArray(R.array.brake_tests)));
-        itemLists[3] = new ArrayList<String>(Arrays.asList(getResources().getStringArray(R.array.light_tests)));
-        itemLists[4] = new ArrayList<String>(Arrays.asList(getResources().getStringArray(R.array.engine_tests)));
-        itemLists[5] = new ArrayList<String>(Arrays.asList(getResources().getStringArray(R.array.steering_tests)));
+        itemLists[0] = new ArrayList<>(Arrays.asList(getResources().getStringArray(R.array.speed_tests)));
+        itemLists[1] = new ArrayList<>(Arrays.asList(getResources().getStringArray(R.array.door_tests)));
+        itemLists[2] = new ArrayList<>(Arrays.asList(getResources().getStringArray(R.array.brake_tests)));
+        itemLists[3] = new ArrayList<>(Arrays.asList(getResources().getStringArray(R.array.light_tests)));
+        itemLists[4] = new ArrayList<>(Arrays.asList(getResources().getStringArray(R.array.engine_tests)));
+        itemLists[5] = new ArrayList<>(Arrays.asList(getResources().getStringArray(R.array.steering_tests)));
     }
 
     private void createCollection(){
@@ -125,8 +137,9 @@ public class TestSelectorActivity extends ActionBarActivity {
         }
     }
 
-    public void startTestRunnerActivity(String title, String[] stages) {
+    public void startTestRunnerActivity(int number, String title, String[] stages) {
         Intent intent = new Intent(this, TestRunnerActivity.class);
+        intent.putExtra(TEST_NUMBER, number);
         intent.putExtra(TEST_TITLE, title);
         intent.putExtra(TEST_STAGES, stages);
         startActivity(intent);
