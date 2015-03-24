@@ -16,15 +16,15 @@ public class ResponderTask extends TimerTask {
   private Socket socket;
 
   /**
-   * Periodically sends a key-value par encoded as a JSON String over a
+   * Periodically sends a key-value pair encoded as a JSON String over a
    * socket's output stream.
    * 
    * @param key
-   *            openxc key
+   *            openXC key
    * @param car2xEntry
    *            corresponding value entry
    * @param socket
-   *            TCP responding channel
+   *            TCP response channel
    */
   public ResponderTask(String key, Car2XEntry car2xEntry, Socket socket) {
     this.key = key;
@@ -45,6 +45,7 @@ public class ResponderTask extends TimerTask {
   }
 
   private JSONObject createResponse() throws JSONException {
+	// INFO: omits key if value is empty 
     JSONObject response = new JSONObject();
     response.put("OpenXCKey", key);
     response.put("OBD2Key", car2xEntry.getObd2key());
