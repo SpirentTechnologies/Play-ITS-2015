@@ -16,11 +16,15 @@ public class ResponderTask extends TimerTask {
   private Socket socket;
 
   /**
-   * Periodically sends a key-value par encoded as a JSON String over a socket's
-   * output stream.
-   * @param key openxc key
-   * @param car2xEntry corresponding value
-   * @param socket TCP responding channel
+   * Periodically sends a key-value par encoded as a JSON String over a
+   * socket's output stream.
+   * 
+   * @param key
+   *            openxc key
+   * @param car2xEntry
+   *            corresponding value entry
+   * @param socket
+   *            TCP responding channel
    */
   public ResponderTask(String key, Car2XEntry car2xEntry, Socket socket) {
     this.key = key;
@@ -30,37 +34,42 @@ public class ResponderTask extends TimerTask {
 
   @Override
   public void run() {
-    if (car2xEntry.getTimestamp() > 0) {
-      try {
-        JSONObject response = createResponse();
-        send(response);
-      } catch (JSONException e) {
-        e.printStackTrace();
-      }
+    try {
+      JSONObject response = createResponse();
+      System.out.println("[ResponderTask] Sending " + response);
+      sendJSONObject(response);
+    } catch (JSONException e) {
+      System.out.println("[ResponderTask] Error creating JSON response. "
+          + e.getMessage());
     }
   }
 
   private JSONObject createResponse() throws JSONException {
     JSONObject response = new JSONObject();
-    response.put("Timestamp", car2xEntry.getTimestamp());
     response.put("OpenXCKey", key);
     response.put("OBD2Key", car2xEntry.getObd2key());
     response.put("valueA", car2xEntry.getValueA());
     response.put("valueB", car2xEntry.getValueB());
+    response.put("respTimestamp", car2xEntry.getTimestamp());
     return response;
   }
 
-  private void send(JSONObject jsonObject) {
+  private void sendJSONObject(JSONObject jsonObject) {
     String jsonAsString = jsonObject.toString();
     byte[] bytes = jsonAsString.getBytes(Charset.forName("UTF-8"));
-    OutputStream outputStream;
     try {
-      outputStream = socket.getOutputStream();
-      outputStream.write(bytes);
-      outputStream.flush();
+      sendBytes(bytes);
     } catch (IOException e) {
-      e.printStackTrace();
+      System.err
+          .println("[ResponderTask] Error while sending response for "
+              + key + ": " + e.getMessage());
+      cancel();
     }
   }
 
+  private void sendBytes(byte[] bytes) throws IOException {
+    OutputStream outputStream = socket.getOutputStream();
+    outputStream.write(bytes);
+    outputStream.flush();
+  }
 }
