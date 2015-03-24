@@ -5,6 +5,7 @@ import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.support.v7.app.ActionBarActivity;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -12,6 +13,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
+import android.widget.TableLayout;
 import android.widget.TextView;
 
 import com.testingtech.car2x.hmi.driver.Driver;
@@ -28,7 +30,8 @@ public class TestRunnerActivity extends ActionBarActivity {
     private Button btnStop;
     private AnimationDrawable logoAnimation;
     private SocketClient socketClient;
-    private TextToSpeech ttobj;
+    private TextToSpeech speech;
+    private int stageCount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,33 +39,31 @@ public class TestRunnerActivity extends ActionBarActivity {
         setContentView(R.layout.activity_test_runner);
 
         // TODO remove (just for testing)
-        //Driver.start();
+        Driver.start();
 
         Intent intent = getIntent();
-        String testName = intent.getStringExtra(TestSelectorActivity.TEST_NAME);
-        switch(testName){
-            case "drive":
-                setTitle(getString(R.string.title_activity_drive_test));
-                break;
-            case "door":
-                setTitle(getString(R.string.title_activity_door_test));
-                break;
-            case "break":
-                setTitle(getString(R.string.title_activity_break_test));
-                break;
-            default:
-                setTitle("Test");
+        String testTitle = intent.getStringExtra(TestSelectorActivity.TEST_TITLE);
+        String[] testStages = intent.getStringArrayExtra(TestSelectorActivity.TEST_STAGES);
+
+        setTitle(testTitle);
+        TableLayout table = (TableLayout) findViewById(R.id.tableStages);
+        for(int stage = 0; stage < testStages.length; stage++){
+            TextView stageText = new TextView(this);
+            stageText.setGravity(Gravity.CENTER);
+            stageText.setTextSize(28);
+            stageText.setText(testStages[stage]);
+            table.addView(stageText);
         }
 
         ImageView logoImage = (ImageView) findViewById(R.id.status_animation);
         logoImage.setBackgroundResource(R.drawable.animation_logo);
         logoAnimation = (AnimationDrawable) logoImage.getBackground();
 
-        ttobj = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
+        speech = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
             @Override
             public void onInit(int status) {
                 if (status != TextToSpeech.ERROR) {
-                    ttobj.setLanguage(Locale.UK);
+                    speech.setLanguage(Locale.UK);
                 }
             }
         });
@@ -72,17 +73,26 @@ public class TestRunnerActivity extends ActionBarActivity {
         progressBar = (ProgressBar) findViewById(R.id.progressbar);
         btnStart = (Button) findViewById(R.id.button_start);
         btnStop = (Button) findViewById(R.id.button_stop);
+        stageCount = testStages.length;
     }
 
+    /**
+     * Start the test. Create a new AsyncThread and run it.
+     * @param view Not used.
+     */
     public void startTest(View view) {
         socketClient = new SocketClient(this, socketConn, progress, progressBar, logoAnimation,
-                statusText, btnStart, btnStop, ttobj);
+                statusText, btnStart, btnStop, speech, stageCount);
         socketClient.execute();
     }
 
+    /**
+     * Stop the running test. Cancel the AsyncThread and close the Socket.
+     * @param view Not used.
+     */
     public void stopTest(View view) {
         socketClient.cancel(true);
-        socketClient.closeSocket();
+        socketClient.closeSocket();     // needed to unblock Socket.read()
     }
 
     @Override
@@ -110,7 +120,7 @@ public class TestRunnerActivity extends ActionBarActivity {
     @Override
     protected void onDestroy(){
         super.onDestroy();
-        if(ttobj != null)
-            ttobj.shutdown();
+        if(speech != null)
+            speech.shutdown();
     }
 }

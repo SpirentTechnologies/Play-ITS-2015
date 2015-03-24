@@ -63,31 +63,52 @@
 
     <!-- stages of test cases -->
     <string-array name="speed_test1_stages">
-        <item>Speed Tests</item>
-        <item>Speed Tests</item>
-        <item>Speed Tests</item>
+        <item>Start engine</item>
+        <item>Drive 50 km/h</item>
+        <item>Slow down to 30 km/h</item>
+        <item>Let the car roll to a halt</item>
+    </string-array>
+    <string-array name="speed_test2_stages">
+        <item>Drive 50 km/h</item>
+        <item>Slow down to 30 km/h</item>
+    </string-array>
+    <string-array name="speed_test3_stages">
+        <item>Drive 50 km/h</item>
+        <item>Slow down to 30 km/h</item>
+        <item>Let the car roll to a halt</item>
+        <item>Let the car roll to a halt</item>
     </string-array>
     <string-array name="door_test1_stages">
+        <item>Door Test Stage 1</item>
+        <item>Speed Tests</item>
+        <item>Speed Tests</item>
+    </string-array>
+    <string-array name="brake_test1_stages">
+        <item>Brake 1</item>
+        <item>Hey what's up</item>
+        <item>How do you do</item>
+    </string-array>
+    <string-array name="brake_test2_stages">
         <item>Speed Tests</item>
         <item>Speed Tests</item>
         <item>Speed Tests</item>
     </string-array>
-    <string-array name="brake_stages">
+    <string-array name="brake_test3_stages">
         <item>Speed Tests</item>
         <item>Speed Tests</item>
         <item>Speed Tests</item>
     </string-array>
-    <string-array name="light_stages">
+    <string-array name="light_test1_stages">
         <item>Speed Tests</item>
         <item>Speed Tests</item>
         <item>Speed Tests</item>
     </string-array>
-    <string-array name="engine_stages">
+    <string-array name="engine_test1_stages">
         <item>Speed Tests</item>
         <item>Speed Tests</item>
         <item>Speed Tests</item>
     </string-array>
-    <string-array name="steering_stages">
+    <string-array name="steering_test1_stages">
         <item>Speed Tests</item>
         <item>Speed Tests</item>
         <item>Speed Tests</item>

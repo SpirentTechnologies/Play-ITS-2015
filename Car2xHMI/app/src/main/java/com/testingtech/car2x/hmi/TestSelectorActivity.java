@@ -16,7 +16,8 @@ import java.util.Map;
 
 public class TestSelectorActivity extends ActionBarActivity {
 
-    public final static String TEST_NAME = "drive";
+    public final static String TEST_TITLE = "name";
+    public final static String TEST_STAGES = "stages";
     List<String> groupList;
     ArrayList<String>[] itemLists;
     Map<String, List<String>> collection;
@@ -39,7 +40,59 @@ public class TestSelectorActivity extends ActionBarActivity {
             @Override
             public boolean onChildClick(ExpandableListView parent, View v,
                                         int groupPosition, int childPosition, long id) {
-                startDriveTest();
+                String[] stages = {};
+                switch(groupPosition){
+                    case 0:
+                        switch(childPosition){
+                            case 0:
+                                stages = getResources().getStringArray(R.array.speed_test1_stages);
+                                break;
+                            case 1:
+                                stages = getResources().getStringArray(R.array.speed_test2_stages);
+                                break;
+                            case 2:
+                                stages = getResources().getStringArray(R.array.speed_test3_stages);
+                                break;
+                        }
+                        break;
+                    case 1:
+                        switch(childPosition) {
+                            case 0:
+                                stages = getResources().getStringArray(R.array.door_test1_stages);
+                                break;
+                        }
+                    case 2:
+                        switch(childPosition) {
+                            case 0:
+                                stages = getResources().getStringArray(R.array.brake_test1_stages);
+                                break;
+                            case 1:
+                                stages = getResources().getStringArray(R.array.brake_test2_stages);
+                                break;
+                            case 2:
+                                stages = getResources().getStringArray(R.array.brake_test3_stages);
+                                break;
+                        }
+                    case 3:
+                        switch(childPosition) {
+                            case 0:
+                                stages = getResources().getStringArray(R.array.light_test1_stages);
+                                break;
+                        }
+                    case 4:
+                        switch(childPosition) {
+                            case 0:
+                                stages = getResources().getStringArray(R.array.engine_test1_stages);
+                                break;
+                        }
+                    case 5:
+                        switch(childPosition) {
+                            case 0:
+                                stages = getResources().getStringArray(R.array.steering_test1_stages);
+                                break;
+                        }
+                }
+                startTestRunnerActivity(itemLists[groupPosition].get(childPosition), stages);
                 return true;
             }
         });
@@ -72,21 +125,10 @@ public class TestSelectorActivity extends ActionBarActivity {
         }
     }
 
-    public void startDriveTest(){
-        startTestRunnerActivity("drive");
-    }
-
-    public void startDoorTest(View view){
-        startTestRunnerActivity("door");
-    }
-
-    public void startBreakTest(View view){
-        startTestRunnerActivity("break");
-    }
-
-    public void startTestRunnerActivity(String test) {
+    public void startTestRunnerActivity(String title, String[] stages) {
         Intent intent = new Intent(this, TestRunnerActivity.class);
-        intent.putExtra(TEST_NAME, test);
+        intent.putExtra(TEST_TITLE, title);
+        intent.putExtra(TEST_STAGES, stages);
         startActivity(intent);
     }
 

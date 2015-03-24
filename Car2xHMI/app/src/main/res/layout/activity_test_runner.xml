@@ -68,26 +68,11 @@
         android:layout_height="0dp"
         android:layout_weight="4" >
         <TableLayout
+            android:id="@+id/tableStages"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:stretchColumns="1"
             android:background="@drawable/rectangle_border_white">
-            <TextView
-                android:text="@string/stage_start_engine"
-                android:gravity="center"
-                android:textSize="28sp" />
-            <TextView
-                android:text="@string/stage_drive_50"
-                android:gravity="center"
-                android:textSize="28sp" />
-            <TextView
-                android:text="@string/stage_down_to_30"
-                android:gravity="center"
-                android:textSize="28sp" />
-            <TextView
-                android:text="@string/stage_roll_halt"
-                android:gravity="center"
-                android:textSize="28sp" />
         </TableLayout>
     </ScrollView>
 
