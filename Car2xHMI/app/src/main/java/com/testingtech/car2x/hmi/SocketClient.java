@@ -36,12 +36,12 @@ public class SocketClient extends AsyncTask<Void, Message, Message> {
     private AnimationDrawable logoAnimation;
     private Button btnStart, btnStop;
     private TextToSpeech speech;
-    private int stageNum = 0, stageCount = 0;
+    private int stageNum = 0, stageCount = 0, testNumber = 0;
     private Socket mySocket = null;
 
     public SocketClient(Context con, TextView tv, ScrollView sv, ProgressBar pb,
                         AnimationDrawable ad, TextView sr, Button start,
-                        Button stop, TextToSpeech tts, int stages) {
+                        Button stop, TextToSpeech tts, int stages, int number) {
         this.context = con;
         this.debugText = tv;
         this.scrollview = sv;
@@ -52,6 +52,7 @@ public class SocketClient extends AsyncTask<Void, Message, Message> {
         this.btnStop = stop;
         this.speech = tts;
         this.stageCount = stages;
+        this.testNumber = number;
     }
 
     /**
@@ -98,7 +99,7 @@ public class SocketClient extends AsyncTask<Void, Message, Message> {
 
         // define and send the start message
         controlMessage = new ControlMessage(
-                    TestCase.TC_VEHICLE_SPEED_OVER_50,      // TODO send the right test case
+                    TestCase.values()[testNumber],
                     new Date(),
                     TestCaseCommand.START
         );
@@ -125,7 +126,7 @@ public class SocketClient extends AsyncTask<Void, Message, Message> {
         try{
             if(isCancelled()){
                 controlMessage = new ControlMessage(
-                        TestCase.TC_VEHICLE_SPEED_OVER_50,      // TODO send the right test case
+                        TestCase.values()[testNumber],
                         new Date(),
                         TestCaseCommand.STOP
                 );
