@@ -32,6 +32,8 @@
     <parameter id="taParams">
       <parameter id="TCP_LOCAL_HOST" value="${Car2X_ModuleParameters.TCP_LOCAL_HOST}"/>
       <parameter id="TCP_LOCAL_PORT" value="${Car2X_ModuleParameters.TCP_LOCAL_PORT}"/>
+      <parameter id="TCP_REMOTE_HOST" value="${Car2X_ModuleParameters.TCP_REMOTE_HOST}"/>
+      <parameter id="TCP_REMOTE_PORT" value="${Car2X_ModuleParameters.TCP_REMOTE_PORT}"/>
       <parameter id="TCP_MODE">
         <value>
           <Values:charstring name="" type="charstring">
@@ -45,9 +47,6 @@
 						<Values:value>-1</Values:value>
 					</Values:integer>
         </value>
-      </parameter>
-      <parameter id="portFilters">
-        <parameter id="CAN_Filter"/>
       </parameter>
     </parameter>
     <parameter id="portType" value="Car2X_ConfigSystem.FilterPortType"/>
