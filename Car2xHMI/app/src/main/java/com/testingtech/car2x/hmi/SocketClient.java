@@ -24,17 +24,18 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
 import java.util.Date;
 
 public class SocketClient extends AsyncTask<Void, Message, Message> {
 
     private Context context;
-    private TextView debugText, statusRunning;
+    private TextView debugText, statusRunningText;
     private ScrollView scrollview;
     private ProgressBar progressBar;
     private AnimationDrawable logoAnimation;
     private Button btnStart, btnStop;
-    private TextToSpeech ttobj;
+    private TextToSpeech speech;
     private int stageNum = 0;
     private Socket mySocket = null;
 
@@ -45,67 +46,114 @@ public class SocketClient extends AsyncTask<Void, Message, Message> {
         this.debugText = tv;
         this.scrollview = sv;
         this.logoAnimation = ad;
-        this.statusRunning = sr;
+        this.statusRunningText = sr;
         this.progressBar = pb;
         this.btnStart = start;
         this.btnStop = stop;
-        this.ttobj = tts;
+        this.speech = tts;
     }
 
+    /**
+     * Initialize the test: reset the debug text, set the status text to loading, animate logo,
+     * disable start button, enable stop button.
+     */
     @Override
     protected void onPreExecute(){
-        statusRunning.setText(context.getString(R.string.textview_loading));
+        debugText.setText("");
+        debugText.setTextColor(Color.TRANSPARENT);
+        statusRunningText.setText(context.getString(R.string.textview_loading));
         logoAnimation.start();
         btnStart.setEnabled(false);
         btnStop.setEnabled(true);
     }
 
+    /**
+     * Start the test: Connect a Socket, send a start message
+     * @param params Contains nothing.
+     * @return The last received message from the socket.
+     */
     @Override
     protected Message doInBackground(Void... params) {
         ControlMessage controlMessage;
-        Message message = null;
+        Message socketMessage;
+        // create a socket and try to connect it with a timeout of 2 seconds
+        mySocket = new Socket();
+        ObjectOutputStream oos;
+        ObjectInputStream ois;
         try {
-            mySocket = new Socket();
             mySocket.connect(new InetSocketAddress("192.168.87.148", 30000), 2000);
-            statusRunning.setText(context.getString(R.string.textview_running));
+            oos = new ObjectOutputStream(mySocket.getOutputStream());
+            ois = new ObjectInputStream(mySocket.getInputStream());
+        }catch(SocketTimeoutException ste) {
+            handleError("Connection failed after timeout. Try again.");
+            return null;
+        }catch (IOException ioe) {
+            handleError("Connecting failed: " + ioe.getMessage());
+            return null;
+        }
 
-            ObjectOutputStream oos = new ObjectOutputStream(mySocket.getOutputStream());
-            ObjectInputStream ois = new ObjectInputStream(mySocket.getInputStream());
+        statusRunningText.setText(context.getString(R.string.textview_running));
 
-            controlMessage = new ControlMessage(
-                    TestCase.TC_VEHICLE_SPEED_OVER_50,
+        // define and send the start message
+        controlMessage = new ControlMessage(
+                    TestCase.TC_VEHICLE_SPEED_OVER_50,      // TODO send the right test case
                     new Date(),
                     TestCaseCommand.START
-            );
+        );
+        try {
             oos.writeObject(controlMessage);
             oos.flush();
-
-            message = (Message) ois.readObject();
-            while(!(message instanceof VerdictMessage) && !isCancelled()) {
-                publishProgress(message);
-                message = (Message) ois.readObject();
+        }catch (IOException ioe) {
+            handleError("Sending the start message failed.");
+            return null;
+        }
+        try {
+            socketMessage = (Message) ois.readObject();
+            while (!(socketMessage instanceof VerdictMessage) && !isCancelled()) {
+                publishProgress(socketMessage);
+                socketMessage = (Message) ois.readObject();
             }
+        }catch (IOException ioe) {
+            handleError("Receiving messages failed.");
+            return null;
+        }catch (ClassNotFoundException cnf) {
+            handleError("Message format was wrong.");
+            return null;
+        }
+        try{
             if(isCancelled()){
                 controlMessage = new ControlMessage(
-                        TestCase.TC_VEHICLE_SPEED_OVER_50,
+                        TestCase.TC_VEHICLE_SPEED_OVER_50,      // TODO send the right test case
                         new Date(),
                         TestCaseCommand.STOP
                 );
                 oos.writeObject(controlMessage);
                 oos.flush();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                mySocket.close();
-            }catch (IOException | NullPointerException ioe){
-                ioe.printStackTrace();
-            }
+        } catch (IOException ioe){
+            handleError("Sending the stop message failed.");
         }
-        return message;
+        return socketMessage;
     }
 
+    /**
+     * Report an error message by displaying it on the GUI. Cancel the Thread.
+     * @param message The message which is displayed.
+     */
+    private void handleError(String message){
+        // TODO change the asyncthread to a runnable and use runonuithread  OR  put this in onprogresupdate
+        /*
+        debugText.setText(message);
+        debugText.setTextColor(Color.RED);
+        */
+        System.out.println(message);
+        cancel(true);
+    }
+
+    /**
+     * Is called by doInBackground for updating the GUI.
+     * @param progress The current received message.
+     */
     @Override
     protected void onProgressUpdate(Message... progress) {
         super.onProgressUpdate(progress);
@@ -136,9 +184,9 @@ public class SocketClient extends AsyncTask<Void, Message, Message> {
                 toSpeak = "";
         }
         if(Build.VERSION.SDK_INT < 21){
-            ttobj.speak(toSpeak, TextToSpeech.QUEUE_FLUSH, null);
+            speech.speak(toSpeak, TextToSpeech.QUEUE_FLUSH, null);
         } else{
-            ttobj.speak(toSpeak, TextToSpeech.QUEUE_FLUSH, null, "speak");
+            speech.speak(toSpeak, TextToSpeech.QUEUE_FLUSH, null, "speak");
         }
         // get the table as child of the scrollview
         TableLayout table = (TableLayout) scrollview.getChildAt(0);
@@ -162,22 +210,33 @@ public class SocketClient extends AsyncTask<Void, Message, Message> {
         }
     }
 
+    /**
+     * Is called after doInBackground if the Thread was not cancelled.
+     * Shows the content of the last received message on the GUI.
+     * @param result The last received message from the socket.
+     */
     @Override
     protected void onPostExecute(Message result) {
         if(result != null) {
             if (result instanceof VerdictMessage)
-                debugText.setText(((VerdictMessage) result).verdict.toString());
+                debugText.setText("Verdict: " + ((VerdictMessage) result).verdict.toString());
             else
                 debugText.setText(result.toString());
         }
         finish();
     }
 
+    /**
+     * Is called after runInBackground if this Thread was cancelled. Calls the finish method.
+     */
     @Override
     protected void onCancelled(){
         finish();
     }
 
+    /**
+     * Finishes all operations, closes the socket and resets the GUI texts.
+     */
     private void finish(){
         // get the table as child of the scrollview
         TableLayout table = (TableLayout) scrollview.getChildAt(0);
@@ -187,13 +246,16 @@ public class SocketClient extends AsyncTask<Void, Message, Message> {
             // change color back to white
             oldText.setBackgroundColor(Color.TRANSPARENT);
         }
-        statusRunning.setText(context.getString(R.string.textview_not_running));
+        statusRunningText.setText(context.getString(R.string.textview_not_running));
         logoAnimation.stop();
         btnStart.setEnabled(true);
         btnStop.setEnabled(false);
         closeSocket();
     }
 
+    /**
+     * Calls shutdown and close on the socket (if not null).
+     */
     public void closeSocket(){
         try {
             if(mySocket != null) {
@@ -202,7 +264,7 @@ public class SocketClient extends AsyncTask<Void, Message, Message> {
                 mySocket.close();
             }
         }catch(IOException ioe){
-            ioe.printStackTrace();
+            System.out.println("Socket cannot be closed: " + ioe.getMessage());
         }
     }
 }
