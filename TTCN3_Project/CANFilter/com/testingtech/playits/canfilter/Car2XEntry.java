@@ -2,7 +2,7 @@ package com.testingtech.playits.canfilter;
 
 public class Car2XEntry {
   // Attributes
-  private String obd2key;
+  private String obd2key = "0D"; // default value
   private String valueA;
   private String valueB;
   private long timestamp;
