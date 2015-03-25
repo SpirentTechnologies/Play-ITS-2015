@@ -189,21 +189,26 @@ module Car2X_Templates {
 	}
 
 	// TODO: add detailed comment
-	/**
-	 * @desc function is used to define an interval; f_max and f_min are custom
-	 *   defined function to get the max and the min value; in ttcn3 intervals
-	 *   are defined as (1..3) or (2.4..5.6)
-	 * @param p_middle midle value of the interval
-	 * @param p_variance variance around the middle value
-	 * @param p_min optional paramter; minimum value
-	 * @param p_ax optional paramter; maximum value
-	 */
-	template float interval(float p_middle, float p_variance,
-							float p_min := - infinity, float p_max := infinity)
-		:=
-		(f_max(p_middle - p_variance, p_min) ..
-		 f_min(p_middle + p_variance, p_max)) with {encode "str2float"};
-
+	// 	/**
+	// 	 *
+	// @desc function is used to define an interval; f_max and f_min are custom
+	// 	 *   defined function to get the max and the min value; in ttcn3
+	// intervals
+	// 	 *   are defined as (1..3) or (2.4..5.6)
+	// 	 *
+	// @param p_middle midle value of the interval
+	// 	 *
+	// @param p_variance variance around the middle value
+	// 	 *
+	// @param p_min optional paramter; minimum value
+	// 	 *
+	// @param p_ax optional paramter; maximum value
+	// 	 */
+	// 	template float interval(float p_middle, float p_variance,
+	// 							float p_min := - infinity, float p_max := infinity)
+	// 		:=
+	// 		(f_max(p_middle - p_variance, p_min) ..
+	// 		 f_min(p_middle + p_variance, p_max)) with {encode "str2float"};
 	/**
 	 * @desc template for ignition status response
 	 */
@@ -224,10 +229,9 @@ module Car2X_Templates {
 		valueA := ?,
 		respTimestamp := ?
 	}
-	with {
-		encode "str2float";
-	}
-
+	// 	with {
+	// 		encode "str2float";
+	// 	}
 	/**
 	 * @desc template for engine speed response
 	 */
