@@ -43,6 +43,34 @@ module Car2X_ModuleParameters {
 	
 	//TODO: camel case
 	
+	//accelerator pedal position
+	const float c_acceleratorPedalMax := 1.0;
+	const float c_acceleratorPedal80Percent := 0.8;
+	const float c_acceleratorPedal50Percent := 0.5;
+	const float c_acceleratorPedal30Percent := 0.3;
+	const float c_acceleratorPedalMin := 0.0;
+	
+	//accelerator pedal variance
+	const float c_acceleratorVariance20Percent := 0.2;
+	const float c_acceleratorVariance10Percent := 0.1;
+	const float c_acceleratorVariance05Percent := 0.05;
+	const float c_acceleratorVariance00Percent := 0.0;
+	
+	//steering wheel angle
+	const float c_steeringWheelMax := 600.0;
+	const float c_steeringWheel400 := 400.0;
+	const float c_steeringWheel200 := 200.0;
+	const float c_steeringWheel0 := 0.0;
+	const float c_steeringWheelMinus200 := -200.0;
+	const float c_steeringWheelMinus400 := - 400.0;
+	const float c_steeringWheelMin := -  600.0;
+	
+	//steering wheel variance
+	const float c_steeringWheelVariance200 := 200.0;
+	const float c_steeringWheelVariance100 := 100.0;
+	const float c_steeringWheelVariance50 := 50.0;
+	const float c_steeringWheelVariance0 := 0.0;
+	
 	//vehicle Speed
 	const float c_vehicleSpeedMax := 655.0;
 	const float c_vehicleSpeed50 := 50.0;
@@ -75,6 +103,8 @@ module Car2X_ModuleParameters {
 	const float c_engineSpeedVar0 := 0.0;
 	
 	//timer values in sec
+	const float c_timerThirtySeconds := 30.0;
+	const float c_timerTwentySeconds := 20.0;
 	const float c_timerTenSeconds := 10.0;
 	const float c_timerFiveSeconds := 5.0;
 	const float c_timerTwoSeconds := 2.0;

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE campaignloader PUBLIC "-//TESTING TECH//DTD MLF//2.0" "mlf.dtd">
 <campaignloader>
-  <campaign Name="Car2X_Testcases" Control="false">
+  <campaign Name="Car2X_Testcases.clf" Control="false">
     <testadapter Name="com.testingtech.ttcn.tri.PluginTestAdapter" File="">
       <description></description>
     </testadapter>
@@ -18,35 +18,31 @@
       </metadata>
     </testcase>
     <testcase Name="TC_VEHICLE_SPEED_SIMULATED" Alias="" Module="Car2X_Testcases" Retries="0" Runs="1" ActionOnFail="continue" Selection="false" Status="stopped" Verdict="fail">
-      <description> Simulated test case; no conection to canfilter;  
- </description>
+      <description> Simulated test case; no conection to canfilter; </description>
       <metadata>
         <comment>/**
-	 * 
-	 * @desc Simulated test case; no conection to canfilter;  
-	 * @verdict 
+	 * @desc Simulated test case; no conection to canfilter;
+	 * @verdict
 	 */</comment>
       </metadata>
     </testcase>
     <testcase Name="TC_STEERING_WHEEL_ANGLE" Alias="" Module="Car2X_Testcases" Retries="0" Runs="1" ActionOnFail="continue" Selection="false" Status="stopped" Verdict="fail">
-      <description> For this testcase, the stering wheel must turn most left, most right and to the middle 
- </description>
+      <description> For this testcase, the stering wheel must turn most left, most   right and to the middle </description>
       <metadata>
         <comment>/**
-	 * 
-	 * @desc For this testcase, the stering wheel must turn most left, most right and to the middle 
-	 * @verdict 
+	 * @desc For this testcase, the stering wheel must turn most left, most
+	 *   right and to the middle
+	 * @verdict
 	 */</comment>
       </metadata>
     </testcase>
     <testcase Name="TC_OPEN_DOOR_AT_SPEED_50" Alias="" Module="Car2X_Testcases" Retries="0" Runs="1" ActionOnFail="continue" Selection="false" Status="stopped" Verdict="fail">
-      <description> For these testcase to driver should speed up to over 50 and then open the driver door.  
- </description>
+      <description> For these testcase to driver should speed up to over 50 and then   open the driver door. </description>
       <metadata>
         <comment>/**
-	 * 
-	 * @desc For these testcase to driver should speed up to over 50 and then open the driver door.  
-	 * @verdict 
+	 * @desc For these testcase to driver should speed up to over 50 and then
+	 *   open the driver door.
+	 * @verdict
 	 */</comment>
       </metadata>
     </testcase>
@@ -54,6 +50,9 @@
       <description></description>
     </testcase>
     <testcase Name="TC_IGNITION_STATE_DUMMY" Alias="" Module="Car2X_Testcases" Retries="0" Runs="1" ActionOnFail="continue" Selection="false" Status="stopped" Verdict="fail">
+      <description></description>
+    </testcase>
+    <testcase Name="TC_ENGINE_ROTATION_SPEED" Alias="" Module="Car2X_Testcases" Retries="0" Runs="1" ActionOnFail="continue" Selection="false" Status="stopped" Verdict="fail">
       <description></description>
     </testcase>
   </campaign>

@@ -4,7 +4,9 @@
  * @remark This class needs to be extended sophistically.
  */
 module Car2X_Testcases {
-	import from Car2X_Types {type DoorStatus, IgnitionStatus;}
+	import from Car2X_ModuleParameters all;
+
+	import from Car2X_Types {type DoorStatus, IgnitionStatus, TransmissionGear;}
 
 	import from Car2X_ConfigSystem {
 		type SystemComponentType, TesterComponentType;
@@ -12,10 +14,13 @@ module Car2X_Testcases {
 
 	import from Car2X_Functions {
 		function
+			f_ACCELERATOR_PEDAL,
 			f_DOOR_STATUS,
+			f_ENGINE_SPEED,
 			f_HEADLAMP_STATUS,
 			f_IGNITION_STATUS,
 			f_STEERING_WHEEL_ANGLE,
+			f_TRANSMISSION_GEAR_STATUS,
 			f_VEHICLE_SPEED,
 			f_setUp,
 			f_setVerdictAndStage,
@@ -52,6 +57,47 @@ module Car2X_Testcases {
 		}
 
 		// stop value request
+		setverdict(v_ret);
+
+		// tear down configuration
+		f_tearDown();
+	}
+
+	/**
+	 * @desc For these Testcase, the tester should start the engine and turn up
+	 *   the engine rotation
+	 */
+	testcase TC_ENGINE_ROTATION_SPEED()
+		runs on TesterComponentType system SystemComponentType {
+		var verdicttype v_ret := inconc;
+		var float v_timerValue := 10.0;
+		// set up configuration
+		f_setUp();
+
+		// send stage information
+		action("stage:" & int2str(v_stage) & ",timeWindow:" &
+			   int2str(float2int(v_timerValue)));
+
+		// executing stage 1 - start engine
+		v_ret := f_IGNITION_STATUS(e_start);
+		f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
+
+		// executing stage 2 - change to gear neutral
+		v_ret := f_TRANSMISSION_GEAR_STATUS(e_neutral, c_timerTenSeconds);
+		f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
+
+		// 	executing stage 3 - speed up engine
+		v_ret :=
+			f_ENGINE_SPEED(c_engineSpeed2500, c_timerOneSecond,
+						   c_engineSpeedVar100, c_timerThirtySeconds);
+		f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
+
+		// 	executing stage 4 - release gas pedal
+		v_ret :=
+			f_ACCELERATOR_PEDAL(c_acceleratorPedalMin, c_timerOneSecond,
+								c_acceleratorVariance05Percent,
+								c_timerTenSeconds);
+
 		setverdict(v_ret);
 
 		// tear down configuration
@@ -197,15 +243,15 @@ module Car2X_Testcases {
 		f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
 
 		// executing stage 2
-		v_ret := f_STEERING_WHEEL_ANGLE(- 600.0, 50.0, 2.0);
+		v_ret := f_STEERING_WHEEL_ANGLE(c_steeringWheelMin, c_steeringWheelVariance50, c_timerTenSeconds);
 		f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
 
 		// 	executing stage 3
-		v_ret := f_STEERING_WHEEL_ANGLE(600.0, 50.0, 2.0);
+		v_ret := f_STEERING_WHEEL_ANGLE(c_steeringWheelMax, c_steeringWheelVariance50, c_timerTenSeconds);
 		f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
 
 		// 	executing stage 4
-		v_ret := f_STEERING_WHEEL_ANGLE(0.0, 50.0, 2.0);
+		v_ret := f_STEERING_WHEEL_ANGLE(c_steeringWheel0, c_steeringWheelVariance50, c_timerTenSeconds);
 
 		setverdict(v_ret);
 		// tear down configuration

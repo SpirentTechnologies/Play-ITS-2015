@@ -7,15 +7,19 @@
 module Car2X_Functions {
 	import from Car2X_ModuleParameters {
 		const
+			c_acceleratorPedalMax,
+			c_acceleratorPedalMin,
 			c_engineSpeedMax,
 			c_engineSpeedMin,
 			c_timerHalfSecond,
-			c_vehicleSpeedMax,
-			c_vehicleSpeedMin;
+			c_timerOneSecond,
+			c_timerTwoSeconds;
 	}
 
 	import from Car2X_Templates {
 		template
+			m_FilterAcceleratorPedalStart,
+			m_FilterAcceleratorPedalStop,
 			m_FilterDoorStatusStart,
 			m_FilterDoorStatusStop,
 			m_FilterEngineSpeedStart,
@@ -30,6 +34,7 @@ module Car2X_Functions {
 			m_FilterTransmissionGearStop,
 			m_FilterVehicleSpeedStart,
 			m_FilterVehicleSpeedStop,
+			mw_FilterResponseAcceleratorPedal,
 			mw_FilterResponseDoorStatus,
 			mw_FilterResponseEngineSpeed,
 			mw_FilterResponseHeadLampStatus,
@@ -127,6 +132,93 @@ module Car2X_Functions {
 	}
 
 	/**
+	 * 
+	 * @desc Function to get door status from CAN filer.
+	 * @param p_accelerator_pedal target accelerator pedal status (in percent) (0.0..1.0)
+	 * @param p_holding_time Time to hold this engine speed (in sec)
+	 * @param p_variance Variance for target engine speed (in rpm)
+	 * @param p_time_out Time until timeout (in sec)
+	 * @return verdicttype for this stage
+	 */
+	function f_ACCELERATOR_PEDAL(float p_accelerator_pedal,
+								 float p_holding_time, float p_variance,
+								 float p_time_out)
+		runs on TesterComponentType return verdicttype  {
+		var verdicttype v_ret := inconc;
+		t_TC_Global.start;
+		filterPort.send(m_FilterAcceleratorPedalStart);
+		while (t_TC_Global.running) {
+			v_ret :=
+				f_AcceleratorPedalSub(p_accelerator_pedal, p_variance,
+									  p_holding_time,
+									  c_timerOneSecond + c_timerHalfSecond);
+			if (v_ret == pass) {
+				t_TC_Global.stop;
+			}
+		}
+		filterPort.send(m_FilterAcceleratorPedalStop);
+		if (v_ret != pass) {
+			setverdict(v_ret);
+			f_tearDown();
+		}
+		return v_ret;
+	}
+
+	/**
+	 * 
+	 * @desc Requests accelerator pedal from CAN filter. Test body for @see f_ACCELERATOR_PEDAL
+	 * @param p_engine_speed Target engine speed to reach (in rpm)
+	 * @param p_variance Variance of target speed
+	 * @param p_holding_time Time with target speed (in sec)
+	 * @param p_interval Time until timeout (in sec)
+	 * @return 
+	 * @verdict 
+	 */
+	function f_AcceleratorPedalSub(float p_accelerator_pedal, float p_variance,
+								   float p_holding_time, float p_interval)
+		runs on TesterComponentType return verdicttype  {
+		var verdicttype v_ret := pass;
+		var template FilterResponse v_accelerator;
+		timer t_holding;
+		var float accelerator;
+
+		// start the timer
+		t_TC.start(p_interval);
+		alt {
+			// store received template into value
+			[] filterPort.receive(mw_FilterResponseAcceleratorPedal) ->
+			   value v_accelerator{
+				t_TC.stop;
+				// check whether vehicle speed is greater than given speed
+				accelerator := str2float(v_accelerator.valueA);
+				if (f_max(p_accelerator_pedal - p_variance, c_acceleratorPedalMin) <= accelerator and
+				accelerator >= f_min(p_accelerator_pedal + p_variance,  c_acceleratorPedalMax)) {
+					t_holding.start(p_holding_time);
+					while (t_holding.running and v_ret == pass) {
+						filterPort.receive(mw_FilterResponseAcceleratorPedal) ->
+						value v_accelerator;
+						if (str2float(v_accelerator.valueA) >= p_accelerator_pedal) {
+							v_ret := pass;
+						} else {
+							v_ret := fail;
+						}
+					}
+				} else {
+					v_ret := fail;
+				}
+			}
+			[] filterPort.receive {
+				t_TC.stop;
+				v_ret := fail;
+			}
+			[] t_TC.timeout {
+				v_ret := inconc;
+			}
+		}
+		return v_ret;			
+		}
+
+	/**
 	 * @desc Function to measure engine speed for a defined period of time
 	 * @param p_engine_speed Target engine speed (in rpm) as integer
 	 * @param p_holding_time Time to hold this engine speed (in sec)
@@ -181,8 +273,8 @@ module Car2X_Functions {
 				t_TC.stop;
 				// check whether vehicle speed is greater than given speed
 				speed := str2float(v_speed.valueA);
-				if (f_max(p_engine_speed - p_variance, 0.0) <= speed and
-					speed >= f_min(p_engine_speed + p_variance, 16382.0)) {
+				if (f_max(p_engine_speed - p_variance, c_engineSpeedMin) <= speed and
+					speed >= f_min(p_engine_speed + p_variance, c_engineSpeedMax)) {
 					t_holding.start(p_holding_time);
 					while (t_holding.running and v_ret == pass) {
 						filterPort.receive(mw_FilterResponseEngineSpeed) ->
@@ -218,13 +310,13 @@ module Car2X_Functions {
 									float p_interval)
 		runs on TesterComponentType return verdicttype  {
 		var verdicttype v_ret := inconc;
-		t_TC_Global.start;
+		t_TC_Global.start(p_interval);
 		// start steering Wheel request
 		filterPort.send(m_FilterSteeringWheelStart);
 
 		while (t_TC_Global.running) {
 			v_ret :=
-				f_SteeringWheelAngleSub(p_targetAngle, p_variance, p_interval);
+				f_SteeringWheelAngleSub(p_targetAngle, p_variance, c_timerTwoSeconds);
 			if (v_ret == pass) {
 				t_TC_Global.stop;
 			}
@@ -534,6 +626,7 @@ module Car2X_Functions {
 	 *   		 Maps the port of the tester to the system port.
 	 */
 	function f_setUp() runs on TesterComponentType  {
+
 
 
 		// create an instance of the tester

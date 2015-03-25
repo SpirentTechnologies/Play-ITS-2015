@@ -3,9 +3,7 @@
  * @desc Here we define our templates.
  */
 module Car2X_Templates {
-	import from Car2X_Functions {
-		function f_bool2str, f_ignitionStatus2str, f_max, f_min;
-	}
+	import from Car2X_Functions {function f_bool2str, f_ignitionStatus2str;}
 
 	import from Car2X_ModuleParameters {
 		const
@@ -13,6 +11,7 @@ module Car2X_Templates {
 			c_FilterInterval1000,
 			c_FilterInterval1500,
 			c_FilterInterval500,
+			c_acceleratorPedalPosition,
 			c_doorStatus,
 			c_engineSpeed,
 			c_headlampStatus,
@@ -159,6 +158,21 @@ module Car2X_Templates {
 	template FilterRequest m_FilterEngineSpeedStop() := {
 		reqType := c_stopRequest, reqData := {{key := c_engineSpeed}}
 	}
+	
+	/**
+	 * @desc template to start accelerator pedal postion with intervall 1000
+	 */
+	template FilterRequest m_FilterAcceleratorPedalStart() := {
+		reqType := c_startRequest,
+		reqData := {{key := c_acceleratorPedalPosition, interval := c_FilterInterval1000}}
+	}
+
+	/**
+	 * @desc template to stop accelerator pedal postion request
+	 */
+	template FilterRequest m_FilterAcceleratorPedalStop() := {
+		reqType := c_stopRequest, reqData := {{key := c_acceleratorPedalPosition}}
+	}
 
 
 	/**
@@ -177,6 +191,13 @@ module Car2X_Templates {
 	template FilterResponse mw_FilterResponseDoorStatus() := {
 		OpenXCKey := c_doorStatus, OBD2Key := ?, valueA := ?, respTimestamp := ?
 	}
+	
+	/**
+		 * @desc template for door status reponse
+		 */
+		template FilterResponse mw_FilterResponseAcceleratorPedal() := {
+			OpenXCKey := c_acceleratorPedalPosition, OBD2Key := ?, valueA := ?, respTimestamp := ?
+		}
 
 	/**
 	 * @desc template for transmission gear reponse
