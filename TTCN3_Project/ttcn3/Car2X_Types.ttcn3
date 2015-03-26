@@ -75,7 +75,7 @@ module Car2X_Types {
 	type record FilterResponse {
 		charstring OpenXCKey,
 		charstring OBD2Key,
-		UnionValue car2XValue ,
+		UnionValue car2XValue,
 		boolean eventValue optional,
 		integer respTimestamp
 	}

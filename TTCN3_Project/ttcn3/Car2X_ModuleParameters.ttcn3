@@ -177,5 +177,4 @@ module Car2X_ModuleParameters {
 				min := c_batteryStatusMin,
 				max := c_batteryStatusMax
 	}
-	
 }
