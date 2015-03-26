@@ -140,6 +140,16 @@ module Car2X_Types {
 		e_reverse,
 		e_neutral
 	}
+	
+	/**
+	 * 
+	 * @desc type description for float value with min and max value range
+	 */
+	type record ValueDescription {
+			charstring openXCKey,
+			float min,
+			float max
+		}
 } 
 with {
   encode "json";
