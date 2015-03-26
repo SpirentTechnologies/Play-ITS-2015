@@ -1,6 +1,7 @@
 /**
  * @author Christian Damm, Sascha Kretzschmann
  * @desc Define parameters we use within our project.
+ * TODO: Add modul parmeter to determin what we want to test (ELM or OpenXC)
  */
 module Car2X_ModuleParameters {
 	
@@ -40,8 +41,6 @@ module Car2X_ModuleParameters {
 	const integer c_FilterInterval500 := 500;
 	
 	//key for testcases
-	
-	//TODO: camel case
 	
 	//accelerator pedal position
 	const float c_acceleratorPedalMax := 1.0;

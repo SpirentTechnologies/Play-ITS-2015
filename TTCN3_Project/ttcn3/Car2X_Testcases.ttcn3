@@ -39,6 +39,7 @@ module Car2X_Testcases {
 			f_ENGINE_SPEED,
 			f_HEADLAMP_STATUS,
 			f_IGNITION_STATUS,
+			f_PARKING_BRAKE_STATUS,
 			f_STEERING_WHEEL_ANGLE,
 			f_TRANSMISSION_GEAR_STATUS,
 			f_VEHICLE_SPEED,
@@ -216,6 +217,32 @@ module Car2X_Testcases {
 
 		setverdict(v_ret);
 
+		// tear down configuration
+		f_tearDown();
+	}
+	
+	testcase TC_PARKING_BRAKE_STATUS() runs on TesterComponentType system SystemComponentType {
+		var verdicttype v_ret := inconc;
+		var float v_timerValue := c_timerTenSeconds;
+		
+		// set up configuration
+		f_setUp();
+		//send stage information
+		action("stage:" & int2str(v_stage) & ",timeWindow:" & int2str(float2int(v_timerValue)));
+		
+		// executing stage 1 - ignition status to accessory
+		v_ret := f_IGNITION_STATUS(e_accessory);
+		f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
+		
+		// executing stage 2 - disengage parking brake (optionally)
+		v_ret := f_PARKING_BRAKE_STATUS(false, c_timerTenSeconds);
+		f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
+		
+		//executing stage 3 - engage parking brake
+		v_ret := f_PARKING_BRAKE_STATUS(true, c_timerTenSeconds);
+		f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
+		
+		setverdict(v_ret);
 		// tear down configuration
 		f_tearDown();
 	}
