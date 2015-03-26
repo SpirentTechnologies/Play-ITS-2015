@@ -26,7 +26,11 @@ import javax.bluetooth.UUID;
 import javax.microedition.io.Connector;
 import javax.microedition.io.StreamConnection;
 
-
+/**
+ * 
+ * @author Benjamin Kodera, Christian Kühling
+ *
+ */
 public class ELMBluetooth implements DiscoveryListener {
   private static Object lock = new Object();
 
@@ -505,6 +509,7 @@ public class ELMBluetooth implements DiscoveryListener {
 	    	int value1;
 	    	int value2;
 	    	int resultInt;
+	    	float resultFloat;
 	    	switch (data[1]) {
 	    	case "0D":
 	    		value1 = Integer.parseInt(data[2], 16);
@@ -517,20 +522,21 @@ public class ELMBluetooth implements DiscoveryListener {
 	    		result = Integer.toString(resultInt);
 	    		break;
 	    	case "49":
-	    		result = (new Integer(
-	    				Integer.parseInt(data[2], 16) * 100 / 255))
-	    				.toString();
+	    		resultFloat = (float) (new Integer(
+	    				Integer.parseInt(data[2], 16) * 100));
+	    		result = Float.toString(resultFloat/255);
 	    		break;
 	    	case "2F":
-	    		result = (new Integer(
-	    				Integer.parseInt(data[2], 16) * 100 / 255))
-	    				.toString();
+	    		resultFloat = (float) (new Integer(
+	    				Integer.parseInt(data[2], 16) * 100));
+	    		result = Float.toString(resultFloat/255);
 	    		break;
 	    	case "43":
 	    		value1 = Integer.parseInt(data[2], 16);
 	    		value2 = Integer.parseInt(data[3], 16);
-	    		resultInt = ((value1 * 256) + value2) * 100 / 255;
-	    		result = Integer.toString(resultInt);
+	    		resultInt = ((value1 * 256) + value2) * 100;
+	    		resultFloat = (float)resultInt/255;
+	    		result = Float.toString(resultFloat);
 	    		break;
 	    	case "1F":
 	    		value1 = Integer.parseInt(data[2], 16);
@@ -589,8 +595,9 @@ public class ELMBluetooth implements DiscoveryListener {
 	    		result = Integer.toString(value1);
 	    		break;
 	    	case "11":
-	    		value1 = Integer.parseInt(data[2], 16) * 100 / 255;
-	    		result = Integer.toString(value1);
+	    		resultFloat = (float) (new Integer(
+	    				Integer.parseInt(data[2], 16) * 100));
+	    		result = Float.toString(resultFloat/255);
 	    		break;
 	    	default:
 	    		result = reply;
@@ -618,7 +625,8 @@ public class ELMBluetooth implements DiscoveryListener {
 	  String input;
 	  
 	  input = run("01 00", in, pwriter);
-	  
+	  //cut the first 4 Bytes
+	  input = input.substring(4);
 	  if (input.matches("([0-9A-F]{2})+")){
 		  input = new BigInteger(input, 16).toString(2);
 		  for (int i = 0; i < input.length(); i++) {
@@ -648,7 +656,8 @@ public class ELMBluetooth implements DiscoveryListener {
 	  String newCmd = "01" + cmdRange.toString();
 	  String input;
 	  input = run(newCmd, in, pwriter);
-	  
+	  //cut the first 4 Bytes
+	  input = input.substring(4);
 	  if (input.matches("([0-9A-F]{2})+")){
 		  input = new BigInteger(input, 16).toString(2);
 		  for (int i = 0; i < input.length(); i++) {
@@ -693,7 +702,7 @@ public String run(String command, InputStream in, PrintWriter pwriter) {
 	} catch (IOException e) {
 		e.printStackTrace();
 	}
-       //ELM sends strings
+       //ELM sends like this: 41 0F 05 with witespaces
       rawData = res.toString().trim();
 
       /*
