@@ -1,4 +1,5 @@
 /**
+ * TODO: store redundant alt statements into variable
  * @author Christian Damm, Sascha Kretzschmann
  * @desc This module provides function for each test case.
  *   		 Additionally this module provide set up and
@@ -107,27 +108,19 @@ module Car2X_Functions {
 		t_TC.start(p_interval);
 		alt {
 			// store received template into value
-			[] filterPort.receive(mw_FilterResponseVehicleSpeed) ->
-			   value v_speed {
+			[] filterPort.receive(mw_FilterResponseVehicleSpeed(p_speed, p_variance)) {
 				t_TC.stop;
-				// check whether vehicle speed is greater than given speed
-				// speed := v_speed.valueA.floatValue;
-				if (f_max(p_speed - p_variance, 0.0) <=
-					v_speed.car2XValue.floatValue and
-					v_speed.car2XValue.floatValue >=
-					f_min(p_speed + p_variance, 655.0)) {
-					t_holding.start(p_holding_time);
-					while (t_holding.running and v_ret == pass) {
-						filterPort.receive(mw_FilterResponseVehicleSpeed) ->
-						value v_speed;
-						if (v_speed.car2XValue.floatValue >= p_speed) {
+				t_holding.start(p_holding_time);
+				while (t_holding.running and v_ret == pass) {
+					alt {
+						[] filterPort.receive(mw_FilterResponseVehicleSpeed(p_speed, p_variance)){
+							t_holding.stop;
 							v_ret := pass;
-						} else {
+						}
+						[] filterPort.receive {
 							v_ret := fail;
 						}
 					}
-				} else {
-					v_ret := fail;
 				}
 			}
 			[] filterPort.receive {
@@ -335,7 +328,7 @@ module Car2X_Functions {
 	 * @param p_holding_time Time with target speed (in sec)
 	 * @param p_interval Time until timeout (in sec)
 	 */
-	function f_EngineSpeedSub(float p_engine_speed, float p_variance,
+	function f_EngineSpeedSub(float p_targetEngineSpeed, float p_variance,
 							  float p_holding_time, float p_interval)
 		runs on TesterComponentType return verdicttype  {
 		var verdicttype v_ret := pass;
@@ -346,27 +339,18 @@ module Car2X_Functions {
 		t_TC.start(p_interval);
 		alt {
 			// store received template into value
-			[] filterPort.receive(mw_FilterResponseEngineSpeed) ->
-			   value v_speed {
+			[] filterPort.receive(mw_FilterResponseEngineSpeed(p_targetEngineSpeed, p_variance)){
 				t_TC.stop;
-				// check whether vehicle speed is greater than given speed
-				// speed := v_speed.valueA.floatValue;
-				if (f_max(p_engine_speed - p_variance, c_engineSpeedMin) <=
-					v_speed.car2XValue.floatValue and
-					v_speed.car2XValue.floatValue >=
-					f_min(p_engine_speed + p_variance, c_engineSpeedMax)) {
-					t_holding.start(p_holding_time);
-					while (t_holding.running and v_ret == pass) {
-						filterPort.receive(mw_FilterResponseEngineSpeed) ->
-						value v_speed;
-						if (v_speed.car2XValue.floatValue >= p_engine_speed) {
+				t_holding.start(p_holding_time);
+				while (t_holding.running and v_ret == pass) {
+					alt {
+						[] filterPort.receive(mw_FilterResponseEngineSpeed(p_targetEngineSpeed, p_variance)){
 							v_ret := pass;
-						} else {
+						}
+						[] filterPort.receive {
 							v_ret := fail;
 						}
 					}
-				} else {
-					v_ret := fail;
 				}
 			}
 			[] filterPort.receive {
