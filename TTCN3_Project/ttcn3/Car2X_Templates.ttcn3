@@ -12,6 +12,7 @@ module Car2X_Templates {
 			c_FilterInterval1500,
 			c_FilterInterval500,
 			c_acceleratorPedalPosition,
+			c_brakePedalStatus,
 			c_doorStatus,
 			c_engineSpeed,
 			c_headlampStatus,
@@ -176,6 +177,22 @@ module Car2X_Templates {
 
 
 	/**
+	 * @desc template to start brake pedal postion with intervall 1000
+	 */
+	template FilterRequest m_FilterBrakePedalStart() := {
+		reqType := c_startRequest,
+		reqData := {{key := c_brakePedalStatus, interval := c_FilterInterval1000}}
+	}
+
+	/**
+	 * @desc template to stop brake pedal postion request
+	 */
+	template FilterRequest m_FilterBrakePedalStop() := {
+		reqType := c_stopRequest, reqData := {{key := c_brakePedalStatus}}
+	}
+
+
+	/**
 	 * @desc template for steering wheel angle response
 	 */
 	template FilterResponse mw_FilterResponseSteeringWheel() := {
@@ -271,6 +288,17 @@ module Car2X_Templates {
 		OpenXCKey := c_headlampStatus,
 		OBD2Key := ?,
 		valueA := f_bool2str(p_Status),
+		respTimestamp := ?
+	}
+	
+	/**
+	 * @desc template for brake pedal status response
+	 */
+	template FilterResponse mw_FilterResponseBrakePedalStatus() :=
+	{
+		OpenXCKey := c_brakePedalStatus,
+		OBD2Key := ?,
+		valueA := ?,
 		respTimestamp := ?
 	}
 }

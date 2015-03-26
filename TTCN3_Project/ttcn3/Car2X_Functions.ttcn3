@@ -20,6 +20,8 @@ module Car2X_Functions {
 		template
 			m_FilterAcceleratorPedalStart,
 			m_FilterAcceleratorPedalStop,
+			m_FilterBrakePedalStart,
+			m_FilterBrakePedalStop,
 			m_FilterDoorStatusStart,
 			m_FilterDoorStatusStop,
 			m_FilterEngineSpeedStart,
@@ -35,6 +37,7 @@ module Car2X_Functions {
 			m_FilterVehicleSpeedStart,
 			m_FilterVehicleSpeedStop,
 			mw_FilterResponseAcceleratorPedal,
+			mw_FilterResponseBrakePedalStatus,
 			mw_FilterResponseDoorStatus,
 			mw_FilterResponseEngineSpeed,
 			mw_FilterResponseHeadLampStatus,
@@ -218,6 +221,66 @@ module Car2X_Functions {
 		return v_ret;			
 		}
 
+	function f_BRAKE_PEDAL(boolean p_pedal_status, float p_holding_time, float p_time_out) runs on TesterComponentType return verdicttype {
+		var verdicttype v_ret := inconc;
+		t_TC_Global.start(p_time_out);
+		filterPort.send(m_FilterBrakePedalStart);
+		while (t_TC_Global.running) {
+			v_ret :=
+				f_EngineSpeedSub(p_pedal_status, p_holding_time,1.0);
+			if (v_ret == pass) {
+				t_TC_Global.stop;
+			}
+		}
+		filterPort.send(m_FilterBrakePedalStop);
+
+		if (v_ret != pass) {
+			setverdict(v_ret);
+			f_tearDown();
+		}
+		return v_ret;
+	}
+	
+	function f_BrakePedalSub(boolean p_pedal_status, float p_holding_time, float p_interval) runs on TesterComponentType return verdicttype {
+		var verdicttype v_ret := pass;
+		var template FilterResponse v_BrakePedal;
+		var boolean status;
+		timer t_holding;
+		t_TC.start(p_interval);
+
+		alt {
+			// store received template into value
+			[] filterPort.receive(mw_FilterResponseBrakePedalStatus) -> value v_BrakePedal {
+				t_TC.stop;
+				// check brake status
+				status := f_str2bool(v_BrakePedal.valueA);
+				if (status == p_pedal_status) {
+					t_holding.start(p_holding_time);
+					while (t_holding.running and v_ret == pass) {
+						filterPort.receive(mw_FilterResponseBrakePedalStatus) ->
+						value v_BrakePedal;
+						if (f_str2bool(v_BrakePedal.valueA) == p_pedal_status) {
+							v_ret := pass;
+						} else {
+							v_ret := fail;
+						}
+					}
+				} else {
+					v_ret := fail;
+				}
+			}
+			[] filterPort.receive {
+				t_TC.stop;
+				v_ret := fail;
+			}
+			[] t_TC.timeout {
+				v_ret := inconc;
+			}
+		}
+		return v_ret;
+	
+	}
+
 	/**
 	 * @desc Function to measure engine speed for a defined period of time
 	 * @param p_engine_speed Target engine speed (in rpm) as integer
@@ -229,7 +292,7 @@ module Car2X_Functions {
 							float p_variance, float p_time_out)
 		runs on TesterComponentType return verdicttype  {
 		var verdicttype v_ret := inconc;
-		t_TC_Global.start;
+		t_TC_Global.start(p_time_out);
 		filterPort.send(m_FilterEngineSpeedStart);
 		while (t_TC_Global.running) {
 			v_ret :=
