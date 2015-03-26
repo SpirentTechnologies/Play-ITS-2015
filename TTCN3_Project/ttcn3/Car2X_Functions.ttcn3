@@ -229,7 +229,7 @@ module Car2X_Functions {
 		filterPort.send(m_FilterBrakePedalStart);
 		while (t_TC_Global.running) {
 			v_ret :=
-				f_EngineSpeedSub(p_pedal_status, p_holding_time,1.0);
+				f_BrakePedalSub(p_pedal_status, p_holding_time,1.0);
 			if (v_ret == pass) {
 				t_TC_Global.stop;
 			}
