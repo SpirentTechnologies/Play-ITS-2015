@@ -48,9 +48,9 @@ public class ResponderTask extends TimerTask {
 	// INFO: omits key if value is empty 
     JSONObject response = new JSONObject();
     response.put("OpenXCKey", key);
-    response.put("OBD2Key", car2xEntry.getObd2key());
-    response.put("valueA", car2xEntry.getValueA());
-    response.put("valueB", car2xEntry.getValueB());
+    response.put("OBD2Key", car2xEntry.getOBD2key());
+    response.put("car2XValue", car2xEntry.getValue());
+    response.put("eventValue", car2xEntry.getEvent());
     response.put("respTimestamp", car2xEntry.getTimestamp());
     return response;
   }

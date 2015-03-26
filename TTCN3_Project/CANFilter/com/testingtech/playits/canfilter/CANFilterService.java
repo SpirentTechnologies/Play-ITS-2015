@@ -51,7 +51,7 @@ public class CANFilterService {
   private static TimeoutResponder timeoutResponder;
 
   /**
-   * Provides tcp server functionality to handle json requests. Upon receiving 
+   * Provides TCP server functionality to handle JSON requests. Upon receiving 
    * a start request, an entry updater thread which updates openXC / obd2 hash 
    * table entries is started. Parallel timeout responder tasks periodically
    * send back updated JSON values from the hash table over a client socket.
