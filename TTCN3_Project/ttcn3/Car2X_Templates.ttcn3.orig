@@ -302,14 +302,13 @@ module Car2X_Templates {
 		respTimestamp := ?
 	}
 	
+<<<<<<< HEAD
 	template FilterResponse mw_FilterResponseParkingBrakeStatus(boolean p_Status) :=
 	{
 		OpenXCKey := c_parkingBrakeStatus,
 		OBD2Key := ?,
 		valueA := f_bool2str(p_Status),
-		respTimestamp := ?
-	}
-	
+=======
 	/**
 	 * @desc template for brake pedal status response
 	 */
@@ -318,6 +317,7 @@ module Car2X_Templates {
 		OpenXCKey := c_brakePedalStatus,
 		OBD2Key := ?,
 		valueA := ?,
+>>>>>>> 3571c9280ff0c5448d71ec63d2f4c4c33e2a8adc
 		respTimestamp := ?
 	}
 }

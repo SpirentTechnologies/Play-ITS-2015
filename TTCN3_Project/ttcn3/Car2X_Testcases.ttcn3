@@ -4,7 +4,26 @@
  * @remark This class needs to be extended sophistically.
  */
 module Car2X_Testcases {
-	import from Car2X_ModuleParameters all;
+	import from Car2X_ModuleParameters {
+		const
+			c_BrakePedalStatusPressed,
+			c_acceleratorPedalMin,
+			c_acceleratorVariance05Percent,
+			c_engineSpeed2500,
+			c_engineSpeedVar100,
+			c_steeringWheel0,
+			c_steeringWheelMax,
+			c_steeringWheelMin,
+			c_steeringWheelVariance50,
+			c_timerFiveSeconds,
+			c_timerOneSecond,
+			c_timerTenSeconds,
+			c_timerThirtySeconds,
+			c_timerTwentySeconds,
+			c_vehicleSpeed10,
+			c_vehicleSpeed50,
+			c_vehicleSpeedVar5;
+	}
 
 	import from Car2X_Types {type DoorStatus, IgnitionStatus, TransmissionGear;}
 
@@ -15,6 +34,7 @@ module Car2X_Testcases {
 	import from Car2X_Functions {
 		function
 			f_ACCELERATOR_PEDAL,
+			f_BRAKE_PEDAL,
 			f_DOOR_STATUS,
 			f_ENGINE_SPEED,
 			f_HEADLAMP_STATUS,
@@ -103,6 +123,36 @@ module Car2X_Testcases {
 		// tear down configuration
 		f_tearDown();
 	}
+	
+	testcase TC_FULL_BRAKE_OVER_60()
+		runs on TesterComponentType system SystemComponentType {
+		var verdicttype v_ret := inconc;
+		var float v_timerValue := c_timerTwentySeconds;
+		// set up configuration
+		f_setUp();
+
+		// send stage information
+		action("stage:" & int2str(v_stage) & ",timeWindow:" &
+			   int2str(float2int(v_timerValue)));
+
+		// executing stage 1 - start engine
+		v_ret := f_IGNITION_STATUS(e_start);
+		v_timerValue := c_timerThirtySeconds;
+		f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
+
+		// executing stage 2 - speed up to 60
+		v_ret := f_VEHICLE_SPEED(c_vehicleSpeed50+c_vehicleSpeed10, c_timerOneSecond, c_vehicleSpeedVar5, c_timerThirtySeconds);
+		v_timerValue := c_timerTenSeconds+c_timerFiveSeconds;
+		f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
+
+		// 	executing stage 3 - brake down
+		v_ret := f_BRAKE_PEDAL(c_BrakePedalStatusPressed,c_timerOneSecond,c_timerTenSeconds+c_timerFiveSeconds);
+		
+		setverdict(v_ret);
+
+		// tear down configuration
+		f_tearDown();
+		}
 
 	/**
 	 * @desc Simulated test case; no conection to canfilter;
