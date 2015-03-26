@@ -117,7 +117,7 @@ public class ELMBluetooth implements DiscoveryListener {
             inStream));
 
         System.out
-            .println("Remember to set the Protocol to auto: AT SP 0  , to check AT DP");
+            .println("If Problems occur, run AT Z");
         while (true) {
           System.out.println("Enter Command: ");
           String command = br.readLine(); 
@@ -164,23 +164,23 @@ public class ELMBluetooth implements DiscoveryListener {
           if (checkIfHexOrAT(command) || command.equals("")) {
             if (getKeyByValue(openXCToOBD2Map,command) != null) {
               System.out.println("response: " + rawData + " = " 
-                  + convertOBD2ReplyToOpenXC( getKeyByValue(openXCToOBD2Map,command), rawData));
+                  + convertOBD2Reply( rawData));
             } else {
               System.out.println("response: " + rawData + "    (not used in any Testcase)");
         	}
           } else if(car2xEntries.containsKey(command)) {
             System.out.println("response:" + rawData + " = " 
-               + convertOBD2ReplyToOpenXC(command, rawData));
+               + convertOBD2Reply( rawData));
           }
 
         }
       }
     }
   }
-//TODO necessary?
   /**
    * @param RemoteDevice
    * @param DeviceClass
+   * using javax.bluetooth import
    */
   public void deviceDiscovered(RemoteDevice btDevice, DeviceClass cod) {
     if (!remdevices.contains(btDevice)) {
@@ -232,6 +232,7 @@ public class ELMBluetooth implements DiscoveryListener {
    * @param cmd
    * @return
    * see http://en.wikipedia.org/wiki/OBD-II_PIDs
+   * adds possible available PID Codes
    */
   public static void initOpenXCToOBD2Map() {  
     //TODO Error-Handling if there is no OBD2 Key(here XX)
@@ -299,7 +300,7 @@ public class ELMBluetooth implements DiscoveryListener {
   }
   
   /**
-   * 
+   * For Testing only: adds some openXCKeys to value-Hashtable
    */
   public static void initCar2XEntries() {
     car2xEntries.put("vehicle_speed", new Car2XEntry(0));
@@ -346,12 +347,13 @@ public class ELMBluetooth implements DiscoveryListener {
   }
   /**
    * 
-   * @param type
-   * @param reply
-   * @return
+   * @param type The expected type of the reply
+   * @param reply The raw Reply
+   * @return the as possible calculated and converted reply
    * see http://en.wikipedia.org/wiki/OBD-II_PIDs
    * If percentage wanted: 2 Hex-Bytes means 00 - FF = 0 - 255.
    * To get the percentage: Data/255*100 
+   * works but will be replaced by convertOBD2Reply
    */
   public static String convertOBD2ReplyToOpenXC(String type, String reply) {
     String result;
@@ -481,8 +483,9 @@ public class ELMBluetooth implements DiscoveryListener {
 	}
   /**
    * 
-   * @param input
-   * @return
+   * @param input the String to check
+   * @return true if hex or starts with AT
+   * primarily to check the Command sending to ELM327
    */
   public static boolean checkIfHexOrAT(String input){
 	  String rawData = input.replaceAll("\\s", "");
@@ -494,9 +497,11 @@ public class ELMBluetooth implements DiscoveryListener {
   }
    
   /**
-   * 
-   * @param reply
-   * @return
+   * @param reply The raw Reply
+   * @return the as possible calculated and converted reply
+   * see http://en.wikipedia.org/wiki/OBD-II_PIDs
+   * If percentage wanted: 2 Hex-Bytes means 00 - FF = 0 - 255.
+   * To get the percentage: Data/255*100 
    */
   public static String convertOBD2Reply(String reply) {
 	    String result;
@@ -609,16 +614,13 @@ public class ELMBluetooth implements DiscoveryListener {
 
 	  }
   
-  
-//command send: 01 00
-//response: 41 00 98 18 00 01
-//=> 10011000000110000000000000000001 binär = hinten 1 -> weitere unterstützte Befehle, dh. 01 20 ausführen.
-//= 04,05,0C,0D 
+ 
   /**
    * 
-   * @param in
-   * @param pwriter
-   * @return
+   * @param in Inputstream
+   * @param pwriter Outputstream
+   * @return ArrayList<String> with all supported 01 PIDs (e.g. "00","1F") 
+   * without leading 01 (Mode 1 = Current Data) 
    */
   public List<String> getSupportedPIDs(InputStream in, PrintWriter pwriter){
 	  List<String> results = new ArrayList<String>();
@@ -627,6 +629,14 @@ public class ELMBluetooth implements DiscoveryListener {
 	  input = run("01 00", in, pwriter);
 	  //cut the first 4 Bytes
 	  input = input.substring(4);
+//	  command send: 01 00
+//	  response: 41 00 98 18 00 01
+//	  => 10011000000110000000000000000001 binary
+//	  if last bit is 1 -> there are more supported pids
+//	  -> run  01 20 
+//	  = 00,04,05,0C,0D,20 supported
+	  
+	  
 	  if (input.matches("([0-9A-F]{2})+")){
 		  input = new BigInteger(input, 16).toString(2);
 		  for (int i = 0; i < input.length(); i++) {
@@ -645,10 +655,11 @@ public class ELMBluetooth implements DiscoveryListener {
   
   /**
    * 
-   * @param results
-   * @param cmd
-   * @param in
-   * @param pwriter
+   * @param results ArrayList
+   * @param cmd last used command(00,20,40..)
+   * @param in Inputstream
+   * @param pwriter Outputstream
+   * Recursively adds remaining supported PIDs to result
    */
   private void getMoreSupportedPIDs(List<String> results, Integer cmd,
 		InputStream in, PrintWriter pwriter) {
@@ -676,10 +687,10 @@ public class ELMBluetooth implements DiscoveryListener {
   
   /**
    * 
-   * @param command
-   * @param in
-   * @param pwriter
-   * @return
+   * @param command the command to run
+   * @param in Inputstream
+   * @param pwriter Outputstream
+   * @return raw reply
    */
 public String run(String command, InputStream in, PrintWriter pwriter) {
 	  pwriter.write(command + "\r");
