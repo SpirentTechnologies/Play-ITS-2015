@@ -26,14 +26,7 @@ module Car2X_Templates {
 			c_transmissionGearPosition,
 			c_vehicleSpeed;
 	}
-	import from Car2X_Types {
-		type
-			ElmRequest,
-			ElmResponse,
-			FilterRequest,
-			FilterResponse,
-			IgnitionStatus;
-	}
+	import from Car2X_Types {type ElmRequest, ElmResponse, FilterRequest, FilterResponse, IgnitionStatus;}
 
 	/**
 	 * @desc Request template to communicate with ELM.
@@ -53,7 +46,7 @@ module Car2X_Templates {
 	 */
 	template FilterRequest m_FilterVehicleSpeedStart() := {
 		reqType := c_startRequest,
-		reqData := {{key := c_vehicleSpeed, interval := c_FilterInterval1500}}
+		reqData := {{key := c_vehicleSpeed, interval := c_FilterInterval1000}}
 	}
 
 	/**
