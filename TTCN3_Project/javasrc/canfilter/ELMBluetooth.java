@@ -257,7 +257,7 @@ public class ELMBluetooth implements DiscoveryListener {
     openXCToOBD2Map.put("fuel_consumption_rate", "01 5E");
     openXCToOBD2Map.put("barometric_pressure", "01 33");
     openXCToOBD2Map.put("fuel_pressure", "01 0A");
-    openXCToOBD2Map.put("Intake_manifold_absolute_pressure", "01 0A");
+    openXCToOBD2Map.put("Intake_manifold_absolute_pressure", "01 0B");
     openXCToOBD2Map.put("air_intake_temperature", "01 0F");
     openXCToOBD2Map.put("ambient_air_temperature", "01 46");
     openXCToOBD2Map.put("engine_coolant_temperature", "01 05");
@@ -443,5 +443,114 @@ public class ELMBluetooth implements DiscoveryListener {
 	    	return false;
 	    }	  
   }
+  
+  
+  public static String convertOBD2Reply(String reply) {
+	    String result;
+//	    if (reply.equals("NO DATA") || reply.equals("OK") || reply.startsWith("BUS") || reply.contains("V")) {
+	    if (!(reply.matches("([0-9A-F]{2})+"))){
+	      result = reply;
+	    } else {
+	     String[] data = reply.split("\\s"); // (response =
+	    	// "41 0C 0C FC") 41,0C,0C,FC, data[0] = Bus, data[1] = Command
+	    	int value1;
+	    	int value2;
+	    	int resultInt;
+	    	switch (data[1]) {
+	    	case "0D":
+	    		value1 = Integer.parseInt(data[2], 16);
+	    		result = Integer.toString(value1);
+	    		break;
+	    	case "0C": // ((A*256)+B)/4
+	    		value1 = Integer.parseInt(data[2], 16);
+	    		value2 = Integer.parseInt(data[3], 16);
+	    		resultInt = ((value1 * 256) + value2) / 4;
+	    		result = Integer.toString(resultInt);
+	    		break;
+	    	case "49":
+	    		result = (new Integer(
+	    				Integer.parseInt(data[2], 16) * 100 / 255))
+	    				.toString();
+	    		break;
+	    	case "2F":
+	    		result = (new Integer(
+	    				Integer.parseInt(data[2], 16) * 100 / 255))
+	    				.toString();
+	    		break;
+	    	case "43":
+	    		value1 = Integer.parseInt(data[2], 16);
+	    		value2 = Integer.parseInt(data[3], 16);
+	    		resultInt = ((value1 * 256) + value2) * 100 / 255;
+	    		result = Integer.toString(resultInt);
+	    		break;
+	    	case "1F":
+	    		value1 = Integer.parseInt(data[2], 16);
+	    		value2 = Integer.parseInt(data[3], 16);
+	    		resultInt = ((value1 * 256) + value2);
+	    		result = Integer.toString(resultInt);
+	    		break;
+	    	case "0E": // relative to #1 cylinder
+	    		result = Integer
+	    		.toString((Integer.parseInt(data[2], 16) - 128) / 2);
+	    		break;
+	    	case "5C":
+	    		result = Integer
+	    		.toString(Integer.parseInt(data[2], 16) - 40);
+	    		break;
+	    	case "61": // percentage torque
+	    		result = Integer
+	    		.toString(Integer.parseInt(data[2], 16) - 125);
+	    		break;
+	    	case "62": // percentage torque
+	    		result = Integer
+	    		.toString(Integer.parseInt(data[2], 16) - 125);
+	    		break;
+	    	case "63": // torque Nm
+	    		value1 = Integer.parseInt(data[2], 16);
+	    		value2 = Integer.parseInt(data[3], 16);
+	    		resultInt = ((value1 * 256) + value2);
+	    		result = Integer.toString(resultInt);
+	    		break;
+	    	case "5E": // engine_fuel_rate
+	    		value1 = Integer.parseInt(data[2], 16);
+	    		value2 = Integer.parseInt(data[3], 16);
+	    		resultInt = ((value1 * 256) + value2) / 20;
+	    		result = Integer.toString(resultInt);
+	    		break;
+	    	case "33": // kPa
+	    		result = Integer.toString(Integer.parseInt(data[2], 16));
+	    		break;
+	    	case "0A": // kPa
+	    		value1 = Integer.parseInt(data[2], 16) * 3;
+	    		result = Integer.toString(value1);
+	    		break;
+	    	case "0B":
+	    		result = Integer.toString(Integer.parseInt(data[2], 16));
+	    		break;
+	    	case "0F":
+	    		value1 = Integer.parseInt(data[2], 16) - 40;
+	    		result = Integer.toString(value1);
+	    		break;
+	    	case "46":
+	    		value1 = Integer.parseInt(data[2], 16) - 40;
+	    		result = Integer.toString(value1);
+	    		break;
+	    	case "05":
+	    		value1 = Integer.parseInt(data[2], 16) - 40;
+	    		result = Integer.toString(value1);
+	    		break;
+	    	case "11":
+	    		value1 = Integer.parseInt(data[2], 16) * 100 / 255;
+	    		result = Integer.toString(value1);
+	    		break;
+	    	default:
+	    		result = reply;
+	    		break;
+	    	}
+	    }
+
+	    return result;
+
+	  }
 
 }
