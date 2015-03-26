@@ -15,11 +15,6 @@
     </parameter>
     <parameter id="default" value="true"/>
   </codec>
-  <codec encode="str2float">
-    <plugin id="StringToFloat">
-      <parameter id="class" value="codec.StringToFloatCodecProvider"/>
-    </plugin>
-  </codec>
   <port>
     <plugin id="com.testingtech.ttworkbench.tt3rt.tcp.port.TcpPortPlugin">
       <parameter id="class" value="com.testingtech.ttworkbench.tt3rt.tcp.port.TcpPortPluginProvider"/>
