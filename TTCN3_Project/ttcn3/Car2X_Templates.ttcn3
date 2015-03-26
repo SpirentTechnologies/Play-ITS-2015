@@ -5,40 +5,17 @@
 module Car2X_Templates {
 	import from Car2X_Functions {function f_doorStatus2Str, f_gearStatus2Str, f_ignitionStatus2str, f_max, f_min;}
 
-	import from Car2X_ModuleParameters {
-		const
-			c_ElmVehicleSpeed,
-		c_engineSpeedMin,
-		c_engineSpeedMax,
-			c_FilterInterval1000,
-			c_FilterInterval500,
-			c_acceleratorPedalMax,
-			c_acceleratorPedalMin,
-			c_acceleratorPedalPosition,
-			c_batteryStatus,
-			c_batteryStatusMin,
-			c_batteryStatusMax,
-			c_brakePedalStatus,
-			c_doorStatus,
-			c_engineSpeed,
-			c_engineSpeedMax,
-			c_engineSpeedMin,
-			c_headlampStatus,
-			c_ignitionStatus,
-			c_modePrefix01,
-			c_parkingBrakeStatus,
-			c_startRequest,
-			c_steeringWheelAngle,
-			c_steeringWheelMax,
-			c_steeringWheelMin,
-			c_stopRequest,
-			c_transmissionGearPosition,
-			c_vehicleSpeed,
-			c_vehicleSpeedMax,
-			c_vehicleSpeedMin;
-	}
+	import from Car2X_ModuleParameters all;
 	import from Car2X_Types {
-		type DoorStatus, ElmRequest, ElmResponse, FilterRequest, FilterResponse, IgnitionStatus, TransmissionGear;
+		type
+			DoorStatus,
+			ElmRequest,
+			ElmResponse,
+			FilterRequest,
+			FilterResponse,
+			IgnitionStatus,
+			TransmissionGear,
+			ValueDescription;
 	}
 
 	/**
@@ -116,7 +93,6 @@ module Car2X_Templates {
 		reqType := c_stopRequest, reqData := {{key := c_batteryStatus}}
 	}
 	
-
 	/**
 	 * @desc Template to start transmission gear request with interval 1000
 	 */
@@ -237,20 +213,7 @@ module Car2X_Templates {
 	template FilterRequest m_FilterBrakePedalStop() := {
 		reqType := c_stopRequest, reqData := {{key := c_brakePedalStatus}}
 	}
-
-
-	/**
-	 * @desc Template for steering wheel angle response
-	 * @param p_targetAngle The angle to reach
-	 * @param p_variance The variance 
-	 */
-	template FilterResponse mw_FilterResponseSteeringWheel(float p_targetAngle, float p_variance) := {
-		OpenXCKey := c_steeringWheelAngle,
-		OBD2Key := ?,
-		car2XValue := {floatValue := (f_max(p_targetAngle-p_variance, c_steeringWheelMin) .. f_min(p_targetAngle+p_variance, c_steeringWheelMax))},
-		respTimestamp := ?
-	}
-
+	
 	/**
 	 * @desc Template for door status reponse
 	 * @param p_door The door to match
@@ -261,16 +224,6 @@ module Car2X_Templates {
 		OBD2Key := ?,
 		car2XValue := {stringValue := f_doorStatus2Str(p_door)},
 		eventValue := p_status,
-		respTimestamp := ?
-	}
-
-	/**
-	 * @desc Template for accelerator status reponse
-	 */
-	template FilterResponse mw_FilterResponseAcceleratorPedal(float p_accelerator_pedal, float p_variance) := {
-		OpenXCKey := c_acceleratorPedalPosition,
-		OBD2Key := ?,
-		car2XValue := {floatValue := (f_max(p_accelerator_pedal-p_variance, c_acceleratorPedalMin) .. f_min(p_accelerator_pedal+p_variance, c_acceleratorPedalMax))},
 		respTimestamp := ?
 	}
 
@@ -295,28 +248,33 @@ module Car2X_Templates {
 		car2XValue := {stringValue := f_ignitionStatus2str(p_status)},
 		respTimestamp := ?
 	}
-
+	
 	/**
 	 * @desc Template for vehicle Speed response
 	 */
-	template FilterResponse mw_FilterResponseVehicleSpeed(float p_targetSpeed, float p_variance) := {
-		OpenXCKey := c_vehicleSpeed,
-		OBD2Key := c_ElmVehicleSpeed,
-		car2XValue := {floatValue := (f_max(p_targetSpeed-p_variance, c_vehicleSpeedMin) .. f_min(p_targetSpeed+p_variance, c_vehicleSpeedMax))},
-		respTimestamp := ?
-	}
+	template FilterResponse mw_FilterResponseVehicleSpeed(float p_value, float p_variance) := mw_FilterResponseFloat(cvd_vehicleSpeed, p_value, p_variance);
 
-	type record ValueDescription {
-		charstring openXCKey,
-		float min,
-		float max
-	}
+	/**
+	 * @desc Template for steering wheel angle response
+	 * @param p_targetAngle The angle to reach
+	 * @param p_variance The variance 
+	 */
+	template FilterResponse mw_FilterResponseSteeringWheel(float p_value, float p_variance) :=mw_FilterResponseFloat(cvd_steeringWheel, p_value, p_variance);
 	
-	const ValueDescription cvd_engineSpeed := {
-		openXCKey := c_engineSpeed,
-		min := c_engineSpeedMin,
-		max := c_engineSpeedMax
-	}
+	/**
+	 * @desc Template for engine speed response
+	 */
+	template FilterResponse mw_FilterResponseEngineSpeed(float p_value, float p_variance) := mw_FilterResponseFloat(cvd_engineSpeed, p_value, p_variance);
+	
+	/**
+	 * @desc template for engine speed response
+	 */
+	template FilterResponse mw_FilterResponseBatteryStatus(float p_value, float p_variance) :=  mw_FilterResponseFloat(cvd_batteryStatus, p_value, p_variance);
+
+	/**
+	 * @desc Template for accelerator status reponse
+	 */
+	template FilterResponse mw_FilterResponseAcceleratorPedal(float p_value, float p_variance) := mw_FilterResponseFloat(cvd_AcceleratorPedal, p_value, p_variance);
 
 	template FilterResponse mw_FilterResponseFloat(ValueDescription p_ValueDescription, float p_value, float p_variance) := {
 		OpenXCKey := p_ValueDescription.openXCKey,
@@ -324,22 +282,7 @@ module Car2X_Templates {
 		car2XValue := {floatValue := (f_max(p_value-p_variance, p_ValueDescription.min) .. f_min(p_value+p_variance, p_ValueDescription.max))},
 		respTimestamp := ?
 	}
-	
-	/**
-	 * @desc Template for engine speed response
-	 */
-	template FilterResponse mw_FilterResponseEngineSpeed(float p_value, float p_variance) := mw_FilterResponseFloat(cvd_engineSpeed, p_value, p_variance);
 
-	/**
-	 * @desc template for engine speed response
-	 */
-	template FilterResponse mw_FilterResponseBatteryStatus(float p_battery_status, float p_variance) := {
-		OpenXCKey := c_batteryStatus,
-		OBD2Key := ?,
-		car2XValue := {floatValue := (f_max(p_battery_status-p_variance, c_batteryStatusMin) .. f_min(p_battery_status+p_variance, c_batteryStatusMax))},
-		respTimestamp := ?
-	}
-		
 	/**
 	 * @desc Template for head lamp status response
 	 * @param p_status Expected status of head lamp
