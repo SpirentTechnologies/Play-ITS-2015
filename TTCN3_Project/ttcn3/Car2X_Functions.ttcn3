@@ -1,5 +1,5 @@
 /**
- * @author Sascha Kretzschmann
+ * @author Christian Damm, Sascha Kretzschmann
  * @desc This module provides function for each test case.
  *   		 Additionally this module provide set up and
  *   		 tear down configurations to reuse.
@@ -103,7 +103,6 @@ module Car2X_Functions {
 		var verdicttype v_ret := pass;
 		var template FilterResponse v_speed;
 		timer t_holding;
-		var float speed;
 
 		// start the timer
 		t_TC.start(p_interval);
@@ -113,9 +112,11 @@ module Car2X_Functions {
 			   value v_speed {
 				t_TC.stop;
 				// check whether vehicle speed is greater than given speed
-				//speed := v_speed.valueA.floatValue;
-				if (f_max(p_speed - p_variance, 0.0) <= v_speed.valueA.floatValue and
-				v_speed.valueA.floatValue >= f_min(p_speed + p_variance, 655.0)) {
+				// speed := v_speed.valueA.floatValue;
+				if (f_max(p_speed - p_variance, 0.0) <=
+					v_speed.valueA.floatValue and
+					v_speed.valueA.floatValue >=
+					f_min(p_speed + p_variance, 655.0)) {
 					t_holding.start(p_holding_time);
 					while (t_holding.running and v_ret == pass) {
 						filterPort.receive(mw_FilterResponseVehicleSpeed) ->
@@ -160,8 +161,7 @@ module Car2X_Functions {
 		while (t_TC_Global.running) {
 			v_ret :=
 				f_AcceleratorPedalSub(p_accelerator_pedal, p_variance,
-									  p_holding_time,
-									  c_timerTwoSeconds);
+									  p_holding_time, c_timerTwoSeconds);
 			if (v_ret == pass) {
 				t_TC_Global.stop;
 			}
@@ -190,7 +190,6 @@ module Car2X_Functions {
 		var verdicttype v_ret := pass;
 		var template FilterResponse v_accelerator;
 		timer t_holding;
-		var float accelerator;
 
 		// start the timer
 		t_TC.start(p_interval);
@@ -202,8 +201,9 @@ module Car2X_Functions {
 				// check whether vehicle speed is greater than given speed
 				// accelerator := v_accelerator.valueA.floatValue;
 				if (f_max(p_accelerator_pedal - p_variance,
-						  c_acceleratorPedalMin) <= v_accelerator.valueA.floatValue and
-				v_accelerator.valueA.floatValue >=
+						  c_acceleratorPedalMin) <=
+					v_accelerator.valueA.floatValue and
+					v_accelerator.valueA.floatValue >=
 					f_min(p_accelerator_pedal + p_variance,
 						  c_acceleratorPedalMax)) {
 					t_holding.start(p_holding_time);
@@ -233,14 +233,15 @@ module Car2X_Functions {
 	}
 
 	/**
-	 * 
 	 * @desc function to get brake pedal status
 	 * @param p_pedal_status target pedal status; true = press, false = release
 	 * @param p_holding_time Time to hold this engine speed (in sec)
 	 * @param p_time_out Time until timeout (in sec)
 	 * @return verdicttype for this stage
 	 */
-	function f_BRAKE_PEDAL(boolean p_pedal_status, float p_holding_time, float p_time_out) runs on TesterComponentType return verdicttype {
+	function f_BRAKE_PEDAL(boolean p_pedal_status, float p_holding_time,
+						   float p_time_out)
+		runs on TesterComponentType return verdicttype  {
 		var verdicttype v_ret := inconc;
 		t_TC_Global.start(p_time_out);
 		filterPort.send(m_FilterBrakePedalStart);
@@ -258,20 +259,20 @@ module Car2X_Functions {
 		}
 		return v_ret;
 	}
-	
+
 	/**
-	 * 
 	 * @desc  function to request brake pedal from CAN filter
 	 * @param p_pedal_status target pedal status; true = press, false = release
 	 * @param p_holding_time Time to hold this engine speed (in sec)
 	 * @param p_interval interval time
 	 * @return verdicttype for this request
-	 * @verdict 
+	 * @verdict
 	 */
-	function f_BrakePedalSub(boolean p_pedal_status, float p_holding_time, float p_interval) runs on TesterComponentType return verdicttype {
+	function f_BrakePedalSub(boolean p_pedal_status, float p_holding_time,
+							 float p_interval)
+		runs on TesterComponentType return verdicttype  {
 		var verdicttype v_ret := pass;
 		var template FilterResponse v_brakePedal;
-		var boolean v_status;
 		timer t_holding;
 		t_TC.start(p_interval);
 
@@ -281,7 +282,7 @@ module Car2X_Functions {
 			   value v_brakePedal {
 				t_TC.stop;
 				// check brake status
-				//v_status := v_brakePedal.valueA.booleanValue;
+				// v_status := v_brakePedal.valueA.booleanValue;
 				if (v_brakePedal.valueA.booleanValue == p_pedal_status) {
 					t_holding.start(p_holding_time);
 					while (t_holding.running and v_ret == pass) {
@@ -353,7 +354,6 @@ module Car2X_Functions {
 		var verdicttype v_ret := pass;
 		var template FilterResponse v_speed;
 		timer t_holding;
-		var float speed;
 
 		// start the timer
 		t_TC.start(p_interval);
@@ -363,10 +363,10 @@ module Car2X_Functions {
 			   value v_speed {
 				t_TC.stop;
 				// check whether vehicle speed is greater than given speed
-				//speed := v_speed.valueA.floatValue;
+				// speed := v_speed.valueA.floatValue;
 				if (f_max(p_engine_speed - p_variance, c_engineSpeedMin) <=
-				v_speed.valueA.floatValue and
-				v_speed.valueA.floatValue >=
+					v_speed.valueA.floatValue and
+					v_speed.valueA.floatValue >=
 					f_min(p_engine_speed + p_variance, c_engineSpeedMax)) {
 					t_holding.start(p_holding_time);
 					while (t_holding.running and v_ret == pass) {
@@ -392,15 +392,17 @@ module Car2X_Functions {
 		}
 		return v_ret;
 	}
-	
-	function f_BATTERY_STATUS(float p_batteryStatus, float p_variance, float p_holdingTime, float p_timeOut)runs on TesterComponentType return verdicttype{
+
+	function f_BATTERY_STATUS(float p_batteryStatus, float p_variance,
+							  float p_holdingTime, float p_timeOut)
+		runs on TesterComponentType return verdicttype  {
 		var verdicttype v_ret := inconc;
 		t_TC_Global.start(p_timeOut);
 		filterPort.send(m_FilterBatteryStatusStart);
 		while (t_TC_Global.running) {
 			v_ret :=
-			f_batteryStatusSub(p_batteryStatus, p_variance, p_holdingTime,
-								 c_timerTwoSeconds);
+				f_batteryStatusSub(p_batteryStatus, p_variance, p_holdingTime,
+								   c_timerTwoSeconds);
 			if (v_ret == pass) {
 				t_TC_Global.stop;
 			}
@@ -413,8 +415,10 @@ module Car2X_Functions {
 		}
 		return v_ret;
 	}
-	
-	function f_batteryStatusSub(float p_batteryStatus, float p_variance, float p_holdingTime,float p_interval) runs on TesterComponentType return verdicttype {
+
+	function f_batteryStatusSub(float p_batteryStatus, float p_variance,
+								float p_holdingTime, float p_interval)
+		runs on TesterComponentType return verdicttype  {
 		var verdicttype v_ret := pass;
 		var template FilterResponse v_battery;
 		timer t_holding;
@@ -427,8 +431,10 @@ module Car2X_Functions {
 			   value v_battery {
 				t_TC.stop;
 				// check whether vehicle speed is greater than given speed
-				if (f_max(p_batteryStatus - p_variance, c_batteryStatusMin) <= v_battery.valueA.floatValue and
-				v_battery.valueA.floatValue >= f_min(p_batteryStatus + p_variance, c_batteryStatusMax)) {
+				if (f_max(p_batteryStatus - p_variance, c_batteryStatusMin) <=
+					v_battery.valueA.floatValue and
+					v_battery.valueA.floatValue >=
+					f_min(p_batteryStatus + p_variance, c_batteryStatusMax)) {
 					t_holding.start(p_holdingTime);
 					while (t_holding.running and v_ret == pass) {
 						filterPort.receive(mw_FilterResponseBatteryStatus) ->
@@ -590,7 +596,8 @@ module Car2X_Functions {
 	 * @desc Measures the ignition status.
 	 * @param ignitionStatus Enum value of type IgnitionStatus
 	 */
-	function f_IGNITION_STATUS(IgnitionStatus p_ignitionStatus, float p_timeOut)
+	function f_IGNITION_STATUS(IgnitionStatus p_ignitionStatus,
+							   float p_timeOut)
 		runs on TesterComponentType return verdicttype  {
 		var verdicttype v_ret := inconc;
 
@@ -845,9 +852,6 @@ module Car2X_Functions {
 	 */
 	function f_setUp() runs on TesterComponentType  {
 
-
-
-
 		// create an instance of the tester
 		var TesterComponentType Tester;
 		Tester := TesterComponentType.create;
@@ -1006,34 +1010,5 @@ module Car2X_Functions {
 		// send stage information
 		action("stage:" & int2str(p_stage) & ",timeWindow:" &
 			   int2str(float2int(p_globalTimer)));
-	}
-
-	/**
-	 * @desc Auxiliary function to cast a received charstring to boolean
-	 * @param p_str
-	 * @return <b>true</b> if p_str == "true" || "True" || "TRUE" || "1";
-	 *   <b>false</b> else
-	 * @verdict
-	 */
-	function f_str2bool(template charstring p_str) return boolean  {
-		if (p_str == "true" or p_str == "True" or p_str == "TRUE" or
-			p_str == "1") {
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	/**
-	 * @desc Auxiliary function to cast a given boolean to a charstring
-	 * @param status The boolean you want to cast
-	 * @return The casted charstring
-	 */
-	function f_bool2str(boolean p_status) return charstring  {
-		if (p_status) {
-			return "true";
-		} else {
-			return "false";
-		}
 	}
 }

@@ -7,7 +7,9 @@ module Car2X_Testcases {
 	import from Car2X_ModuleParameters all;
 	import from Car2X_Types {type DoorStatus, IgnitionStatus, TransmissionGear;}
 
-	import from Car2X_ConfigSystem {type SystemComponentType, TesterComponentType;}
+	import from Car2X_ConfigSystem {
+		type SystemComponentType, TesterComponentType;
+	}
 
 	import from Car2X_Functions {
 		function
