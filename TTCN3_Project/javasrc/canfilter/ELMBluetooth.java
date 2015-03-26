@@ -132,7 +132,7 @@ public class ELMBluetooth implements DiscoveryListener {
             System.out.println("command send: " + car2xEntries.get(command).getObd2key() 
                 + " = " + command);
           }
-          Thread.sleep(500);
+          Thread.sleep(200);
           byte bytes = 0;
           StringBuilder res = new StringBuilder();
           String rawData = null;
@@ -235,37 +235,26 @@ public class ELMBluetooth implements DiscoveryListener {
    * adds possible available PID Codes
    */
   public static void initOpenXCToOBD2Map() {  
-    //TODO Error-Handling if there is no OBD2 Key(here XX)
+    //TODO Error-Handling if there is no OBD2 Key(here 00)
 
-    openXCToOBD2Map.put("steering_wheel_angle", "XX");
-    openXCToOBD2Map.put("torque_at_transmission", "XX");
+    openXCToOBD2Map.put("steering_wheel_angle", "00");
+    openXCToOBD2Map.put("torque_at_transmission", "00");
     
-    openXCToOBD2Map.put("parking_brake_status", "XX");
-    openXCToOBD2Map.put("brake_pedal_status", "XX");
-    openXCToOBD2Map.put("transmission_gear_position", "XX");
-    openXCToOBD2Map.put("gear_lever_position", "XX");
-    openXCToOBD2Map.put("odometer", "XX");
-    openXCToOBD2Map.put("ignition_status", "XX");
-    openXCToOBD2Map.put("fuel_consumed_since_restart", "XX");
-    openXCToOBD2Map.put("door_status", "XX");
-    openXCToOBD2Map.put("headlamp_status", "XX");
-    openXCToOBD2Map.put("high_beam_status", "XX");
-    openXCToOBD2Map.put("windshield_wiper_status", "XX");
-    openXCToOBD2Map.put("latitude", "XX");
-    openXCToOBD2Map.put("longitude", "XX");
-    openXCToOBD2Map.put("battery_status", "AT RV");
-    
-    
+    openXCToOBD2Map.put("parking_brake_status", "00");
+    openXCToOBD2Map.put("brake_pedal_status", "00");
+    openXCToOBD2Map.put("transmission_gear_position", "00");
+    openXCToOBD2Map.put("gear_lever_position", "00");
+    openXCToOBD2Map.put("odometer", "00");
+    openXCToOBD2Map.put("ignition_status", "00");
+    openXCToOBD2Map.put("fuel_consumed_since_restart", "00");
+    openXCToOBD2Map.put("door_status", "00");
+    openXCToOBD2Map.put("headlamp_status", "00");
+    openXCToOBD2Map.put("high_beam_status", "00");
+    openXCToOBD2Map.put("windshield_wiper_status", "00");
+    openXCToOBD2Map.put("latitude", "00");
+    openXCToOBD2Map.put("longitude", "00");
+    openXCToOBD2Map.put("battery_status", "AT RV"); //AT Command
 
-    openXCToOBD2Map.put("engine_oil_temperature", "01 5C");
-    openXCToOBD2Map.put("drivers_demand_engine", "01 61"); // percentage torque
-    openXCToOBD2Map.put("actual_engine", "01 62"); // percentage torque
-    openXCToOBD2Map.put("engine_reference", "01 63");  // torque Nm
-    openXCToOBD2Map.put("fuel_consumption_rate", "01 5E");
-    
-    
-    
-    
     openXCToOBD2Map.put("pid_supported_0120", "01 00");
     openXCToOBD2Map.put("pid_supported_2140", "01 20");
     openXCToOBD2Map.put("pid_supported_4160", "01 40");
@@ -362,9 +351,54 @@ public class ELMBluetooth implements DiscoveryListener {
     openXCToOBD2Map.put("short_term_secondary_oxygen_sensor_trim_bank2_and_bank4", "01 57");
     openXCToOBD2Map.put("long_term_secondary_oxygen_sensor_trim_bank2_and_bank4", "01 58");  
     
-    
-    //...
-    
+    openXCToOBD2Map.put("Fuel_rail_pressure_absolute", "01 59");
+    openXCToOBD2Map.put("relative_accelerator_pedal_position", "01 5A");
+    openXCToOBD2Map.put("hybrid_battery_pack_remaining_life", "01 5B");
+    openXCToOBD2Map.put("engine_oil_temperature", "01 5C");
+    openXCToOBD2Map.put("fuel_injection_timing", "01 5D");
+    openXCToOBD2Map.put("fuel_consumption_rate", "01 5E"); //openXC
+    openXCToOBD2Map.put("engine_fuel_rate", "01 5E");
+    openXCToOBD2Map.put("emission_requirements_to_which_vehicle_is_designed", "01 5F");
+    openXCToOBD2Map.put("drivers_demand_engine_percent_torque", "01 61");
+    openXCToOBD2Map.put("actual_engine_percentage_torque", "01 62");
+    openXCToOBD2Map.put("engine_reference_torque", "01 63");  // Nm
+    openXCToOBD2Map.put("engine_percent_torque_data", "01 64");
+    openXCToOBD2Map.put("auxiliary_input_output_supported", "01 65");
+    openXCToOBD2Map.put("mass_air_flow_sensor", "01 66");
+    openXCToOBD2Map.put("engine_coolant_temperature", "01 67");
+    openXCToOBD2Map.put("intake_air_temperature_sensor", "01 68");
+    openXCToOBD2Map.put("commanded_egr_and_egr_error", "01 69");
+    openXCToOBD2Map.put("commanded_diesel_intake_air_flow_control_and_relative_intake"
+    		+ "_air_flow position", "01 6A");
+    openXCToOBD2Map.put("exhaust_gas_recirculation_temperature", "01 6B");
+    openXCToOBD2Map.put("commanded_throttle_actuator_control_and_relative"
+    		+ "_throttle_position", "01 6C");
+    openXCToOBD2Map.put("Fuel_pressure_control_system", "01 6D");
+    openXCToOBD2Map.put("injection_pressure_control_system", "01 6E");
+    openXCToOBD2Map.put("turbocharger_compressor_inlet_pressure", "01 6F");
+    openXCToOBD2Map.put("boost_pressure_control", "01 70");
+    openXCToOBD2Map.put("variable_geometry_turbo_control", "01 71");
+    openXCToOBD2Map.put("wastegate_control", "01 72");
+    openXCToOBD2Map.put("exhaust_pressure", "01 73");
+    openXCToOBD2Map.put("turbocharger_rpm", "01 74");
+    openXCToOBD2Map.put("turbocharger_temperature", "01 75");
+    openXCToOBD2Map.put("turbocharger_temperature", "01 76");
+    openXCToOBD2Map.put("charge_air_cooler_temperature", "01 77");
+    openXCToOBD2Map.put("exhaust_gas_temperature_bank1", "01 78");
+    openXCToOBD2Map.put("exhaust_gas_temperature_bank2", "01 79");
+    openXCToOBD2Map.put("diesel_particulate_filter", "01 7A"); //AND 7B?
+    openXCToOBD2Map.put("diesel_particulate_filter_temperature", "01 7C");
+    openXCToOBD2Map.put("nox_nte_control_area_status", "01 7D");
+    openXCToOBD2Map.put("pm_nte_control_area_status", "01 7E");
+    openXCToOBD2Map.put("engine_run_time", "01 7F");
+    openXCToOBD2Map.put("engine_run_time_for_auxiliary"
+    		+ "_emissions_control_device", "01 81"); //AND 82?
+    openXCToOBD2Map.put("nox_sensor", "01 83");
+    openXCToOBD2Map.put("manifold_surface_temperature", "01 84");
+    openXCToOBD2Map.put("nox_reagent_system", "01 85");
+    openXCToOBD2Map.put("particulate_matter_sensor", "01 86");
+    openXCToOBD2Map.put("intake_manifold_absolute_pressure", "01 87");
+    //+Manufacturespecific PIDs ?
   }
   
   /**
