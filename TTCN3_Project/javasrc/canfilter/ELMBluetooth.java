@@ -7,8 +7,11 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Vector;
@@ -227,8 +230,7 @@ public class ELMBluetooth implements DiscoveryListener {
    */
   public static void initOpenXCToOBD2Map() {  
     //TODO Error-Handling if there is no OBD2 Key(here XX)
-    openXCToOBD2Map.put("vehicle_speed", "01 0D");
-    openXCToOBD2Map.put("engine_speed", "01 0C");
+
     openXCToOBD2Map.put("steering_wheel_angle", "XX");
     openXCToOBD2Map.put("torque_at_transmission", "XX");
     openXCToOBD2Map.put("accelerator_pedal_position", "01 49"); //or 4A or 4B ?
@@ -249,19 +251,46 @@ public class ELMBluetooth implements DiscoveryListener {
     openXCToOBD2Map.put("battery_status", "AT RV");
     openXCToOBD2Map.put("absolute_load", "01 43");
     openXCToOBD2Map.put("runtime_since_last_start", "01 1F");
-    openXCToOBD2Map.put("timing_advanced", "01 0E"); // relative to #1 cylinder
+
     openXCToOBD2Map.put("engine_oil_temperature", "01 5C");
     openXCToOBD2Map.put("drivers_demand_engine", "01 61"); // percentage torque
     openXCToOBD2Map.put("actual_engine", "01 62"); // percentage torque
     openXCToOBD2Map.put("engine_reference", "01 63");  // torque Nm
     openXCToOBD2Map.put("fuel_consumption_rate", "01 5E");
-    openXCToOBD2Map.put("barometric_pressure", "01 33");
+    openXCToOBD2Map.put("barometric_pressure", "01 33");    
+    
+    openXCToOBD2Map.put("ambient_air_temperature", "01 46");
+    
+    
+    openXCToOBD2Map.put("pid_supported_0120", "01 00");
+    openXCToOBD2Map.put("pid_supported_2140", "01 20");
+    openXCToOBD2Map.put("pid_supported_4160", "01 40");
+    openXCToOBD2Map.put("pid_supported_6180", "01 60");
+    openXCToOBD2Map.put("pid_supported_81A0", "01 80");
+    openXCToOBD2Map.put("pid_supported_A1C0", "01 A0");
+    openXCToOBD2Map.put("pid_supported_C1E0", "01 C0");
+    openXCToOBD2Map.put("monitor_status_since_dtc_cleared", "01 01");
+    openXCToOBD2Map.put("freeze_dtc", "01 02");
+    openXCToOBD2Map.put("fuel_system_status", "01 03");
+    openXCToOBD2Map.put("calculated_engine_load", "01 04");
+    openXCToOBD2Map.put("engine_coolant_temperature", "01 05");
+    openXCToOBD2Map.put("short_term_fuel_bank1", "01 06");
+    openXCToOBD2Map.put("long_termin_fuel_bank1", "01 07");
+    openXCToOBD2Map.put("short_term_fuel_bank2", "01 08");
+    openXCToOBD2Map.put("long_termin_fuel_bank2", "01 09");
     openXCToOBD2Map.put("fuel_pressure", "01 0A");
     openXCToOBD2Map.put("Intake_manifold_absolute_pressure", "01 0B");
+    openXCToOBD2Map.put("engine_speed", "01 0C");
+    openXCToOBD2Map.put("engine_rpm", "01 0C");
+    openXCToOBD2Map.put("vehicle_speed", "01 0D");
+    openXCToOBD2Map.put("timing_advanced", "01 0E"); // relative to #1 cylinder
     openXCToOBD2Map.put("air_intake_temperature", "01 0F");
-    openXCToOBD2Map.put("ambient_air_temperature", "01 46");
-    openXCToOBD2Map.put("engine_coolant_temperature", "01 05");
+    openXCToOBD2Map.put("maf_air_flow_rate", "01 10");
     openXCToOBD2Map.put("throttle_position", "01 11");
+    openXCToOBD2Map.put("commanded_secondary_air_status", "01 12");
+    openXCToOBD2Map.put("oxygen_sensor_present", "01 13");
+    //...
+    
   }
   
   /**
@@ -425,7 +454,12 @@ public class ELMBluetooth implements DiscoveryListener {
     return result;
 
   }
-  
+  /**
+   * 
+   * @param map
+   * @param value
+   * @return
+   */
   public static <T, E> T getKeyByValue(Map<T, E> map, E value) {
 	    for (Entry<T, E> entry : map.entrySet()) {
 	        if (value.equals(entry.getValue())) {
@@ -434,7 +468,11 @@ public class ELMBluetooth implements DiscoveryListener {
 	    }
 	    return null;
 	}
-  
+  /**
+   * 
+   * @param input
+   * @return
+   */
   public static boolean checkIfHexOrAT(String input){
 	  String rawData = input.replaceAll("\\s", "");
 	    if (rawData.matches("([0-9A-F]{2})+") || (rawData.startsWith("AT"))) {
@@ -443,8 +481,12 @@ public class ELMBluetooth implements DiscoveryListener {
 	    	return false;
 	    }	  
   }
-  
-  
+   
+  /**
+   * 
+   * @param reply
+   * @return
+   */
   public static String convertOBD2Reply(String reply) {
 	    String result;
 //	    if (reply.equals("NO DATA") || reply.equals("OK") || reply.startsWith("BUS") || reply.contains("V")) {
@@ -552,5 +594,110 @@ public class ELMBluetooth implements DiscoveryListener {
 	    return result;
 
 	  }
+  
+  
+//command send: 01 00
+//response: 41 00 98 18 00 01
+//=> 10011000000110000000000000000001 binär = hinten 1 -> weitere unterstützte Befehle, dh. 01 20 ausführen.
+//= 04,05,0C,0D 
+  /**
+   * 
+   * @param in
+   * @param pwriter
+   * @return
+   */
+  public List<String> getSupportedPIDs(InputStream in, PrintWriter pwriter){
+	  List<String> results = new ArrayList<String>();
+	  String input;
+	  
+	  input = run("01 00", in, pwriter);
+	  
+	  if (input.matches("([0-9A-F]{2})+")){
+		  input = new BigInteger(input, 16).toString(2);
+		  for (int i = 0; i < input.length(); i++) {
+			  char c = input.charAt(i);
+			  if (c == '1'){
+				  String hex = Integer.toHexString(i);
+				  results.add("01" + hex);
+			  }
+		  }			
+		  if (input.charAt(input.length()-1) == 1){ //if there are more supported PIDs
+			  getMoreSupportedPIDs(results, 00 ,in, pwriter);
+		  }
+	  }
+	  return results;
+  }
+  
+  /**
+   * 
+   * @param results
+   * @param cmd
+   * @param in
+   * @param pwriter
+   */
+  private void getMoreSupportedPIDs(List<String> results, Integer cmd,
+		InputStream in, PrintWriter pwriter) {
+	  Integer cmdRange = cmd + 20;
+	  String newCmd = "01" + cmdRange.toString();
+	  String input;
+	  input = run(newCmd, in, pwriter);
+	  
+	  if (input.matches("([0-9A-F]{2})+")){
+		  input = new BigInteger(input, 16).toString(2);
+		  for (int i = 0; i < input.length(); i++) {
+			  char c = input.charAt(i);
+			  if (c == '1'){
+				  String hex = Integer.toHexString(i+cmdRange);
+				  results.add("01" + hex);
+			  }
+		  }			
+		  if (input.charAt(input.length()-1) == 1){ //if there are more supported PIDs
+			  getMoreSupportedPIDs(results, cmdRange ,in, pwriter);
+		  }
+	  }
+	  
+}
+  
+  /**
+   * 
+   * @param command
+   * @param in
+   * @param pwriter
+   * @return
+   */
+public String run(String command, InputStream in, PrintWriter pwriter) {
+	  pwriter.write(command + "\r");
+      pwriter.flush();
+      
+      try {
+		Thread.sleep(200);
+	} catch (InterruptedException e) {
+		e.printStackTrace();
+	}
+      byte bytes = 0;
+      StringBuilder res = new StringBuilder();
+      String rawData = null;
+
+      // read until '>' arrives
+      try {
+		while ((char) (bytes = (byte) in.read()) != '>') {
+		    res.append((char) bytes);
+		  }
+	} catch (IOException e) {
+		e.printStackTrace();
+	}
+       //ELM sends strings
+      rawData = res.toString().trim();
+
+      /*
+       * Data may have echo or informative text like "INIT BUS..."
+       * or similar. The response ends with two carriage return
+       * characters. So we need to take everything from the last
+       * carriage return before those two (trimmed above).
+       */
+      rawData = rawData.substring(rawData.lastIndexOf(13) + 1);
+      
+      return rawData;
+  }
 
 }
