@@ -7,15 +7,7 @@
  */
 module Car2X_Functions {
 	import from Car2X_ModuleParameters {
-		const
-			c_acceleratorPedalMax,
-			c_acceleratorPedalMin,
-			c_batteryStatusMax,
-			c_batteryStatusMin,
-			c_engineSpeedMax,
-			c_engineSpeedMin,
-			c_timerHalfSecond,
-			c_timerTwoSeconds;
+		const c_timerHalfSecond, c_timerTwoSeconds;
 	}
 
 	import from Car2X_Templates {
@@ -108,12 +100,15 @@ module Car2X_Functions {
 		t_TC.start(p_interval);
 		alt {
 			// store received template into value
-			[] filterPort.receive(mw_FilterResponseVehicleSpeed(p_speed, p_variance)) {
+			[] filterPort
+			   .receive(mw_FilterResponseVehicleSpeed(p_speed, p_variance)) {
 				t_TC.stop;
 				t_holding.start(p_holding_time);
 				while (t_holding.running and v_ret == pass) {
 					alt {
-						[] filterPort.receive(mw_FilterResponseVehicleSpeed(p_speed, p_variance)){
+						[] filterPort
+						   .receive(mw_FilterResponseVehicleSpeed(p_speed,
+																  p_variance)) {
 							t_holding.stop;
 							v_ret := pass;
 						}
@@ -187,12 +182,16 @@ module Car2X_Functions {
 		t_TC.start(p_interval);
 		alt {
 			// store received template into value
-			[] filterPort.receive(mw_FilterResponseAcceleratorPedal(p_accelerator_pedal, p_variance)){
+			[] filterPort
+			   .receive(mw_FilterResponseAcceleratorPedal(p_accelerator_pedal,
+														  p_variance)) {
 				t_TC.stop;
 				t_holding.start(p_holding_time);
 				while (t_holding.running and v_ret == pass) {
 					alt {
-						[] filterPort.receive(mw_FilterResponseAcceleratorPedal(p_accelerator_pedal, p_variance)){
+						[] filterPort
+						   .receive(mw_FilterResponseAcceleratorPedal
+									(p_accelerator_pedal, p_variance)) {
 							v_ret := pass;
 						}
 						[] filterPort.receive {
@@ -248,7 +247,7 @@ module Car2X_Functions {
 	 * @return verdicttype for this request
 	 * @verdict
 	 */
-	function f_BrakePedalSub(boolean p_pedal_status, float p_holding_time,
+	function f_BrakePedalSub(boolean p_pedalStatus, float p_holding_time,
 							 float p_interval)
 		runs on TesterComponentType return verdicttype  {
 		var verdicttype v_ret := pass;
@@ -258,25 +257,17 @@ module Car2X_Functions {
 
 		alt {
 			// store received template into value
-			[] filterPort.receive(mw_FilterResponseBrakePedalStatus) ->
-			   value v_brakePedal {
+			[] filterPort.receive(mw_FilterResponseBrakePedalStatus(p_pedalStatus)){
 				t_TC.stop;
-				// check brake status
-				// v_status := v_brakePedal.valueA.booleanValue;
-				if (v_brakePedal.car2XValue.booleanValue == p_pedal_status) {
-					t_holding.start(p_holding_time);
-					while (t_holding.running and v_ret == pass) {
-						filterPort.receive(mw_FilterResponseBrakePedalStatus) ->
-						value v_brakePedal;
-						if (v_brakePedal.car2XValue.booleanValue == p_pedal_status)
-						{
+				while (t_holding.running and v_ret == pass) {
+					alt{
+						[] filterPort.receive(mw_FilterResponseBrakePedalStatus(p_pedalStatus)){
 							v_ret := pass;
-						} else {
+						}
+						[] filterPort.receive {
 							v_ret := fail;
 						}
 					}
-				} else {
-					v_ret := fail;
 				}
 			}
 			[] filterPort.receive {
@@ -339,12 +330,17 @@ module Car2X_Functions {
 		t_TC.start(p_interval);
 		alt {
 			// store received template into value
-			[] filterPort.receive(mw_FilterResponseEngineSpeed(p_targetEngineSpeed, p_variance)){
+			[] filterPort
+			   .receive(mw_FilterResponseEngineSpeed(p_targetEngineSpeed,
+													 p_variance)) {
 				t_TC.stop;
 				t_holding.start(p_holding_time);
 				while (t_holding.running and v_ret == pass) {
 					alt {
-						[] filterPort.receive(mw_FilterResponseEngineSpeed(p_targetEngineSpeed, p_variance)){
+						[] filterPort
+						   .receive(mw_FilterResponseEngineSpeed(p_targetEngineSpeed
+																 , p_variance))
+						{
 							v_ret := pass;
 						}
 						[] filterPort.receive {
@@ -398,26 +394,24 @@ module Car2X_Functions {
 		t_TC.start(p_interval);
 		alt {
 			// store received template into value
-			[] filterPort.receive(mw_FilterResponseBatteryStatus) ->
-			   value v_battery {
+			[] filterPort
+			   .receive(mw_FilterResponseBatteryStatus(p_batteryStatus,
+													   p_variance)) {
 				t_TC.stop;
-				// check whether vehicle speed is greater than given speed
-				if (f_max(p_batteryStatus - p_variance, c_batteryStatusMin) <=
-					v_battery.car2XValue.floatValue and
-					v_battery.car2XValue.floatValue >=
-					f_min(p_batteryStatus + p_variance, c_batteryStatusMax)) {
-					t_holding.start(p_holdingTime);
-					while (t_holding.running and v_ret == pass) {
-						filterPort.receive(mw_FilterResponseBatteryStatus) ->
-						value v_battery;
-						if (v_battery.car2XValue.floatValue >= p_batteryStatus) {
+				t_holding.start(p_holdingTime);
+				while (t_holding.running and v_ret == pass) {
+					alt {
+						[] filterPort
+						   .receive(mw_FilterResponseBatteryStatus(p_batteryStatus
+																   ,
+																   p_variance))
+						{
 							v_ret := pass;
-						} else {
+						}
+						[] filterPort.receive {
 							v_ret := fail;
 						}
 					}
-				} else {
-					v_ret := fail;
 				}
 			}
 			[] filterPort.receive {
@@ -479,9 +473,11 @@ module Car2X_Functions {
 
 		t_TC.start(p_interval);
 		alt {
-			[] filterPort.receive(mw_FilterResponseSteeringWheel(p_targetAngle, p_variance)){
-    			v_ret := pass;
-    			t_TC.stop;
+			[] filterPort
+			   .receive(mw_FilterResponseSteeringWheel(p_targetAngle,
+													   p_variance)) {
+				v_ret := pass;
+				t_TC.stop;
 			}
 			[] filterPort.receive {
 				v_ret := fail;
@@ -722,7 +718,7 @@ module Car2X_Functions {
 		t_TC.start(p_interval);
 
 		alt {
-			[] filterPort.receive(mw_FilterResponseTransmissionGear(p_gear)){
+			[] filterPort.receive(mw_FilterResponseTransmissionGear(p_gear)) {
 				t_TC.stop;
 				v_ret := pass;
 			}
@@ -785,7 +781,8 @@ module Car2X_Functions {
 		t_TC.start(p_interval);
 
 		alt {
-			[] filterPort.receive(mw_FilterResponseDoorStatus(p_door, p_status)){
+			[] filterPort
+			   .receive(mw_FilterResponseDoorStatus(p_door, p_status)) {
 				v_ret := pass;
 			}
 			[] filterPort.receive {
@@ -805,6 +802,8 @@ module Car2X_Functions {
 	 *   		 Maps the port of the tester to the system port.
 	 */
 	function f_setUp() runs on TesterComponentType  {
+
+
 
 		// create an instance of the tester
 		var TesterComponentType Tester;
