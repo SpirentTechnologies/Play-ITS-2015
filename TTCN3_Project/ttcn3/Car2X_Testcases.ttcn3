@@ -124,6 +124,11 @@ module Car2X_Testcases {
 		f_tearDown();
 	}
 	
+	/**
+	 * 
+	 * @desc speed up to 60 and full brake
+	 * @verdict 
+	 */
 	testcase TC_FULL_BRAKE_OVER_60()
 		runs on TesterComponentType system SystemComponentType {
 		var verdicttype v_ret := inconc;
@@ -220,6 +225,11 @@ module Car2X_Testcases {
 		f_tearDown();
 	}
 
+	/**
+	 * 
+	 * @desc testcase for testing headlamp status
+	 * @verdict 
+	 */
 	testcase TC_HEADLAMP_STATUS()
 		runs on TesterComponentType system SystemComponentType {
 		var verdicttype v_ret := inconc;
