@@ -62,6 +62,14 @@ module Car2X_Types {
 		integer respTimestamp
 	}
 	
+	/**
+	 * 
+	 * @desc Enum type to represent the ignition status
+	 * @member e_off Ignition status is off
+	 * @member e_accessory Ignition status is accessory
+	 * @member e_run Ignition status is run
+	 * @member e_start Ignition status is start
+	 */
 	type enumerated IgnitionStatus {
 		e_off,
 		e_accessory,
@@ -69,6 +77,14 @@ module Car2X_Types {
 		e_start
 	};
 	
+	/**
+	 * 
+	 * @desc Enum type to represent the door status
+	 * @member e_driver Driver door
+	 * @member e_passenger Passenger door
+	 * @member e_rearLeft Left rear door
+	 * @member e_rearRight Right rear door
+	 */
 	type enumerated DoorStatus {
 		e_driver,
 		e_passenger,
@@ -76,6 +92,22 @@ module Car2X_Types {
 		e_rearRight
 	};
 	
+	/**
+	 * 
+	 * @desc Enum to represent the transmission gear status
+	 * @member e_first
+	 * @member e_second
+	 * @member e_third
+	 * @member e_fourth
+	 * @member e_fifth
+	 * @member e_sixth
+	 * @member e_seventh
+	 * @member e_eighth
+	 * @member e_nineth
+	 * @member e_tenth
+	 * @member e_reverse
+	 * @member e_neutral
+	 */
 	type enumerated TransmissionGear {
 		e_first,
 		e_second,
