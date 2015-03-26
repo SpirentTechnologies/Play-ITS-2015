@@ -9,19 +9,19 @@ public class Car2XEntry {
 
   /**
    * Backup key for communicating with ELM327
-   * @return hexadecimal obd-2 key
+   * @return hexadecimal OBD2 key
    */
   public String getOBD2key() {
     return obd2key;
   }
-
+  
   /**
    * Date in milliseconds according to the last time 
    * valueA and valueB where updated.
-   * @return a timestamp
+   * @return a time stamp
    */
   public long getTimestamp() {
-    return timestamp;
+    return this.timestamp;
   }
 
   /**
@@ -40,9 +40,9 @@ public class Car2XEntry {
   public boolean getEvent() {
     return event;
   }
-
+  
   /**
-   * Name of valueA read from openXC simulator 
+   * Name of car2XValue read from openXC simulator 
    * @param key two byte hexadecimal String
    */
   public void setOpenXCkey(String key) {
@@ -58,7 +58,7 @@ public class Car2XEntry {
   }
 
   /**
-   * Date of last update of valueA and valueB
+   * Date of last update of car2XValue and event
    * @param timestamp milliseconds.
    */
   public void setTimestamp(long timestamp) {
