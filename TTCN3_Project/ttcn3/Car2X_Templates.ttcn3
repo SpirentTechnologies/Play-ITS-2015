@@ -17,6 +17,7 @@ module Car2X_Templates {
 			c_headlampStatus,
 			c_ignitionStatus,
 			c_modePrefix01,
+			c_parkingBrakeStatus,
 			c_startRequest,
 			c_steeringWheelAngle,
 			c_stopRequest,
@@ -120,6 +121,16 @@ module Car2X_Templates {
 	 */
 	template FilterRequest m_FilterHeadLampStatusStop() := {
 		reqType := c_stopRequest, reqData := {{key := c_headlampStatus}}
+	}
+	
+	template FilterRequest m_FilterParkingBrakeStatusStart() := {
+		reqType := c_startRequest,
+		reqData := {{key := c_parkingBrakeStatus, interval := c_FilterInterval1000}}
+	}
+	
+	template FilterRequest m_m_FilterParkingBrakeStatusStop() := {
+		reqType := c_stopRequest,
+		reqData := {{key := c_parkingBrakeStatus}}
 	}
 
 	/**
@@ -269,6 +280,14 @@ module Car2X_Templates {
 	template FilterResponse mw_FilterResponseHeadLampStatus(boolean p_Status) :=
 	{
 		OpenXCKey := c_headlampStatus,
+		OBD2Key := ?,
+		valueA := f_bool2str(p_Status),
+		respTimestamp := ?
+	}
+	
+	template FilterResponse mw_FilterResponseParkingBrakeStatus(boolean p_Status) :=
+	{
+		OpenXCKey := c_parkingBrakeStatus,
 		OBD2Key := ?,
 		valueA := f_bool2str(p_Status),
 		respTimestamp := ?
