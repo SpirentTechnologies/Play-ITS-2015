@@ -8,6 +8,8 @@ module Car2X_Templates {
 	import from Car2X_ModuleParameters {
 		const
 			c_ElmVehicleSpeed,
+		c_engineSpeedMin,
+		c_engineSpeedMax,
 			c_FilterInterval1000,
 			c_FilterInterval500,
 			c_acceleratorPedalMax,
@@ -31,7 +33,9 @@ module Car2X_Templates {
 			c_steeringWheelMin,
 			c_stopRequest,
 			c_transmissionGearPosition,
-			c_vehicleSpeed;
+			c_vehicleSpeed,
+			c_vehicleSpeedMax,
+			c_vehicleSpeedMin;
 	}
 	import from Car2X_Types {
 		type DoorStatus, ElmRequest, ElmResponse, FilterRequest, FilterResponse, IgnitionStatus, TransmissionGear;
@@ -295,10 +299,10 @@ module Car2X_Templates {
 	/**
 	 * @desc Template for vehicle Speed response
 	 */
-	template FilterResponse mw_FilterResponseVehicleSpeed() := {
+	template FilterResponse mw_FilterResponseVehicleSpeed(float p_targetSpeed, float p_variance) := {
 		OpenXCKey := c_vehicleSpeed,
 		OBD2Key := c_ElmVehicleSpeed,
-		car2XValue := {floatValue := ?},
+		car2XValue := {floatValue := (f_max(p_targetSpeed-p_variance, c_vehicleSpeedMin) .. f_min(p_targetSpeed+p_variance, c_vehicleSpeedMax))},
 		respTimestamp := ?
 	}
 
