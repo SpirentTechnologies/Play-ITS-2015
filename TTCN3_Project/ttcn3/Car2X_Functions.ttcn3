@@ -9,6 +9,8 @@ module Car2X_Functions {
 		const
 			c_acceleratorPedalMax,
 			c_acceleratorPedalMin,
+			c_batteryStatusMax,
+			c_batteryStatusMin,
 			c_engineSpeedMax,
 			c_engineSpeedMin,
 			c_timerHalfSecond,
@@ -20,6 +22,8 @@ module Car2X_Functions {
 		template
 			m_FilterAcceleratorPedalStart,
 			m_FilterAcceleratorPedalStop,
+			m_FilterBatteryStatusStart,
+			m_FilterBatteryStatusStop,
 			m_FilterBrakePedalStart,
 			m_FilterBrakePedalStop,
 			m_FilterDoorStatusStart,
@@ -38,6 +42,7 @@ module Car2X_Functions {
 			m_FilterVehicleSpeedStart,
 			m_FilterVehicleSpeedStop,
 			mw_FilterResponseAcceleratorPedal,
+			mw_FilterResponseBatteryStatus,
 			mw_FilterResponseBrakePedalStatus,
 			mw_FilterResponseDoorStatus,
 			mw_FilterResponseEngineSpeed,
@@ -63,15 +68,15 @@ module Car2X_Functions {
 	 * @param p_interval Time until timeout (in sec)
 	 */
 	function f_VEHICLE_SPEED(float p_speed, float p_holding_time,
-							 float p_variance, float p_interval)
+							 float p_variance, float p_timeOut)
 		runs on TesterComponentType return verdicttype  {
 		var verdicttype v_ret := inconc;
-		t_TC_Global.start;
+		t_TC_Global.start(p_timeOut);
 		filterPort.send(m_FilterVehicleSpeedStart);
 		while (t_TC_Global.running) {
 			v_ret :=
 				f_VehicleSpeedSub(p_speed, p_holding_time, p_variance,
-								  p_interval);
+								  c_timerTwoSeconds);
 			if (v_ret == pass) {
 				t_TC_Global.stop;
 			}
@@ -156,7 +161,7 @@ module Car2X_Functions {
 			v_ret :=
 				f_AcceleratorPedalSub(p_accelerator_pedal, p_variance,
 									  p_holding_time,
-									  c_timerOneSecond + c_timerHalfSecond);
+									  c_timerTwoSeconds);
 			if (v_ret == pass) {
 				t_TC_Global.stop;
 			}
@@ -223,6 +228,14 @@ module Car2X_Functions {
 		return v_ret;			
 		}
 
+	/**
+	 * 
+	 * @desc function to get brake pedal status
+	 * @param p_pedal_status target pedal status; true = press, false = release
+	 * @param p_holding_time Time to hold this engine speed (in sec)
+	 * @param p_time_out Time until timeout (in sec)
+	 * @return verdicttype for this stage
+	 */
 	function f_BRAKE_PEDAL(boolean p_pedal_status, float p_holding_time, float p_time_out) runs on TesterComponentType return verdicttype {
 		var verdicttype v_ret := inconc;
 		t_TC_Global.start(p_time_out);
@@ -243,6 +256,15 @@ module Car2X_Functions {
 		return v_ret;
 	}
 	
+	/**
+	 * 
+	 * @desc  function to request brake pedal from CAN filter
+	 * @param p_pedal_status target pedal status; true = press, false = release
+	 * @param p_holding_time Time to hold this engine speed (in sec)
+	 * @param p_interval interval time
+	 * @return verdicttype for this request
+	 * @verdict 
+	 */
 	function f_BrakePedalSub(boolean p_pedal_status, float p_holding_time, float p_interval) runs on TesterComponentType return verdicttype {
 		var verdicttype v_ret := pass;
 		var template FilterResponse v_BrakePedal;
@@ -280,7 +302,6 @@ module Car2X_Functions {
 			}
 		}
 		return v_ret;
-	
 	}
 
 	/**
@@ -345,6 +366,69 @@ module Car2X_Functions {
 						filterPort.receive(mw_FilterResponseEngineSpeed) ->
 						value v_speed;
 						if (str2float(v_speed.valueA) >= p_engine_speed) {
+							v_ret := pass;
+						} else {
+							v_ret := fail;
+						}
+					}
+				} else {
+					v_ret := fail;
+				}
+			}
+			[] filterPort.receive {
+				t_TC.stop;
+				v_ret := fail;
+			}
+			[] t_TC.timeout {
+				v_ret := inconc;
+			}
+		}
+		return v_ret;
+	}
+	
+	function f_BATTERY_STATUS(float p_batteryStatus, float p_variance, float p_holdingTime, float p_timeOut)runs on TesterComponentType return verdicttype{
+		var verdicttype v_ret := inconc;
+		t_TC_Global.start(p_timeOut);
+		filterPort.send(m_FilterBatteryStatusStart);
+		while (t_TC_Global.running) {
+			v_ret :=
+			f_batteryStatusSub(p_batteryStatus, p_variance, p_holdingTime,
+								 c_timerTwoSeconds);
+			if (v_ret == pass) {
+				t_TC_Global.stop;
+			}
+		}
+		filterPort.send(m_FilterBatteryStatusStop);
+
+		if (v_ret != pass) {
+			setverdict(v_ret);
+			f_tearDown();
+		}
+		return v_ret;
+	}
+	
+	function f_batteryStatusSub(float p_batteryStatus, float p_variance, float p_holdingTime,float p_interval) runs on TesterComponentType return verdicttype {
+		var verdicttype v_ret := pass;
+		var template FilterResponse v_battery;
+		timer t_holding;
+		var float status;
+
+		// start the timer
+		t_TC.start(p_interval);
+		alt {
+			// store received template into value
+			[] filterPort.receive(mw_FilterResponseBatteryStatus) ->
+			   value v_battery {
+				t_TC.stop;
+				// check whether vehicle speed is greater than given speed
+				status := str2float(v_battery.valueA);
+				if (f_max(p_batteryStatus - p_variance, c_batteryStatusMin) <= status and
+				status >= f_min(p_batteryStatus + p_variance, c_batteryStatusMax)) {
+					t_holding.start(p_holdingTime);
+					while (t_holding.running and v_ret == pass) {
+						filterPort.receive(mw_FilterResponseBatteryStatus) ->
+						value v_battery;
+						if (str2float(v_battery.valueA) >= p_batteryStatus) {
 							v_ret := pass;
 						} else {
 							v_ret := fail;
@@ -450,7 +534,7 @@ module Car2X_Functions {
 		t_TC_Global.start(p_timeout);
 
 		while (t_TC_Global.running) {
-			f_HeadlampStatusSub(p_Status, 0.8);
+			f_HeadlampStatusSub(p_Status, c_timerTwoSeconds);
 			if (v_ret == pass) {
 				t_TC_Global.stop;
 			}
@@ -500,7 +584,7 @@ module Car2X_Functions {
 	 * @desc Measures the ignition status.
 	 * @param ignitionStatus Enum value of type IgnitionStatus
 	 */
-	function f_IGNITION_STATUS(IgnitionStatus p_ignitionStatus)
+	function f_IGNITION_STATUS(IgnitionStatus p_ignitionStatus, float p_timeOut)
 		runs on TesterComponentType return verdicttype  {
 		var verdicttype v_ret := inconc;
 
@@ -686,14 +770,14 @@ module Car2X_Functions {
 	 * @verdict
 	 */
 	function f_DOOR_STATUS(DoorStatus p_door, boolean p_status,
-						   float p_interval)
+						   float p_timeOut)
 		runs on TesterComponentType return verdicttype  {
 		var verdicttype v_ret := inconc;
-		t_TC_Global.start(p_interval);
+		t_TC_Global.start(p_timeOut);
 		filterPort.send(m_FilterDoorStatusStart);
 
 		while (t_TC_Global.running) {
-			v_ret := f_doorStatusSub(p_door, p_status, 1.0);
+			v_ret := f_doorStatusSub(p_door, p_status, c_timerTwoSeconds);
 			if (v_ret == pass) {
 				t_TC_Global.stop;
 			}

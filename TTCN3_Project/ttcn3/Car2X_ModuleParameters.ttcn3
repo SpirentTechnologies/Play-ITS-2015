@@ -29,6 +29,7 @@ module Car2X_ModuleParameters {
 	const charstring c_windshieldWiperStatus := "windshield_wiper_status";
 	const charstring c_latitude := "latitude";
 	const charstring c_longitude := "longitude";
+	const charstring c_batteryStatus := "battery_status";
 	
 	//key for start and stop request
 	const charstring c_startRequest := "start";
@@ -42,12 +43,37 @@ module Car2X_ModuleParameters {
 	
 	//key for testcases
 	
+	//batteryStatus
+	const float c_batteryStatusMax := 20.0;
+	const float c_batteryStatus15 := 15.0;
+	const float c_batteryStatus12 := 12.0;
+	const float c_batteryStatus10 := 10.0;
+	const float c_batteryStatus8 := 8.0;
+	const float c_batteryStatus5 := 5.0;
+	const float c_batteryStatus3 := 3.0;
+	const float c_batteryStatusMin := 0.0;
+	
+	//battery status variance
+	const float c_batteryStatusVarriance5 := 5.0;
+	const float c_batteryStatusVarriance2 := 2.0;
+	const float c_batteryStatusVarriance1 := 1.0;
+	const float c_batteryStatusVarrianceHalf := 0.5;
+	const float c_batteryStatusVarriance0 := 0.0;
+	
 	//accelerator pedal position
 	const float c_acceleratorPedalMax := 1.0;
 	const float c_acceleratorPedal80Percent := 0.8;
 	const float c_acceleratorPedal50Percent := 0.5;
 	const float c_acceleratorPedal30Percent := 0.3;
 	const float c_acceleratorPedalMin := 0.0;
+	
+	//door status
+	const boolean c_doorStatusOpen := true;
+	const boolean c_doorStatusClose := false;
+	
+	//head lamp status
+	const boolean c_headLampOn := true;
+	const boolean c_headLampOff := false;
 	
 	//accelerator pedal variance
 	const float c_acceleratorVariance20Percent := 0.2;
@@ -70,9 +96,14 @@ module Car2X_ModuleParameters {
 	const float c_steeringWheelVariance50 := 50.0;
 	const float c_steeringWheelVariance0 := 0.0;
 	
-	//brake pedal
-	const boolean c_BrakePedalStatusPressed := true;
-	const boolean c_BrakePedalStatusReleased := false;
+	//brake pedal status
+	const boolean c_brakePedalStatusPressed := true;
+	const boolean c_brakePedalStatusReleased := false;
+	
+
+	//parking brake status
+	const boolean c_parkingBrakeStatusPressed := true;
+	const boolean c_parkingBrakeStatusReleased := false;
 	
 	//vehicle Speed
 	const float c_vehicleSpeedMax := 655.0;
