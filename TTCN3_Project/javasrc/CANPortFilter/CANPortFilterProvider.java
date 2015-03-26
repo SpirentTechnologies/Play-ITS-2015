@@ -3,12 +3,17 @@ package CANPortFilter;
 import com.testingtech.ttcn.tri.PortFilter;
 import com.testingtech.ttcn.tri.extension.PortFilterProvider;
 
-// FIXME: This whole class does nothing except returning an object of type CANPportFilter(). So: Why is it necessary?
+/**
+ * 
+ * @author Christian Damm, Sascha Kretzschmann
+ * This class is necessary to
+ *         manipulate the communication between the TE and the SUT
+ * 
+ */
 public class CANPortFilterProvider implements PortFilterProvider {
 
 	@Override
 	public PortFilter getPortFilter() {
-		// TODO Auto-generated method stub
 		return new CANPortFilter();
 	}
 
