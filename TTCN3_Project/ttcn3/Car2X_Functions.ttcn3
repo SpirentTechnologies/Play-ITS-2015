@@ -30,6 +30,7 @@ module Car2X_Functions {
 			m_FilterHeadLampStatusStop,
 			m_FilterIgnitionStateStart,
 			m_FilterIgnitionStateStop,
+			m_FilterParkingBrakeStatusStart,
 			m_FilterSteeringWheelStart,
 			m_FilterSteeringWheelStop,
 			m_FilterTransmissionGearStart,
@@ -42,6 +43,7 @@ module Car2X_Functions {
 			mw_FilterResponseEngineSpeed,
 			mw_FilterResponseHeadLampStatus,
 			mw_FilterResponseIgnitionStatus,
+			mw_FilterResponseParkingBrakeStatus,
 			mw_FilterResponseSteeringWheel,
 			mw_FilterResponseTransmissionGear,
 			mw_FilterResponseVehicleSpeed;
@@ -463,7 +465,7 @@ module Car2X_Functions {
 		}
 		return v_ret;
 	}
-
+	
 	/**
 	 * @desc Receives values from CAN filter. Test body of
 	 * @see f_HEADLAMP_STATUS
@@ -541,6 +543,64 @@ module Car2X_Functions {
 		alt {
 			// store received template into value
 			[] filterPort.receive(mw_FilterResponseIgnitionStatus(e_run)) {
+				t_TC.stop;
+				v_ret := pass;
+			}
+			[] filterPort.receive {
+				t_TC.stop;
+				v_ret := fail;
+			}
+			[] t_TC.timeout {
+				v_ret := inconc;
+			}
+		}
+		return v_ret;
+	}
+	/**
+	 * @desc Checks the parking brake status.
+	 * @param p_status <b>true</b> parking brake engaged; <b>false</b> headlamp disengaged
+	 * @param p_interval interval until timeout
+	 */
+	function f_PARKING_BRAKE_STATUS(boolean p_status, float p_interval) runs on TesterComponentType return verdicttype {
+		var verdicttype v_ret := inconc;
+	
+		// start parking brake status request
+		filterPort.send(m_FilterParkingBrakeStatusStart);
+		t_TC_Global.start(p_interval);
+	
+		while (t_TC_Global.running) {
+			f_parkingBrakeStatusSub(p_status, 0.8);
+			if (v_ret == pass) {
+				t_TC_Global.stop;
+			}
+		}
+		// stop parking brake status request
+		filterPort.send(m_FilterParkingBrakeStatusStart);
+	
+		//stage failed -> end whole TC
+		if (v_ret != pass) {
+			setverdict(v_ret);
+			f_tearDown();
+		}
+		return v_ret;
+	
+	}
+	
+	/**
+	 * @desc Receives values from CAN filter. Test body of
+	 * @see f_PARKING_BRAKE_STATUS
+	 * @param p_status Target status of parking brake; <b>true</b> brake engaged;
+	 *   <b>false</b> brake disengaged
+	 * @param p_interval Time until timeout
+	 */
+	function f_parkingBrakeStatusSub(boolean p_status, float p_interval) runs on TesterComponentType return verdicttype  {
+		var verdicttype v_ret := inconc;
+		var template FilterResponse v_parkingBrakeStatus;
+		t_TC.start(p_interval);
+	
+		alt {
+			// store received template into value
+			[] filterPort.receive(mw_FilterResponseParkingBrakeStatus(p_status)) {
 				t_TC.stop;
 				v_ret := pass;
 			}
