@@ -3,9 +3,7 @@
  * @desc Here we define our templates.
  */
 module Car2X_Templates {
-	import from Car2X_Functions {
-		function f_bool2str, f_ignitionStatus2str, f_max, f_min;
-	}
+	import from Car2X_Functions {function f_ignitionStatus2str;}
 
 	import from Car2X_ModuleParameters {
 		const
@@ -38,7 +36,6 @@ module Car2X_Templates {
 
 	/**
 	 * @desc Request template to communicate with ELM.
-	 *   	currently not used
 	 */
 	template ElmRequest m_ElmVehicleSpeed() := {
 		modePrefix := c_modePrefix01, parameterID := c_ElmVehicleSpeed
@@ -51,7 +48,7 @@ module Car2X_Templates {
 	template ElmResponse mw_ElmVehicleSpeed() := {response := ?}
 
 	/**
-	 * @desc template to start vehicle speed request with intervall 1500
+	 * @desc Template to start vehicle speed request with interval 1500
 	 */
 	template FilterRequest m_FilterVehicleSpeedStart() := {
 		reqType := c_startRequest,
@@ -59,14 +56,14 @@ module Car2X_Templates {
 	}
 
 	/**
-	 * @desc template to stop vehicle speed request
+	 * @desc Template to stop vehicle speed request
 	 */
 	template FilterRequest m_FilterVehicleSpeedStop() := {
 		reqType := c_stopRequest, reqData := {{key := c_vehicleSpeed}}
 	}
 
 	/**
-	 * @desc template to start steering wheel request with interval 1000
+	 * @desc Template to start steering wheel request with interval 1000
 	 */
 	template FilterRequest m_FilterSteeringWheelStart() := {
 		reqType := c_startRequest,
@@ -76,7 +73,14 @@ module Car2X_Templates {
 	}
 
 	/**
-	 * @desc template to start door status request with interval 1000
+	 * @desc Template to stop steering wheel request
+	 */
+	template FilterRequest m_FilterSteeringWheelStop() := {
+		reqType := c_stopRequest, reqData := {{key := c_steeringWheelAngle}}
+	}
+
+	/**
+	 * @desc Template to start door status request with interval 1000
 	 */
 	template FilterRequest m_FilterDoorStatusStart() := {
 		reqType := c_startRequest,
@@ -84,14 +88,14 @@ module Car2X_Templates {
 	}
 
 	/**
-	 * @desc template to stop door status request
+	 * @desc Template to stop door status request
 	 */
 	template FilterRequest m_FilterDoorStatusStop() := {
 		reqType := c_stopRequest, reqData := {{key := c_doorStatus}}
 	}
 
 	/**
-	 * @desc template to start transmission gear request with interval 1000
+	 * @desc Template to start transmission gear request with interval 1000
 	 */
 	template FilterRequest m_FilterTransmissionGearStart() := {
 		reqType := c_startRequest,
@@ -104,7 +108,7 @@ module Car2X_Templates {
 	}
 
 	/**
-	 * @desc template to stop steering wheel request with interval 1000
+	 * @desc Template to stop steering gear request with interval 1000
 	 */
 	template FilterRequest m_FilterTransmissionGearStop() := {
 		reqType := c_stopRequest,
@@ -112,7 +116,7 @@ module Car2X_Templates {
 	}
 
 	/**
-	 * @desc template to start head lamp request with interval 1000
+	 * @desc Template to start head lamp request with interval 1000
 	 */
 	template FilterRequest m_FilterHeadLampStatusStart() := {
 		reqType := c_startRequest,
@@ -120,24 +124,31 @@ module Car2X_Templates {
 	}
 
 	/**
-	 * @desc template to stop head lamp request
+	 * @desc Template to stop head lamp request
 	 */
 	template FilterRequest m_FilterHeadLampStatusStop() := {
 		reqType := c_stopRequest, reqData := {{key := c_headlampStatus}}
 	}
-	
+
+	/**
+	 * @desc Template to start parking brake request
+	 */
 	template FilterRequest m_FilterParkingBrakeStatusStart() := {
 		reqType := c_startRequest,
-		reqData := {{key := c_parkingBrakeStatus, interval := c_FilterInterval1000}}
-	}
-	
-	template FilterRequest m_m_FilterParkingBrakeStatusStop() := {
-		reqType := c_stopRequest,
-		reqData := {{key := c_parkingBrakeStatus}}
+		reqData := {
+			{key := c_parkingBrakeStatus, interval := c_FilterInterval1000}
+		}
 	}
 
 	/**
-	 * @desc template to start ingnition status request with intervall 500
+	 * @desc Template to stop parking brake request
+	 */
+	template FilterRequest m_FilterParkingBrakeStatusStop() := {
+		reqType := c_stopRequest, reqData := {{key := c_parkingBrakeStatus}}
+	}
+
+	/**
+	 * @desc Template to start ingnition status request with interval 500
 	 */
 	template FilterRequest m_FilterIgnitionStateStart() := {
 		reqType := c_startRequest,
@@ -145,21 +156,14 @@ module Car2X_Templates {
 	}
 
 	/**
-	 * @desc template to stop steering wheel request
-	 */
-	template FilterRequest m_FilterSteeringWheelStop() := {
-		reqType := c_stopRequest, reqData := {{key := c_steeringWheelAngle}}
-	}
-
-	/**
-	 * @desc template to stop ignition status request
+	 * @desc Template to stop ignition status request
 	 */
 	template FilterRequest m_FilterIgnitionStateStop() := {
 		reqType := c_stopRequest, reqData := {{key := c_ignitionStatus}}
 	}
 
 	/**
-	 * @desc template to start engine speed request with intervall 500
+	 * @desc Template to start engine speed request with interval 500
 	 */
 	template FilterRequest m_FilterEngineSpeedStart() := {
 		reqType := c_startRequest,
@@ -167,38 +171,45 @@ module Car2X_Templates {
 	}
 
 	/**
-	 * @desc template to stop engine speed request
+	 * @desc Template to stop engine speed request
 	 */
 	template FilterRequest m_FilterEngineSpeedStop() := {
 		reqType := c_stopRequest, reqData := {{key := c_engineSpeed}}
 	}
-	
+
 	/**
-	 * @desc template to start accelerator pedal postion with intervall 1000
+	 * @desc Template to start accelerator pedal postion with interval 1000
 	 */
 	template FilterRequest m_FilterAcceleratorPedalStart() := {
 		reqType := c_startRequest,
-		reqData := {{key := c_acceleratorPedalPosition, interval := c_FilterInterval1000}}
+		reqData := {
+			{
+				key := c_acceleratorPedalPosition,
+				interval := c_FilterInterval1000
+			}
+		}
 	}
 
 	/**
-	 * @desc template to stop accelerator pedal postion request
+	 * @desc Template to stop accelerator pedal postion request
 	 */
 	template FilterRequest m_FilterAcceleratorPedalStop() := {
-		reqType := c_stopRequest, reqData := {{key := c_acceleratorPedalPosition}}
+		reqType := c_stopRequest,
+		reqData := {{key := c_acceleratorPedalPosition}}
 	}
 
-
 	/**
-	 * @desc template to start brake pedal postion with intervall 1000
+	 * @desc Template to start brake pedal postion with interval 1000
 	 */
 	template FilterRequest m_FilterBrakePedalStart() := {
 		reqType := c_startRequest,
-		reqData := {{key := c_brakePedalStatus, interval := c_FilterInterval1000}}
+		reqData := {
+			{key := c_brakePedalStatus, interval := c_FilterInterval1000}
+		}
 	}
 
 	/**
-	 * @desc template to stop brake pedal postion request
+	 * @desc Template to stop brake pedal postion request
 	 */
 	template FilterRequest m_FilterBrakePedalStop() := {
 		reqType := c_stopRequest, reqData := {{key := c_brakePedalStatus}}
@@ -206,120 +217,110 @@ module Car2X_Templates {
 
 
 	/**
-	 * @desc template for steering wheel angle response
+	 * @desc Template for steering wheel angle response
 	 */
 	template FilterResponse mw_FilterResponseSteeringWheel() := {
 		OpenXCKey := c_steeringWheelAngle,
 		OBD2Key := ?,
-		valueA := ?,
+		valueA := {floatValue := ?},
 		respTimestamp := ?
 	}
 
 	/**
-	 * @desc template for door status reponse
+	 * @desc Template for door status reponse
 	 */
 	template FilterResponse mw_FilterResponseDoorStatus() := {
-		OpenXCKey := c_doorStatus, OBD2Key := ?, valueA := ?, respTimestamp := ?
+		OpenXCKey := c_doorStatus,
+		OBD2Key := ?,
+		valueA := {stringValue := ?},
+		valueB := ?,
+		respTimestamp := ?
 	}
-	
-	/**
-		 * @desc template for door status reponse
-		 */
-		template FilterResponse mw_FilterResponseAcceleratorPedal() := {
-			OpenXCKey := c_acceleratorPedalPosition, OBD2Key := ?, valueA := ?, respTimestamp := ?
-		}
 
 	/**
-	 * @desc template for transmission gear reponse
+	 * @desc Template for accelerator status reponse
+	 */
+	template FilterResponse mw_FilterResponseAcceleratorPedal() := {
+		OpenXCKey := c_acceleratorPedalPosition,
+		OBD2Key := ?,
+		valueA := {floatValue := ?},
+		respTimestamp := ?
+	}
+
+	/**
+	 * @desc Template for transmission gear reponse
 	 */
 	template FilterResponse mw_FilterResponseTransmissionGear() := {
 		OpenXCKey := c_transmissionGearPosition,
 		OBD2Key := ?,
-		valueA := ?,
+		valueA := {stringValue := ?},
 		respTimestamp := ?
 	}
 
-	// TODO: add detailed comment
-	 	/**
-	 	 *
-	 @desc function is used to define an interval; f_max and f_min are custom
-	 	 *   defined function to get the max and the min value; in ttcn3
-	 intervals
-	 	 *   are defined as (1..3) or (2.4..5.6)
-	 	 *
-	 @param p_middle midle value of the interval
-	 	 *
-	 @param p_variance variance around the middle value
-	 	 *
-	 @param p_min optional paramter; minimum value
-	 	 *
-	 @param p_ax optional paramter; maximum value
-	 	 */
-	 	template float interval(float p_middle, float p_variance,
-	 							float p_min := - infinity, float p_max := infinity)
-	 		:=
-	 		(f_max(p_middle - p_variance, p_min) ..
-	 		 f_min(p_middle + p_variance, p_max)) with {encode "str2float"};
 	/**
-	 * @desc template for ignition status response
+	 * @desc Template for ignition status response
+	 * @param p_status Expected ignition status
 	 */
 	template FilterResponse mw_FilterResponseIgnitionStatus(IgnitionStatus
-																status) := {
+																p_status) := {
 		OpenXCKey := c_ignitionStatus,
 		OBD2Key := ?,
-		valueA := f_ignitionStatus2str(status),
+		valueA := {stringValue := f_ignitionStatus2str(p_status)},
 		respTimestamp := ?
 	}
 
 	/**
-	 * @desc template for vehicle Speed response
+	 * @desc Template for vehicle Speed response
 	 */
 	template FilterResponse mw_FilterResponseVehicleSpeed() := {
 		OpenXCKey := c_vehicleSpeed,
 		OBD2Key := c_ElmVehicleSpeed,
-		valueA := ?,
-		respTimestamp := ?
-	}
-	// 	with {
-	// 		encode "str2float";
-	// 	}
-	/**
-	 * @desc template for engine speed response
-	 */
-	template FilterResponse mw_FilterResponseEngineSpeed() := {
-		OpenXCKey := c_engineSpeed,
-		OBD2Key := ?,
-		valueA := ?,
+		valueA := {floatValue := ?},
 		respTimestamp := ?
 	}
 
 	/**
-	 * @desc template for head lamp status response
+	 * @desc Template for engine speed response
 	 */
-	template FilterResponse mw_FilterResponseHeadLampStatus(boolean p_Status) :=
+	template FilterResponse mw_FilterResponseEngineSpeed() := {
+		OpenXCKey := c_engineSpeed,
+		OBD2Key := ?,
+		valueA := {floatValue := ?},
+		respTimestamp := ?
+	}
+
+	/**
+	 * @desc Template for head lamp status response
+	 * @param p_status Expected status of head lamp
+	 */
+	template FilterResponse mw_FilterResponseHeadLampStatus(boolean p_status) :=
 	{
 		OpenXCKey := c_headlampStatus,
 		OBD2Key := ?,
-		valueA := f_bool2str(p_Status),
+		valueA := {booleanValue := p_status},
 		respTimestamp := ?
 	}
-	
-	template FilterResponse mw_FilterResponseParkingBrakeStatus(boolean p_Status) :=
+
+	/**
+	 * @desc Template for parking brake response
+	 * @param p_status Expected status of parking brake
+	 */
+	template FilterResponse mw_FilterResponseParkingBrakeStatus(boolean
+																	p_status) :=
 	{
 		OpenXCKey := c_parkingBrakeStatus,
 		OBD2Key := ?,
-		valueA := f_bool2str(p_Status),
+		valueA := {booleanValue := p_status},
 		respTimestamp := ?
 	}
-	
+
 	/**
-	 * @desc template for brake pedal status response
+	 * @desc Template for brake pedal status response
 	 */
-	template FilterResponse mw_FilterResponseBrakePedalStatus() :=
-	{
+	template FilterResponse mw_FilterResponseBrakePedalStatus() := {
 		OpenXCKey := c_brakePedalStatus,
 		OBD2Key := ?,
-		valueA := ?,
+		valueA := {booleanValue := ?},
 		respTimestamp := ?
 	}
 }

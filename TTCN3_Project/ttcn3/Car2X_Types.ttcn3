@@ -1,3 +1,7 @@
+/**
+ * @author Christian Damm, Sascha Kretzschmann
+ * @desc Self defined type we use within our project.
+ */
 module Car2X_Types {
 	
 	/**
@@ -45,6 +49,20 @@ module Car2X_Types {
 	}
 	
 	/**
+	 *
+	 * @desc The response can have different types. To avoid conversion a union is defined to
+	 * take the suitable type.
+	 * @member stringValue The response value given as string.
+	 * @member floatValue The response value given as float.
+	 * @member booleanValue The response value given as boolean.
+	 */
+	type union UnionValue {
+    	charstring stringValue,
+    	float floatValue,
+    	boolean booleanValue
+	}
+	
+	/**
      * 
      * @desc Type for the filter response.
      * 		 For more information @url https://github.com/TestingTechnologies/Play-ITS-2015/wiki/TTWorkbench#response
@@ -57,7 +75,7 @@ module Car2X_Types {
 	type record FilterResponse {
 		charstring OpenXCKey,
 		charstring OBD2Key,
-		charstring valueA ,
+		UnionValue valueA ,
 		boolean valueB optional,
 		integer respTimestamp
 	}
