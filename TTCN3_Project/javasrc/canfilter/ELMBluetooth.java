@@ -227,6 +227,7 @@ public class ELMBluetooth implements DiscoveryListener {
    * 
    * @param cmd
    * @return
+   * see http://en.wikipedia.org/wiki/OBD-II_PIDs
    */
   public static void initOpenXCToOBD2Map() {  
     //TODO Error-Handling if there is no OBD2 Key(here XX)
@@ -344,6 +345,9 @@ public class ELMBluetooth implements DiscoveryListener {
    * @param type
    * @param reply
    * @return
+   * see http://en.wikipedia.org/wiki/OBD-II_PIDs
+   * If percentage wanted: 2 Hex-Bytes means 00 - FF = 0 - 255.
+   * To get the percentage: Data/255*100 
    */
   public static String convertOBD2ReplyToOpenXC(String type, String reply) {
     String result;
@@ -355,6 +359,7 @@ public class ELMBluetooth implements DiscoveryListener {
     	int value1;
     	int value2;
     	int resultInt;
+    	float resultFloat;
     	switch (type) {
     	case "vehicle_speed":
     		value1 = Integer.parseInt(data[2], 16);
@@ -367,14 +372,14 @@ public class ELMBluetooth implements DiscoveryListener {
     		result = Integer.toString(resultInt);
     		break;
     	case "accelerator_pedal_position":
-    		result = (new Integer(
-    				Integer.parseInt(data[2], 16) * 100 / 255))
-    				.toString();
+    		resultFloat = (float) (new Integer(
+    				Integer.parseInt(data[2], 16) * 100));
+    		result = Float.toString(resultFloat/255);
     		break;
     	case "fuel_level":
-    		result = (new Integer(
-    				Integer.parseInt(data[2], 16) * 100 / 255))
-    				.toString();
+    		resultFloat = (float) (new Integer(
+    				Integer.parseInt(data[2], 16) * 100));
+    		result = Float.toString(resultFloat/255);
     		break;
     	case "battery_status": // 11.8V
     		result = reply;
@@ -382,8 +387,9 @@ public class ELMBluetooth implements DiscoveryListener {
     	case "absolute_load":
     		value1 = Integer.parseInt(data[2], 16);
     		value2 = Integer.parseInt(data[3], 16);
-    		resultInt = ((value1 * 256) + value2) * 100 / 255;
-    		result = Integer.toString(resultInt);
+    		resultInt = ((value1 * 256) + value2) * 100;
+    		resultFloat = (float)resultInt/255;
+    		result = Float.toString(resultFloat);
     		break;
     	case "runtime_since_last_start":
     		value1 = Integer.parseInt(data[2], 16);
@@ -442,8 +448,9 @@ public class ELMBluetooth implements DiscoveryListener {
     		result = Integer.toString(value1);
     		break;
     	case "throttle_position":
-    		value1 = Integer.parseInt(data[2], 16) * 100 / 255;
-    		result = Integer.toString(value1);
+    		resultFloat = (float) (new Integer(
+    				Integer.parseInt(data[2], 16) * 100));
+    		result = Float.toString(resultFloat/255);
     		break;
     	default:
     		result = reply;
