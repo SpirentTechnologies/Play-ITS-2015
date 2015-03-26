@@ -1,0 +1,3 @@
+module Car2X_Main {
+	import from Car2X_Types all;
+}

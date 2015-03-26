@@ -114,7 +114,9 @@ public class Car2XEntryUpdater extends Thread {
 
 	private void parseString(String jsonString) {
 		// TODO enable to debug
-		// System.out.println("[EntryUpdater] Incoming object: " + jsonString);
+//		 System.out.println("[EntryUpdater] Incoming object: " + jsonString);
+		if (jsonString.contains("parking_brake_status"))
+				System.out.println(jsonString);
 		try {
 			JSONObject jsonObject = new JSONObject(jsonString);
 			Car2XEntry car2xEntry = car2xEntries.get(jsonObject

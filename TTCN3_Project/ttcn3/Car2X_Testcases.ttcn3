@@ -4,27 +4,31 @@
  * @remark This class needs to be extended sophistically.
  */
 module Car2X_Testcases {
-	import from Car2X_Functions {
-		function
-			f_TP_DOOR_STATUS,
-			f_TP_HEADLAMP_STATUS,
-			f_TP_IGNITION_STATUS,
-			f_TP_STEERING_WHEEL_ANGLE,
-			f_TP_VEHICLE_SPEED,
-			f_setUp,
-			f_set_verdict_and_stage,
-			f_tearDown;
-	}
-
-	import from Car2X_Types {type DoorStatus, IgnitionStatus;}
+	import from Car2X_ModuleParameters all;
+	import from Car2X_Types {type DoorStatus, IgnitionStatus, TransmissionGear;}
 
 	import from Car2X_ConfigSystem {
 		type SystemComponentType, TesterComponentType;
 	}
 
-	import from Car2X_Templates {
-		template m_Filter_vehicleSpeed_Start, m_Filter_vehicleSpeed_Stop;
+	import from Car2X_Functions {
+		function
+			f_ACCELERATOR_PEDAL,
+			f_BATTERY_STATUS,
+			f_BRAKE_PEDAL,
+			f_DOOR_STATUS,
+			f_ENGINE_SPEED,
+			f_HEADLAMP_STATUS,
+			f_IGNITION_STATUS,
+			f_PARKING_BRAKE_STATUS,
+			f_STEERING_WHEEL_ANGLE,
+			f_TRANSMISSION_GEAR_STATUS,
+			f_VEHICLE_SPEED,
+			f_setUp,
+			f_setVerdictAndStage,
+			f_tearDown;
 	}
+
 
 	/**
 	 * @desc Checks that the vehicle speed is greater 50km/h.
@@ -32,23 +36,20 @@ module Car2X_Testcases {
 	 * @verdict fail Not received anything.
 	 * @verdict inconclusive Timer ran out.
 	 */
-	testcase TC_VEHICLE_SPEED_OVER_50_10_SEC()
-		runs on TesterComponentType system SystemComponentType {
-			
+	testcase TC_VEHICLE_SPEED_OVER_50_10_SEC() runs on TesterComponentType system SystemComponentType {
+		var verdicttype v_ret := inconc;
+
+		var float v_timerValue := c_timerThirtySeconds;
+
 		// set up configuration
 		f_setUp();
 
-		// start value request for TC
 
 		// send stage information
-		action("stage:" & int2str(v_stage));
-		t_TC_Global.start(10.0);
+		action("stage:" & int2str(v_stage) & ",timeWindow:" & int2str(float2int(v_timerValue)));
 
-		// loop to check if speed is over 50 the whole time
-		while (t_TC_Global.running) {
-			// test body
-			f_TP_VEHICLE_SPEED(50.0, 10.0, 5.0, 2.0);
-		}
+		// test body
+		v_ret := f_VEHICLE_SPEED(c_vehicleSpeed50, c_timerTenSeconds, c_vehicleSpeedVar5, v_timerValue);
 
 		// stop value request
 		setverdict(v_ret);
@@ -57,136 +58,306 @@ module Car2X_Testcases {
 		f_tearDown();
 	}
 
+	testcase TC_OBD2_TESTCASE() runs on TesterComponentType system SystemComponentType {
+		var verdicttype v_ret := inconc;
+		var float v_timerValue := c_timerTwentySeconds;
+		// set up configuration
+		f_setUp();
+
+		// send stage information
+		action("stage:" & int2str(v_stage) & ",timeWindow:" & int2str(float2int(v_timerValue)));
+
+		// executing stage 1 - start engine; use battery status
+		v_ret := f_BATTERY_STATUS(c_batteryStatus12, c_batteryStatusVarrianceHalf, c_timerOneSecond, c_timerTwoSeconds);
+		v_timerValue := c_timerTwentySeconds;
+		f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
+
+		// 	executing stage 2 - speed up engine
+		v_ret := f_ENGINE_SPEED(c_engineSpeed2500, c_timerOneSecond, c_engineSpeedVar100, c_timerThirtySeconds);
+		setverdict(v_ret);
+
+		// tear down configuration
+		f_tearDown();
+	}
+
 	/**
-	 * 
-	 * @desc Simulated test case; no conection to canfilter;  
-	 * @verdict 
+	 * @desc For these Testcase, the tester should start the engine and turn up
+	 *   the engine rotation
 	 */
-	testcase TC_VEHICLE_SPEED_SIMULATED()
-		runs on TesterComponentType system SystemComponentType {
+	testcase TC_ENGINE_ROTATION_SPEED() runs on TesterComponentType system SystemComponentType {
+		var verdicttype v_ret := inconc;
+		var float v_timerValue := c_timerTwentySeconds;
+		// set up configuration
+		f_setUp();
+
+		// send stage information
+		action("stage:" & int2str(v_stage) & ",timeWindow:" & int2str(float2int(v_timerValue)));
+
+		// executing stage 1 - start engine
+		v_ret := f_IGNITION_STATUS(e_start, v_timerValue);
+		v_timerValue := c_timerTenSeconds;
+		f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
+
+		// executing stage 2 - change to gear neutral
+		v_ret := f_TRANSMISSION_GEAR_STATUS(e_neutral, v_timerValue);
+		v_timerValue := c_timerThirtySeconds;
+		f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
+
+		// 	executing stage 3 - speed up engine
+		v_ret := f_ENGINE_SPEED(c_engineSpeed2500, c_timerOneSecond, c_engineSpeedVar100, v_timerValue);
+		v_timerValue := c_timerTenSeconds;
+		f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
+
+		// 	executing stage 4 - release gas pedal
+		v_ret :=
+			f_ACCELERATOR_PEDAL(c_acceleratorPedalMin, c_timerOneSecond, c_acceleratorVariance05Percent, v_timerValue);
+		setverdict(v_ret);
+
+		// tear down configuration
+		f_tearDown();
+	}
+
+	/**
+	 * @desc speed up to 60 and full brake
+	 * @verdict
+	 */
+	testcase TC_FULL_BRAKE_OVER_60() runs on TesterComponentType system SystemComponentType {
+		var verdicttype v_ret := inconc;
+		var float v_timerValue := c_timerTwentySeconds;
+		// set up configuration
+		f_setUp();
+
+		// send stage information
+		action("stage:" & int2str(v_stage) & ",timeWindow:" & int2str(float2int(v_timerValue)));
+
+		// executing stage 1 - start engine
+		v_ret := f_IGNITION_STATUS(e_start,v_timerValue);
+		v_timerValue := c_timerThirtySeconds;
+		f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
+
+		// executing stage 2 - speed up to 60
+		v_ret :=
+			f_VEHICLE_SPEED(c_vehicleSpeed50 + c_vehicleSpeed10, c_timerOneSecond, c_vehicleSpeedVar5,
+							v_timerValue);
+		v_timerValue := c_timerTenSeconds + c_timerFiveSeconds;
+		f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
+
+		// 	executing stage 3 - brake down
+		v_ret := f_BRAKE_PEDAL(c_brakePedalStatusPressed, c_timerOneSecond, v_timerValue);
+
+		setverdict(v_ret);
+
+		// tear down configuration
+		f_tearDown();
+	}
+
+	/**
+	 * @desc Simulated test case; no conection to canfilter;
+	 * @verdict
+	 */
+	testcase TC_VEHICLE_SPEED_SIMULATED() runs on TesterComponentType system SystemComponentType {
+		var verdicttype v_ret := pass;
+
+		var float v_timerValue := 5.0;
 
 		// set up configuration
 		f_setUp();
-		action("stage:" & int2str(v_stage));
+		action("stage:" & int2str(v_stage) & ",timeWindow:" & int2str(float2int(v_timerValue)));
 
-		t_TC_Global.start(5.0);
+		t_TC_Global.start(v_timerValue);
 
 		while (t_TC_Global.running) {}
 		v_stage := 2;
-		action("stage:" & int2str(v_stage));
+		action("stage:" & int2str(v_stage) & ",timeWindow:" & int2str(float2int(v_timerValue)));
 		// 		setverdict(inconc);
 		// 		stop;
-		t_TC_Global.start(5.0);
+		t_TC_Global.start(v_timerValue);
 
 		while (t_TC_Global.running) {}
 		setverdict(v_ret);
 	}
-	
+
 	/**
-	 * 
-	 * @desc For these testcase to driver should speed up to over 50 and then open the driver door.  
-	 * @verdict 
+	 * @desc For these testcase to driver should speed up to over 50 and then
+	 *   open the driver door.
+	 * @verdict
 	 */
-	testcase TC_OPEN_DOOR_AT_SPEED_50() runs on TesterComponentType system SystemComponentType{		
+	testcase TC_OPEN_DOOR_AT_SPEED_50() runs on TesterComponentType system SystemComponentType {
+		var verdicttype v_ret := inconc;
+		var float v_timerValue := c_timerTwentySeconds;
 		// set up configuration
 		f_setUp();
 
 		// send stage information
-		action("stage:" & int2str(v_stage));
+		action("stage:" & int2str(v_stage) & ",timeWindow:" & int2str(float2int(v_timerValue)));
 
 		// executing stage 1 - start engine
-		f_TP_IGNITION_STATUS(e_start);
-		f_set_verdict_and_stage(v_ret, v_stage);
+		v_ret := f_IGNITION_STATUS(e_start, v_timerValue);
+		v_timerValue := c_timerThirtySeconds;
+		f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
 
 		// executing stage 2 - speed up o 50
-		f_TP_VEHICLE_SPEED(50.0,1.0,2.0,1.0);
-		f_set_verdict_and_stage(v_ret, v_stage);
+		v_ret := f_VEHICLE_SPEED(c_vehicleSpeed50, c_timerOneSecond, c_vehicleSpeedVar5, v_timerValue);
+		v_timerValue := c_timerTenSeconds + c_timerFiveSeconds;
+		f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
 
 		// 	executing stage 3 - open driver door
-		f_TP_DOOR_STATUS(e_driver, true, 1.0);
-		f_set_verdict_and_stage(v_ret, v_stage);
+		v_ret := f_DOOR_STATUS(e_driver, c_doorStatusOpen, v_timerValue);
+		f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
 
 		// 	executing stage 4 - close driver door
-		f_TP_DOOR_STATUS(e_driver, false, 1.0);
+		v_ret := f_DOOR_STATUS(e_driver, c_doorStatusClose, v_timerValue);
 
 		setverdict(v_ret);
 
 		// tear down configuration
 		f_tearDown();
 	}
-	
-	testcase TC_HEADLAMP_STATUS() runs on TesterComponentType system SystemComponentType{		
+
+	testcase TC_PARKING_BRAKE_STATUS() runs on TesterComponentType system SystemComponentType {
+		var verdicttype v_ret := inconc;
+		var float v_timerValue := c_timerTwentySeconds;
+
 		// set up configuration
 		f_setUp();
 		// send stage information
-		action("stage:" & int2str(v_stage));
+		action("stage:" & int2str(v_stage) & ",timeWindow:" & int2str(float2int(v_timerValue)));
 
-		// executing stage 1 - engine to start
-		f_TP_IGNITION_STATUS(e_run);
-		f_set_verdict_and_stage(v_ret, v_stage);
+		// executing stage 1 - ignition status to accessory
+		v_ret := f_IGNITION_STATUS(e_accessory,v_timerValue);
+		v_timerValue := c_timerTenSeconds;
+		f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
 
-		// executing stage 2 - turn off head lamp (optional)
-		f_TP_HEADLAMP_STATUS(false, 10.0);
-		f_set_verdict_and_stage(v_ret, v_stage);
+		// executing stage 2 - disengage parking brake (optionally)
+		v_ret := f_PARKING_BRAKE_STATUS(c_parkingBrakeStatusReleased, v_timerValue);
+		f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
 
-		// executing stage 3 - turn on head lamp
-		f_TP_HEADLAMP_STATUS(true, 10.0);
-		f_set_verdict_and_stage(v_ret, v_stage);
-
-		// executing stage 4 - turn off head lamp
-		f_TP_HEADLAMP_STATUS(false, 10.0);
+		// executing stage 3 - engage parking brake
+		v_ret := f_PARKING_BRAKE_STATUS(c_parkingBrakeStatusPressed, v_timerValue);
+		f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
 
 		setverdict(v_ret);
 		// tear down configuration
-		f_tearDown();				
-	}
-	
-	testcase TC_IGNITION_STATE_DUMMY() runs on TesterComponentType system SystemComponentType {
-		// set up configuration
-		f_setUp();
-
-		// send stage information
-//		action("stage:" & int2str(v_stage));
-		
-//		executing stage 1
-		 f_TP_IGNITION_STATUS(e_accessory);
-		
-		setverdict(v_ret);
-		// tear down configuration
-		f_tearDown();				
+		f_tearDown();
 	}
 
 	/**
-	 * 
-	 * @desc For this testcase, the stering wheel must turn most left, most right and to the middle 
-	 * @verdict 
+	 * @desc testcase for testing headlamp status
+	 * @verdict
 	 */
-	testcase TC_STEERING_WHEEL_ANGLE()
-		runs on TesterComponentType system SystemComponentType {
+	testcase TC_HEADLAMP_STATUS() runs on TesterComponentType system SystemComponentType {
+		var verdicttype v_ret := inconc;
+		var float v_timerValue := c_timerTwentySeconds;
+
+		// set up configuration
+		f_setUp();
+		// send stage information
+		action("stage:" & int2str(v_stage) & ",timeWindow:" & int2str(float2int(v_timerValue)));
+
+		// executing stage 1 - engine to start
+		v_ret := f_IGNITION_STATUS(e_run, v_timerValue);
+		v_timerValue := c_timerTenSeconds;
+		f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
+
+		// executing stage 2 - turn off head lamp (optional)
+		v_ret := f_HEADLAMP_STATUS(c_headLampOff, v_timerValue);
+		f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
+
+		// executing stage 3 - turn on head lamp
+		v_ret := f_HEADLAMP_STATUS(c_headLampOn, v_timerValue);
+		f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
+
+		// executing stage 4 - turn off head lamp
+		v_ret := f_HEADLAMP_STATUS(c_headLampOff, v_timerValue);
+
+		setverdict(v_ret);
+		// tear down configuration
+		f_tearDown();
+	}
+
+	testcase TC_IGNITION_STATE_DUMMY() runs on TesterComponentType system SystemComponentType {
+		var verdicttype v_ret := inconc;
+		var float v_timerValue := 10.0;
 
 		// set up configuration
 		f_setUp();
 
 		// send stage information
-		action("stage:" & int2str(v_stage));
+		action("stage:" & int2str(v_stage) & ",timeWindow:" & int2str(float2int(v_timerValue)));
 
-		// executing stage 1
-		f_TP_IGNITION_STATUS(e_accessory);
-		f_set_verdict_and_stage(v_ret, v_stage);
-
-		// executing stage 2
-		f_TP_STEERING_WHEEL_ANGLE(- 600.0, 50.0);
-		f_set_verdict_and_stage(v_ret, v_stage);
-
-		// 	executing stage 3
-		f_TP_STEERING_WHEEL_ANGLE(600.0, 50.0);
-		f_set_verdict_and_stage(v_ret, v_stage);
-
-		// 	executing stage 4
-		f_TP_STEERING_WHEEL_ANGLE(0.0, 50.0);
+		// 		executing stage 1
+		v_ret := f_IGNITION_STATUS(e_accessory,v_timerValue);
 
 		setverdict(v_ret);
 		// tear down configuration
 		f_tearDown();
+	}
+
+	/**
+	 * @desc For this testcase, the stering wheel must turn most left, most
+	 *   right and to the middle
+	 * @verdict
+	 */
+	testcase TC_STEERING_WHEEL_ANGLE() runs on TesterComponentType system SystemComponentType {
+		var verdicttype v_ret := inconc;
+		var float v_timerValue := c_timerTwentySeconds;
+
+		// set up configuration
+		f_setUp();
+
+		// send stage information
+		action("stage:" & int2str(v_stage) & ",timeWindow:" & int2str(float2int(v_timerValue)));
+
+		// executing stage 1
+		v_ret := f_IGNITION_STATUS(e_accessory, v_timerValue);
+		v_timerValue := c_timerTenSeconds;
+		f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
+
+		// executing stage 2
+		v_ret := f_STEERING_WHEEL_ANGLE(c_steeringWheelMin, c_steeringWheelVariance50, v_timerValue);
+		f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
+
+		// 	executing stage 3
+		v_ret := f_STEERING_WHEEL_ANGLE(c_steeringWheelMax, c_steeringWheelVariance50, v_timerValue);
+		f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
+
+		// 	executing stage 4
+		v_ret := f_STEERING_WHEEL_ANGLE(c_steeringWheel0, c_steeringWheelVariance50, v_timerValue);
+
+		setverdict(v_ret);
+		// tear down configuration
+		f_tearDown();
+	}
+	
+	testcase TC_SPEED_UP_30_AND_STOP() runs on TesterComponentType{
+    	var verdicttype v_ret := inconc;
+    	var float v_timerValue := c_timerTwentySeconds;
+    
+    	// set up configuration
+    	f_setUp();
+    
+    	// send stage information
+    	action("stage:" & int2str(v_stage) & ",timeWindow:" & int2str(float2int(v_timerValue)));
+    
+    	// executing stage 1
+    	v_ret := f_IGNITION_STATUS(e_start, v_timerValue);
+    	v_timerValue := c_timerThirtySeconds;
+    	f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
+    
+    	// 	executing stage 2 - speed up to 30
+    	v_ret := f_VEHICLE_SPEED(c_vehicleSpeed30, c_timerOneSecond, c_vehicleSpeedVar5, v_timerValue);
+		v_timerValue := c_timerThirtySeconds;
+		f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
+		
+		// 	executing stage 3 - slow down to 0
+		v_ret := f_VEHICLE_SPEED(c_vehicleSpeedMin, c_timerOneSecond, c_vehicleSpeedVar5, v_timerValue);
+		v_timerValue := c_timerTenSeconds;
+		f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
+		
+		//executing stage 4 -  activate parking brake
+		v_ret := f_PARKING_BRAKE_STATUS(c_parkingBrakeStatusPressed,v_timerValue);
+    	setverdict(v_ret);
+    	// tear down configuration
+    	f_tearDown();	
 	}
 }

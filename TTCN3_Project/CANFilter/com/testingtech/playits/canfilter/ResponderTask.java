@@ -15,17 +15,17 @@ public class ResponderTask extends TimerTask {
   private Car2XEntry car2xEntry;
   private Socket socket;
 
-  /**
-   * Periodically sends a key-value pair encoded as a JSON String over a
-   * socket's output stream.
-   * 
-   * @param key
-   *            openXC key
-   * @param car2xEntry
-   *            corresponding value entry
-   * @param socket
-   *            TCP response channel
-   */
+//  /**
+//   * Periodically sends a key-value pair encoded as a JSON String over a
+//   * socket's output stream.
+//   * 
+//   * @param key
+//   *            openXC key
+//   * @param car2xEntry
+//   *            corresponding value entry
+//   * @param socket
+//   *            TCP response channel
+//   */
   public ResponderTask(String key, Car2XEntry car2xEntry, Socket socket) {
     this.key = key;
     this.car2xEntry = car2xEntry;
@@ -45,14 +45,31 @@ public class ResponderTask extends TimerTask {
   }
 
   private JSONObject createResponse() throws JSONException {
-	// INFO: omits key if value is empty 
+    // INFO: omits key if value is empty
     JSONObject response = new JSONObject();
     response.put("OpenXCKey", key);
     response.put("OBD2Key", car2xEntry.getOBD2key());
-    response.put("car2XValue", car2xEntry.getValue());
+    response.put("car2XValue", getValue());
     response.put("eventValue", car2xEntry.getEvent());
     response.put("respTimestamp", car2xEntry.getTimestamp());
     return response;
+  }
+
+  private JSONObject getValue() throws JSONException {
+    JSONObject valueObject = new JSONObject();
+    Object value = car2xEntry.getValue();
+    if (value instanceof String) {
+      valueObject.put("stringValue", value.toString());
+    } else if (value instanceof Double) {
+      valueObject.put("floatValue", new Float((double) value));
+    } else if (value instanceof Integer) {
+      valueObject.put("floatValue", new Float((int) value));
+    } else if (value instanceof Boolean) {
+      valueObject.put("booleanValue", (boolean) value);
+    } else {
+      valueObject.put("stringValue", "null");
+    }
+    return valueObject;
   }
 
   private void sendJSONObject(JSONObject jsonObject) {
