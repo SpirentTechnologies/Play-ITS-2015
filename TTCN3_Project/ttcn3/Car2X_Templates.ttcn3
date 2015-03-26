@@ -9,16 +9,18 @@ module Car2X_Templates {
 	import from Car2X_Types all;
 
 
-	/**
-	 * @desc Request template to communicate with ELM.
-	 */
-	template ElmRequest m_ElmVehicleSpeed() := {modePrefix := c_modePrefix01, parameterID := c_ElmVehicleSpeed}
+    /**
+    * @desc Request template to communicate with ELM.
+    */
+    template ElmRequest m_ElmVehicleSpeed() := {
+    modePrefix := c_modePrefix01, parameterID := c_ElmVehicleSpeed
+    }
+    /**
+    * @desc Response template receiving from ELM.
+    * currently not used
+    */
+    template ElmResponse mw_ElmVehicleSpeed() := {response := ?}
 
-	/**
-	 * @desc Response template receiving from ELM.
-	 *   	currently not used
-	 */
-	template ElmResponse mw_ElmVehicleSpeed() := {response := ?}
 
 	/**
 	 * @desc Template to start vehicle speed request with interval 1500
@@ -149,7 +151,6 @@ module Car2X_Templates {
 		reqType := c_startRequest, reqData := {{key := c_acceleratorPedalPosition, interval := c_FilterInterval1000}}
 	}
 
-
 	/**
 	 * @desc Template to stop accelerator pedal postion request
 	 */
@@ -239,6 +240,13 @@ module Car2X_Templates {
 	template FilterResponse mw_FilterResponseAcceleratorPedal(float p_value, float p_variance) :=
 		mw_FilterResponseFloat(cvd_AcceleratorPedal, p_value, p_variance);
 
+	/**
+	 * 
+	 * @desc abstract template for float values
+	 * @param p_ValueDescription request specific parameters
+	 * @param p_value target value
+	 * @param p_variance variance range around target value
+	 */
 	template FilterResponse mw_FilterResponseFloat(ValueDescription p_ValueDescription, float p_value, float p_variance)
 		:= {
 		OpenXCKey := p_ValueDescription.openXCKey,

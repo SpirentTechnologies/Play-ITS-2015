@@ -153,30 +153,49 @@ module Car2X_ModuleParameters {
 	const float c_timerHalfSecond := 0.5;
 	
 	//Value Description
+	/**
+	 * 
+	 * @desc value description for steering wheel; used in template
+	 */
 	const ValueDescription cvd_steeringWheel := {
 				openXCKey := c_steeringWheelAngle,
 				min := c_steeringWheelMin,
 				max := c_steeringWheelMax
 	}
 	
+	/**
+	 * 
+	 * @desc value description for acceleratoe pedal ; used in template
+	 */
 	const ValueDescription cvd_AcceleratorPedal := {
 				openXCKey := c_acceleratorPedalPosition,
 				min := c_acceleratorPedalMin,
 				max := c_acceleratorPedalMax
 	}
 	
+	/**
+	 * 
+	 * @desc value description for vehicle speed; used in template
+	 */
 	const ValueDescription cvd_vehicleSpeed := {
 				openXCKey := c_vehicleSpeed,
 				min := c_vehicleSpeedMin,
 				max := c_vehicleSpeedMax
 	}
 	
+	/**
+	 * 
+	 * @desc value description for engine speed; used in template
+	 */
 	const ValueDescription cvd_engineSpeed := {
 			openXCKey := c_engineSpeed,
 			min := c_engineSpeedMin,
 			max := c_engineSpeedMax
 	}
 	
+	/**
+	 * @desc value description for battery status ; used in template
+	 */
 	const ValueDescription cvd_batteryStatus := {
 				openXCKey := c_batteryStatus,
 				min := c_batteryStatusMin,
