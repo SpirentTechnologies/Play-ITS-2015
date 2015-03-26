@@ -3,21 +3,28 @@
  * @desc Here we define our templates.
  */
 module Car2X_Templates {
-	import from Car2X_Functions {function f_doorStatus2Str, f_gearStatus2Str, f_ignitionStatus2str, f_max, f_min;}
+	
+
+	import from Car2X_Functions {
+		function
+			f_doorStatus2Str,
+			f_gearStatus2Str,
+			f_ignitionStatus2str,
+			f_max,
+			f_min;
+	}
 
 	import from Car2X_ModuleParameters {
 		const
 			c_ElmVehicleSpeed,
-		c_engineSpeedMin,
-		c_engineSpeedMax,
 			c_FilterInterval1000,
 			c_FilterInterval500,
 			c_acceleratorPedalMax,
 			c_acceleratorPedalMin,
 			c_acceleratorPedalPosition,
 			c_batteryStatus,
-			c_batteryStatusMin,
 			c_batteryStatusMax,
+			c_batteryStatusMin,
 			c_brakePedalStatus,
 			c_doorStatus,
 			c_engineSpeed,
@@ -38,8 +45,16 @@ module Car2X_Templates {
 			c_vehicleSpeedMin;
 	}
 	import from Car2X_Types {
-		type DoorStatus, ElmRequest, ElmResponse, FilterRequest, FilterResponse, IgnitionStatus, TransmissionGear;
+		type
+			DoorStatus,
+			ElmRequest,
+			ElmResponse,
+			FilterRequest,
+			FilterResponse,
+			IgnitionStatus,
+			TransmissionGear;
 	}
+	import from Car2X_ConfigSystem all;
 
 	/**
 	 * @desc Request template to communicate with ELM.
@@ -373,6 +388,20 @@ module Car2X_Templates {
 		OBD2Key := ?,
 		car2XValue := {booleanValue := status},
 		respTimestamp := ?
+	}
+	
+	/**
+	 * @desc Self defined default altstep for fail and inconc case.
+	 * @param p_timer The timer that can run out.
+	 * TODO: use it in Car2X_Function
+	 */
+	altstep a_defaultFailAndInconcAltstep(timer p_timer, verdicttype p_verdict) runs on TesterComponentType {
+		[] filterPort.receive {
+			p_verdict := fail;
+		}
+		[] p_timer.timeout {
+			p_verdict := inconc;
+		}
 	}
 }
 with {

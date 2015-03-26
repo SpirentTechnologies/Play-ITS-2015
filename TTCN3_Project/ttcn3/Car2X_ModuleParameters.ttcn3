@@ -143,6 +143,5 @@ module Car2X_ModuleParameters {
 	const float c_timerFiveSeconds := 5.0;
 	const float c_timerTwoSeconds := 2.0;
 	const float c_timerOneSecond := 1.0;
-	const float c_timerHalfSecond := 0.5;
-	
+	const float c_timerHalfSecond := 0.5;	
 }
