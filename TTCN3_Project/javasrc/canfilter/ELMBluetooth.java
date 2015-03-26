@@ -239,14 +239,13 @@ public class ELMBluetooth implements DiscoveryListener {
 
     openXCToOBD2Map.put("steering_wheel_angle", "XX");
     openXCToOBD2Map.put("torque_at_transmission", "XX");
-    openXCToOBD2Map.put("accelerator_pedal_position", "01 49"); //or 4A or 4B ?
+    
     openXCToOBD2Map.put("parking_brake_status", "XX");
     openXCToOBD2Map.put("brake_pedal_status", "XX");
     openXCToOBD2Map.put("transmission_gear_position", "XX");
     openXCToOBD2Map.put("gear_lever_position", "XX");
     openXCToOBD2Map.put("odometer", "XX");
     openXCToOBD2Map.put("ignition_status", "XX");
-    openXCToOBD2Map.put("fuel_level", "01 2F");
     openXCToOBD2Map.put("fuel_consumed_since_restart", "XX");
     openXCToOBD2Map.put("door_status", "XX");
     openXCToOBD2Map.put("headlamp_status", "XX");
@@ -255,17 +254,16 @@ public class ELMBluetooth implements DiscoveryListener {
     openXCToOBD2Map.put("latitude", "XX");
     openXCToOBD2Map.put("longitude", "XX");
     openXCToOBD2Map.put("battery_status", "AT RV");
-    openXCToOBD2Map.put("absolute_load", "01 43");
-    openXCToOBD2Map.put("runtime_since_last_start", "01 1F");
+    
+    
 
     openXCToOBD2Map.put("engine_oil_temperature", "01 5C");
     openXCToOBD2Map.put("drivers_demand_engine", "01 61"); // percentage torque
     openXCToOBD2Map.put("actual_engine", "01 62"); // percentage torque
     openXCToOBD2Map.put("engine_reference", "01 63");  // torque Nm
     openXCToOBD2Map.put("fuel_consumption_rate", "01 5E");
-    openXCToOBD2Map.put("barometric_pressure", "01 33");    
     
-    openXCToOBD2Map.put("ambient_air_temperature", "01 46");
+    
     
     
     openXCToOBD2Map.put("pid_supported_0120", "01 00");
@@ -294,7 +292,77 @@ public class ELMBluetooth implements DiscoveryListener {
     openXCToOBD2Map.put("maf_air_flow_rate", "01 10");
     openXCToOBD2Map.put("throttle_position", "01 11");
     openXCToOBD2Map.put("commanded_secondary_air_status", "01 12");
-    openXCToOBD2Map.put("oxygen_sensor_present", "01 13");
+    openXCToOBD2Map.put("oxygen_sensor_present", "01 13"); //or 1D ?
+    openXCToOBD2Map.put("bank1_sensor1_oxygen_sensor_voltage", "01 14");
+    openXCToOBD2Map.put("bank1_sensor2_oxygen_sensor_voltage", "01 15");
+    openXCToOBD2Map.put("bank1_sensor3_oxygen_sensor_voltage", "01 16");
+    openXCToOBD2Map.put("bank1_sensor4_oxygen_sensor_voltage", "01 17");
+    openXCToOBD2Map.put("bank2_sensor1_oxygen_sensor_voltage", "01 18");
+    openXCToOBD2Map.put("bank2_sensor2_oxygen_sensor_voltage", "01 19");
+    openXCToOBD2Map.put("bank2_sensor3_oxygen_sensor_voltage", "01 1A");
+    openXCToOBD2Map.put("bank2_sensor4_oxygen_sensor_voltage", "01 1B");
+    openXCToOBD2Map.put("obd_standard_this_vehicle_conforms_to", "01 1C");
+    openXCToOBD2Map.put("auxiliary_input_status", "01 1E");
+    openXCToOBD2Map.put("distance_traveled_with_malfunction_indicator_lamp_on", "01 21");
+    openXCToOBD2Map.put("fuel_rail_pressure_manifold_vacuum", "01 22");
+    openXCToOBD2Map.put("fuel_rail_pressure_direct_inject", "01 23");
+    openXCToOBD2Map.put("o2s1_wr_lambda_equivalent_ratio_voltage", "01 24");
+    openXCToOBD2Map.put("o2s2_wr_lambda_equivalent_ratio_voltage", "01 25");
+    openXCToOBD2Map.put("o2s3_wr_lambda_equivalent_ratio_voltage", "01 26");
+    openXCToOBD2Map.put("o2s4_wr_lambda_equivalent_ratio_voltage", "01 27");
+    openXCToOBD2Map.put("o2s5_wr_lambda_equivalent_ratio_voltage", "01 28");
+    openXCToOBD2Map.put("o2s6_wr_lambda_equivalent_ratio_voltage", "01 29");
+    openXCToOBD2Map.put("o2s7_wr_lambda_equivalent_ratio_voltage", "01 2A");
+    openXCToOBD2Map.put("o2s8_wr_lambda_equivalent_ratio_voltage", "01 2B");
+    openXCToOBD2Map.put("commanded_egr", "01 2C");
+    openXCToOBD2Map.put("egr_error", "01 2D");
+    openXCToOBD2Map.put("commanded_evaporative_purge", "01 2E");
+    openXCToOBD2Map.put("fuel_level", "01 2F"); //fuel_level_input
+    openXCToOBD2Map.put("num_of_warmups_since_codes_cleared", "01 30");
+    openXCToOBD2Map.put("distance_traveled_since_codes_cleared", "01 31");
+    openXCToOBD2Map.put("evap_system_vapor_pressure", "01 32");
+    openXCToOBD2Map.put("barometric_pressure", "01 33");
+    openXCToOBD2Map.put("o2s1_wr_lambda_equivalent_ratio_current", "01 34");
+    openXCToOBD2Map.put("o2s2_wr_lambda_equivalent_ratio_current", "01 35");
+    openXCToOBD2Map.put("o2s3_wr_lambda_equivalent_ratio_current", "01 36");
+    openXCToOBD2Map.put("o2s4_wr_lambda_equivalent_ratio_current", "01 37");
+    openXCToOBD2Map.put("o2s5_wr_lambda_equivalent_ratio_current", "01 38");
+    openXCToOBD2Map.put("o2s6_wr_lambda_equivalent_ratio_current", "01 39");
+    openXCToOBD2Map.put("o2s7_wr_lambda_equivalent_ratio_current", "01 3A");
+    openXCToOBD2Map.put("o2s8_wr_lambda_equivalent_ratio_current", "01 3B");
+    openXCToOBD2Map.put("catalyst_temperature_bank1_sensor1", "01 3C");
+    openXCToOBD2Map.put("catalyst_temperature_bank1_sensor2", "01 3D");
+    openXCToOBD2Map.put("catalyst_temperature_bank2_sensor1", "01 3E");
+    openXCToOBD2Map.put("catalyst_temperature_bank2_sensor2", "01 3F");
+    openXCToOBD2Map.put("monitor_status_this_drive_cycle", "01 41");
+    openXCToOBD2Map.put("control_module_voltage", "01 42");
+    openXCToOBD2Map.put("absolute_load", "01 43");
+    openXCToOBD2Map.put("fuel_air_commanded_equivalence_ratio", "01 44");
+    openXCToOBD2Map.put("relative_throttle_position", "01 45");
+    openXCToOBD2Map.put("ambient_air_temperature", "01 46");
+    openXCToOBD2Map.put("absolute_throttle_position_b", "01 47");
+    openXCToOBD2Map.put("absolute_throttle_position_c", "01 48");
+    openXCToOBD2Map.put("absolute_throttle_position_d", "01 49");
+    openXCToOBD2Map.put("accelerator_pedal_position", "01 49"); //openxc
+    openXCToOBD2Map.put("absolute_throttle_position_e", "01 4A");
+    openXCToOBD2Map.put("absolute_throttle_position_f", "01 4B");
+    openXCToOBD2Map.put("commanded_throttle_actuator", "01 4C");
+    openXCToOBD2Map.put("time_run_with_mil_on", "01 4D");
+    openXCToOBD2Map.put("time_since_trouble_codes_cleared", "01 4E");
+    openXCToOBD2Map.put("maximum_value__equivalence_ratio_oxygen_sensor"
+    		+"_voltage_oxygen_sensor current_ and_intake_manifold_absolute_pressure", "01 4F");
+    openXCToOBD2Map.put("maximum_value_for_air_flow_rate_from_mass_air_flow_sensor", "01 50");
+    openXCToOBD2Map.put("fuel_type", "01 51");
+    
+    openXCToOBD2Map.put("ethanol_fuel_percent", "01 52");
+    openXCToOBD2Map.put("absolute_evap_system_vapor_pressure", "01 53");
+    openXCToOBD2Map.put("evap_system_vapor_pressure", "01 54");
+    openXCToOBD2Map.put("short_term_secondary_oxygen_sensor_trim_bank1_and_bank3", "01 55");
+    openXCToOBD2Map.put("long_term_secondary_oxygen_sensor_trim_bank1_and_bank3", "01 56");
+    openXCToOBD2Map.put("short_term_secondary_oxygen_sensor_trim_bank2_and_bank4", "01 57");
+    openXCToOBD2Map.put("long_term_secondary_oxygen_sensor_trim_bank2_and_bank4", "01 58");  
+    
+    
     //...
     
   }
