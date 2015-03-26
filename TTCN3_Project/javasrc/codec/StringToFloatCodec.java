@@ -11,6 +11,8 @@ import org.etsi.ttcn.tri.TriMessage;
 
 import com.testingtech.ttcn.tri.AbstractCodecPlugin;
 
+import de.tu_berlin.cs.uebb.muttcn.runtime.RB;
+
 /**
  * @author Christian Damm, Sascha Kretzschmann
  * 
@@ -25,6 +27,10 @@ import com.testingtech.ttcn.tri.AbstractCodecPlugin;
  */
 public class StringToFloatCodec extends AbstractCodecPlugin {
 
+	
+	public StringToFloatCodec(){
+		super();
+	}
 	/**
 	 * Override the decode() method from class AbstractCodecPlugin. The decode()
 	 * method is invoked when the receive() method is executed at a port. It
