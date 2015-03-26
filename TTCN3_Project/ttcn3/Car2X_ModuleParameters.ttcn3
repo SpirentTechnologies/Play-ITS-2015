@@ -71,6 +71,10 @@ module Car2X_ModuleParameters {
 	const float c_steeringWheelVariance50 := 50.0;
 	const float c_steeringWheelVariance0 := 0.0;
 	
+	//brake pedal
+	const boolean c_BrakePedalStatusPressed := true;
+	const boolean c_BrakePedalStatusReleased := false;
+	
 	//vehicle Speed
 	const float c_vehicleSpeedMax := 655.0;
 	const float c_vehicleSpeed50 := 50.0;
