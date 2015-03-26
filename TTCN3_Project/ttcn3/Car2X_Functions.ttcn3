@@ -14,7 +14,6 @@ module Car2X_Functions {
 			c_engineSpeedMax,
 			c_engineSpeedMin,
 			c_timerHalfSecond,
-			c_timerOneSecond,
 			c_timerTwoSeconds;
 	}
 
@@ -114,14 +113,14 @@ module Car2X_Functions {
 				// check whether vehicle speed is greater than given speed
 				// speed := v_speed.valueA.floatValue;
 				if (f_max(p_speed - p_variance, 0.0) <=
-					v_speed.valueA.floatValue and
-					v_speed.valueA.floatValue >=
+					v_speed.car2XValue.floatValue and
+					v_speed.car2XValue.floatValue >=
 					f_min(p_speed + p_variance, 655.0)) {
 					t_holding.start(p_holding_time);
 					while (t_holding.running and v_ret == pass) {
 						filterPort.receive(mw_FilterResponseVehicleSpeed) ->
 						value v_speed;
-						if (v_speed.valueA.floatValue >= p_speed) {
+						if (v_speed.car2XValue.floatValue >= p_speed) {
 							v_ret := pass;
 						} else {
 							v_ret := fail;
@@ -195,30 +194,18 @@ module Car2X_Functions {
 		t_TC.start(p_interval);
 		alt {
 			// store received template into value
-			[] filterPort.receive(mw_FilterResponseAcceleratorPedal) ->
-			   value v_accelerator {
+			[] filterPort.receive(mw_FilterResponseAcceleratorPedal(p_accelerator_pedal, p_variance)){
 				t_TC.stop;
-				// check whether vehicle speed is greater than given speed
-				// accelerator := v_accelerator.valueA.floatValue;
-				if (f_max(p_accelerator_pedal - p_variance,
-						  c_acceleratorPedalMin) <=
-					v_accelerator.valueA.floatValue and
-					v_accelerator.valueA.floatValue >=
-					f_min(p_accelerator_pedal + p_variance,
-						  c_acceleratorPedalMax)) {
-					t_holding.start(p_holding_time);
-					while (t_holding.running and v_ret == pass) {
-						filterPort.receive(mw_FilterResponseAcceleratorPedal) ->
-						value v_accelerator;
-						if (v_accelerator.valueA.floatValue >=
-							p_accelerator_pedal) {
+				t_holding.start(p_holding_time);
+				while (t_holding.running and v_ret == pass) {
+					alt {
+						[] filterPort.receive(mw_FilterResponseAcceleratorPedal(p_accelerator_pedal, p_variance)){
 							v_ret := pass;
-						} else {
+						}
+						[] filterPort.receive {
 							v_ret := fail;
 						}
 					}
-				} else {
-					v_ret := fail;
 				}
 			}
 			[] filterPort.receive {
@@ -283,12 +270,12 @@ module Car2X_Functions {
 				t_TC.stop;
 				// check brake status
 				// v_status := v_brakePedal.valueA.booleanValue;
-				if (v_brakePedal.valueA.booleanValue == p_pedal_status) {
+				if (v_brakePedal.car2XValue.booleanValue == p_pedal_status) {
 					t_holding.start(p_holding_time);
 					while (t_holding.running and v_ret == pass) {
 						filterPort.receive(mw_FilterResponseBrakePedalStatus) ->
 						value v_brakePedal;
-						if (v_brakePedal.valueA.booleanValue == p_pedal_status)
+						if (v_brakePedal.car2XValue.booleanValue == p_pedal_status)
 						{
 							v_ret := pass;
 						} else {
@@ -365,14 +352,14 @@ module Car2X_Functions {
 				// check whether vehicle speed is greater than given speed
 				// speed := v_speed.valueA.floatValue;
 				if (f_max(p_engine_speed - p_variance, c_engineSpeedMin) <=
-					v_speed.valueA.floatValue and
-					v_speed.valueA.floatValue >=
+					v_speed.car2XValue.floatValue and
+					v_speed.car2XValue.floatValue >=
 					f_min(p_engine_speed + p_variance, c_engineSpeedMax)) {
 					t_holding.start(p_holding_time);
 					while (t_holding.running and v_ret == pass) {
 						filterPort.receive(mw_FilterResponseEngineSpeed) ->
 						value v_speed;
-						if (v_speed.valueA.floatValue >= p_engine_speed) {
+						if (v_speed.car2XValue.floatValue >= p_engine_speed) {
 							v_ret := pass;
 						} else {
 							v_ret := fail;
@@ -432,14 +419,14 @@ module Car2X_Functions {
 				t_TC.stop;
 				// check whether vehicle speed is greater than given speed
 				if (f_max(p_batteryStatus - p_variance, c_batteryStatusMin) <=
-					v_battery.valueA.floatValue and
-					v_battery.valueA.floatValue >=
+					v_battery.car2XValue.floatValue and
+					v_battery.car2XValue.floatValue >=
 					f_min(p_batteryStatus + p_variance, c_batteryStatusMax)) {
 					t_holding.start(p_holdingTime);
 					while (t_holding.running and v_ret == pass) {
 						filterPort.receive(mw_FilterResponseBatteryStatus) ->
 						value v_battery;
-						if (v_battery.valueA.floatValue >= p_batteryStatus) {
+						if (v_battery.car2XValue.floatValue >= p_batteryStatus) {
 							v_ret := pass;
 						} else {
 							v_ret := fail;
@@ -505,22 +492,12 @@ module Car2X_Functions {
 									 float p_interval)
 		runs on TesterComponentType return verdicttype  {
 		var verdicttype v_ret := inconc;
-		var template FilterResponse v_angle;
 
 		t_TC.start(p_interval);
 		alt {
-			[] filterPort.receive(mw_FilterResponseSteeringWheel) ->
-			   value v_angle {
-				if (f_max(p_targetAngle - p_variance, - 600.0) <=
-					v_angle.valueA.floatValue and
-					v_angle.valueA.floatValue <=
-					f_min(p_targetAngle + p_variance, 600.0)) {
-					v_ret := pass;
-					t_TC.stop;
-				} else {
-					v_ret := fail;
-					t_TC.stop;
-				}
+			[] filterPort.receive(mw_FilterResponseSteeringWheel(p_targetAngle, p_variance)){
+    			v_ret := pass;
+    			t_TC.stop;
 			}
 			[] filterPort.receive {
 				v_ret := fail;
@@ -761,12 +738,9 @@ module Car2X_Functions {
 		t_TC.start(p_interval);
 
 		alt {
-			[] filterPort.receive(mw_FilterResponseTransmissionGear) ->
-			   value v_gearStatus {
-				if (f_gearStatus2Str(p_gear) ==
-					v_gearStatus.valueA.stringValue) {
-					v_ret := pass;
-				}
+			[] filterPort.receive(mw_FilterResponseTransmissionGear(p_gear)){
+				t_TC.stop;
+				v_ret := pass;
 			}
 			[] filterPort.receive {
 				t_TC.stop;
@@ -827,12 +801,8 @@ module Car2X_Functions {
 		t_TC.start(p_interval);
 
 		alt {
-			[] filterPort.receive(mw_FilterResponseDoorStatus) ->
-			   value v_doorStatus {
-				if (f_doorStatus2Str(p_door) == v_doorStatus.valueA.stringValue
-					and p_status == v_doorStatus.valueB) {
-					v_ret := pass;
-				}
+			[] filterPort.receive(mw_FilterResponseDoorStatus(p_door, p_status)){
+				v_ret := pass;
 			}
 			[] filterPort.receive {
 				t_TC.stop;
