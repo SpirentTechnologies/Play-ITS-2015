@@ -23,13 +23,12 @@ import java.util.Locale;
 public class TestRunnerActivity extends ActionBarActivity {
 
     private TextView statusText;
-    private TextView socketConn;
+    private TextView noticeText;
     private ScrollView progress;
     private ProgressBar progressBar;
     private Button btnStart;
     private Button btnStop;
     private AnimationDrawable logoAnimation;
-    private SocketClient socketClient;
     private TextToSpeech speech;
     private int stageCount, testNumber;
 
@@ -38,8 +37,7 @@ public class TestRunnerActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_test_runner);
 
-        // TODO remove (just for testing)
-        Driver.start();
+        Globals.view = this;
 
         Intent intent = getIntent();
         testNumber = intent.getIntExtra(TestSelectorActivity.TEST_NUMBER, 0);
@@ -69,7 +67,7 @@ public class TestRunnerActivity extends ActionBarActivity {
             }
         });
         statusText = (TextView) findViewById(R.id.status_text);
-        socketConn = (TextView) findViewById(R.id.socket);
+        noticeText = (TextView) findViewById(R.id.notification);
         progress = (ScrollView) findViewById(R.id.progress);
         progressBar = (ProgressBar) findViewById(R.id.progressbar);
         btnStart = (Button) findViewById(R.id.button_start);
@@ -82,9 +80,16 @@ public class TestRunnerActivity extends ActionBarActivity {
      * @param view Not used.
      */
     public void startTest(View view) {
-        socketClient = new SocketClient(this, socketConn, progress, progressBar, logoAnimation,
+        /*socketClient = new SocketClient(this, noticeText, progress, progressBar, logoAnimation,
                 statusText, btnStart, btnStop, speech, stageCount, testNumber);
-        socketClient.execute();
+        socketClient.execute();*/
+
+        new Thread( new Driver()).start();
+        //new Thread(new TestConn()).start();
+        Button b = (Button) findViewById(R.id.button_start);
+        b.setEnabled(false);
+        Button b2 = (Button) findViewById(R.id.button_stop);
+        b2.setEnabled(true);
     }
 
     /**
@@ -92,8 +97,11 @@ public class TestRunnerActivity extends ActionBarActivity {
      * @param view Not used.
      */
     public void stopTest(View view) {
-        socketClient.cancel(true);
-        socketClient.closeSocket();     // needed to unblock Socket.read()
+        // TODO interrupt threads
+        Button b = (Button) findViewById(R.id.button_start);
+        b.setEnabled(true);
+        Button b2 = (Button) findViewById(R.id.button_stop);
+        b2.setEnabled(false);
     }
 
     @Override

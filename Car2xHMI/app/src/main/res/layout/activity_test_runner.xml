@@ -77,7 +77,7 @@
     </ScrollView>
 
     <TextView
-        android:id="@+id/socket"
+        android:id="@+id/notification"
         android:text=""
         android:textSize="24sp"
         android:layout_width="wrap_content"
