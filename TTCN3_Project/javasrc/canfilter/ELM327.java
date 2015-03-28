@@ -40,13 +40,14 @@ public class ELM327 {
 	static Socket sock = null;
 	static Hashtable<String, String> commandHashTable = new Hashtable<String, String>();
 
-	private static String portName = "COM3";
+	private static String portName = "COM4";
 	private static Long commandTimeout = 3000l;
+	private static String string;
 
 	private final static SerialPort serialPort = new SerialPort(portName);
 
 
-	public static void main(String[] args) throws IOException, SerialPortException {
+	public static void main(String[] args) throws IOException, SerialPortException, InterruptedException {
 //		initConnection(args[0]);
 //		initCommandHashTable();
 		initConnection("rs232");
@@ -57,23 +58,61 @@ public class ELM327 {
 			
 			System.out.println("Enter Command: ");
 	        String command = br.readLine(); 
-	        if (command == "EXit"){
+	        if (command == "EXIT"){
 	        	serialPort.closePort();
 	        } else {
 	        	serialPort.writeString(command +"\r");
-	        	System.out.println(readResponse());
+	        	Thread.sleep(200);
+	        	System.out.println(getResponse());
+	        	
+	        	if (serialPort.getInputBufferBytesCount() == 0) {
+					Thread.yield();
+					continue;
+				}
+	        	
 	        }
 		}
 
 	}
 
-	private void initCommandHashTable() {
-		// http://www.totalcardiagnostics.com/support/Knowledgebase/Article/View/21/0/genericmanufacturer-obd2-codes-and-their-meanings
-		// TODO Auto-generated method stub
-		String manufacturer = executeCommand("09");
+	
+	public static String getResponse() throws SerialPortException{
+        StringBuilder res = new StringBuilder();
+        String rawData = null;
+        byte[] input = null;
 
+        // read until '>' arrives
+//        while ((char) (bytes = (byte) in.read()) != '>') {
+//          res.append((char) bytes);
+//        }
+        
+        input = serialPort.readBytes();
+        for (int i = 0; i < input.length; i++) {
+			if(((char)input[i]) != '>'){
+				res.append((char) input[i]);
+			}
+		}
+        /*
+         * Imagine the following response 41 0c 00 0d.
+         * 
+         * ELM sends strings!! So, ELM puts spaces between each
+         * "byte". And pay attention to the fact that I've put the
+         * word byte in quotes, because 41 is actually TWO bytes
+         * (two chars) in the socket. So, we must do some more
+         * processing..
+         */
+        rawData = res.toString().trim();
+
+        /*
+         * Data may have echo or informative text like "INIT BUS..."
+         * or similar. The response ends with two carriage return
+         * characters. So we need to take everything from the last
+         * carriage return before those two (trimmed above).
+         */
+        rawData = rawData.substring(rawData.lastIndexOf(13) + 1);
+        
+        return rawData;
 	}
-
 	public static void initConnection(String type) {
 		if (type == "rs232") {
 			usedConnection = RS232;
@@ -85,7 +124,10 @@ public class ELM327 {
 
 				// Page 7 Manual elm327.pdf
 				serialPort.openPort();
-				serialPort.setParams(38400, 8, 1, 0, true, true);
+				serialPort.setParams(SerialPort.BAUDRATE_9600, //38400 OR 9600
+									SerialPort.DATABITS_8,
+			                        SerialPort.STOPBITS_1,
+			                        SerialPort.PARITY_NONE);
 			} catch (SerialPortException e) {
 				e.printStackTrace();
 			}
