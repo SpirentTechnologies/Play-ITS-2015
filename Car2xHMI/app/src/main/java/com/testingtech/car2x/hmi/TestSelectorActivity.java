@@ -67,6 +67,7 @@ public class TestSelectorActivity extends ActionBarActivity {
                                 stages = getResources().getStringArray(R.array.door_test1_stages);
                                 break;
                         }
+                        break;
                     case 2:
                         switch(childPosition) {
                             case 0:
@@ -82,6 +83,7 @@ public class TestSelectorActivity extends ActionBarActivity {
                                 stages = getResources().getStringArray(R.array.brake_test3_stages);
                                 break;
                         }
+                        break;
                     case 3:
                         switch(childPosition) {
                             case 0:
@@ -89,6 +91,7 @@ public class TestSelectorActivity extends ActionBarActivity {
                                 stages = getResources().getStringArray(R.array.light_test1_stages);
                                 break;
                         }
+                        break;
                     case 4:
                         switch(childPosition) {
                             case 0:
@@ -96,6 +99,7 @@ public class TestSelectorActivity extends ActionBarActivity {
                                 stages = getResources().getStringArray(R.array.engine_test1_stages);
                                 break;
                         }
+                        break;
                     case 5:
                         switch(childPosition) {
                             case 0:
@@ -103,6 +107,7 @@ public class TestSelectorActivity extends ActionBarActivity {
                                 stages = getResources().getStringArray(R.array.steering_test1_stages);
                                 break;
                         }
+                        break;
                 }
                 startTestRunnerActivity(testNo, itemLists[groupPosition].get(childPosition), stages);
                 return true;

@@ -1,4 +1,4 @@
-package com.testingtech.car2x.hmi.messages;
+package com.testingtech.car2x.hmi.testcase;
 
 /**
  * Defines all the test cases supported by the HMI service.
@@ -16,6 +16,7 @@ public enum TestCase {
     TC_ENGINE_SPEED,
     TC_STEERING_WHEEL_ANGLE,
 
+    TC_VEHICLE_SPEED_SIMULATED,
     TC_VEHICLE_SPEED_OVER_50,   // TODO remove
 
 }

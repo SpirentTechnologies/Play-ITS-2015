@@ -6,8 +6,11 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 
 public class MainActivity extends ActionBarActivity {
+
+    public static String WORKBENCH_IP = "ip";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -16,6 +19,8 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public void startActivityTest(View view) {
+        EditText ipText = (EditText) findViewById(R.id.ip);
+        Globals.serverIp = ipText.getText().toString();
         Intent intent = new Intent(this, TestSelectorActivity.class);
         startActivity(intent);
     }

@@ -9,16 +9,33 @@
  */
 package com.testingtech.car2x.hmi.driver;
 
-import com.testingtech.car2x.hmi.appserver.AppService;
+import android.util.Log;
 
-public class Driver {
+import com.testingtech.car2x.hmi.publish.Publisher;
+import com.testingtech.car2x.hmi.testcase.TestCase;
+import com.testingtech.car2x.hmi.ttmanclient.NotificationHandler;
+import com.testingtech.car2x.hmi.ttmanclient.TestCaseRunner;
 
-  public static void start() {
+import java.io.IOException;
 
-    System.out.println("Starting app thread");
-    Thread appThread = new Thread(new AppService());
-    appThread.start();
-    System.out.println("App thread is in state: " + appThread.getState());
+public class Driver implements Runnable{
+
+  public void run() {
+
+      try {
+          Publisher publisher = new Publisher();
+          NotificationHandler notificationHandler = new NotificationHandler(publisher);
+          TestCaseRunner testCaseRunner = new TestCaseRunner(notificationHandler);
+
+          testCaseRunner.setCurrentTestCase(TestCase.TC_VEHICLE_SPEED_SIMULATED);
+          publisher.setCurrentTestCase(TestCase.TC_VEHICLE_SPEED_SIMULATED);
+
+          new Thread(testCaseRunner).start();
+      }catch(IOException ioe){
+          Log.e("DRIVER", ioe.getMessage());
+          ioe.printStackTrace();
+      }
+
 
   }
 
