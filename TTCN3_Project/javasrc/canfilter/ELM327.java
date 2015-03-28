@@ -13,42 +13,57 @@ import org.apache.commons.lang3.StringUtils;
 
 import jssc.SerialPort;
 import jssc.SerialPortException;
+import jssc.SerialPortList;
 
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
-
 import java.io.*;
 import java.util.Vector;
 
 
 public class ELM327 {
-	private int RS232 = 0;
-	private int BLUETOOTH = 1;
-	private int usedConnection;
+	private static int RS232 = 0;
+	private static int BLUETOOTH = 1;
+	private static int usedConnection;
 	private static final String RESPONSE_OK = "OK";
 	private static final String RESPONSE_TERMINALCHAR = ">";
 
-	// Bluetooth Variables
-	private static Object lock = new Object();
-	private static Vector remdevices = new Vector();
-	private static String connectionURL = null;
+//	// Bluetooth Variables
+//	private static Object lock = new Object();
+//	private static Vector remdevices = new Vector();
+//	private static String connectionURL = null;
 
 	// Serial Variables:
-	Socket sock = null;
-	Hashtable<String, String> commandHashTable = new Hashtable<String, String>();
+	static Socket sock = null;
+	static Hashtable<String, String> commandHashTable = new Hashtable<String, String>();
 
-	private String portName; // //TODO: never set?
-	private Long commandTimeout = 3000l; //
+	private static String portName = "COM3";
+	private static Long commandTimeout = 3000l;
 
-	private final SerialPort serialPort = new SerialPort(portName);
+	private final static SerialPort serialPort = new SerialPort(portName);
 
 
-	public void main(String[] args) {
-		initConnection(args[0]);
-		initCommandHashTable();
+	public static void main(String[] args) throws IOException, SerialPortException {
+//		initConnection(args[0]);
+//		initCommandHashTable();
+		initConnection("rs232");
+		
+		
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		while(true){
+			
+			System.out.println("Enter Command: ");
+	        String command = br.readLine(); 
+	        if (command == "EXit"){
+	        	serialPort.closePort();
+	        } else {
+	        	serialPort.writeString(command +"\r");
+	        	System.out.println(readResponse());
+	        }
+		}
 
 	}
 
@@ -59,16 +74,23 @@ public class ELM327 {
 
 	}
 
-	public void initConnection(String type) {
+	public static void initConnection(String type) {
 		if (type == "rs232") {
 			usedConnection = RS232;
 			try {
+				String[] portNames = SerialPortList.getPortNames();
+				for (int i = 0; i < portNames.length; i++) {
+					System.out.println(portNames[i]);
+				}
+
 				// Page 7 Manual elm327.pdf
+				serialPort.openPort();
 				serialPort.setParams(38400, 8, 1, 0, true, true);
 			} catch (SerialPortException e) {
 				e.printStackTrace();
 			}
 		} else if (type == "bluetooth") {
+			usedConnection = BLUETOOTH;
 			sock = new Socket();
 			// TODO implement Bluetooth version
 		} else {
@@ -85,7 +107,7 @@ public class ELM327 {
 	 * @throws PortCommunicationException
 	 *             - if there was no response or prompt was missing.
 	 */
-	public List<String> readResponse() {
+	public static List<String> readResponse() {
 
 		try {
 			final StringBuilder buffer = new StringBuilder(256);
