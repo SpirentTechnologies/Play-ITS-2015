@@ -118,6 +118,7 @@ public class ELMBluetooth implements DiscoveryListener {
 
         System.out
             .println("If Problems occur, run AT Z");
+        System.out.println(getSupportedPIDs(inStream, pwriter));
         while (true) {
           System.out.println("Enter Command: ");
           String command = br.readLine(); 
@@ -292,6 +293,7 @@ public class ELMBluetooth implements DiscoveryListener {
     openXCToOBD2Map.put("bank2_sensor4_oxygen_sensor_voltage", "01 1B");
     openXCToOBD2Map.put("obd_standard_this_vehicle_conforms_to", "01 1C");
     openXCToOBD2Map.put("auxiliary_input_status", "01 1E");
+    openXCToOBD2Map.put("runtime_since_last_start", "01 1F");
     openXCToOBD2Map.put("distance_traveled_with_malfunction_indicator_lamp_on", "01 21");
     openXCToOBD2Map.put("fuel_rail_pressure_manifold_vacuum", "01 22");
     openXCToOBD2Map.put("fuel_rail_pressure_direct_inject", "01 23");
@@ -459,7 +461,8 @@ public class ELMBluetooth implements DiscoveryListener {
    */
   public static String convertOBD2ReplyToOpenXC(String type, String reply) {
     String result;
-    if (reply.equals("NO DATA") || reply.equals("OK") || reply.startsWith("BUS")) {
+    String replyTrimmend = reply.replaceAll("\\s+","");
+    if (replyTrimmend.equals("NO DATA") || replyTrimmend.equals("OK") || replyTrimmend.startsWith("BUS")) {
       result = reply;
     } else {
      String[] data = reply.split("\\s"); // cut first 4 bytes (response =
@@ -607,11 +610,10 @@ public class ELMBluetooth implements DiscoveryListener {
    */
   public static String convertOBD2Reply(String reply) {
 	    String result;
-//	    if (reply.equals("NO DATA") || reply.equals("OK") || reply.startsWith("BUS") || reply.contains("V")) {
-	    if (!(reply.matches("([0-9A-F]{2})+"))){
+	    if (!((reply.replaceAll("\\s+","")).matches("([0-9A-F]{2})+"))){
 	      result = reply;
 	    } else {
-	     String[] data = reply.split("\\s"); // (response =
+	    	String[] data = reply.split("\\s"); // (response =
 	    	// "41 0C 0C FC") 41,0C,0C,FC, data[0] = Bus, data[1] = Command
 	    	int value1;
 	    	int value2;
@@ -721,35 +723,46 @@ public class ELMBluetooth implements DiscoveryListener {
    * 
    * @param in Inputstream
    * @param pwriter Outputstream
-   * @return ArrayList<String> with all supported 01 PIDs (e.g. "00","1F") 
-   * without leading 01 (Mode 1 = Current Data) 
+   * @return ArrayList<String> with all supported 01 PIDs (e.g. " 01 00"," 01 1F") 
+   * Example: 
+   * 41 00 98 18 00 01 = 10011000000110000000000000000001
+   * 41 20 00 01 80 01 = 00000000000000011000000000000001
+   * 41 40 C0 80 00 00 = 11000000100000000000000000000000 -> last Bit 0 -> no more PIDs
+   * = all supported PIDs = 00,03,04,0B,0C,1F,2F,30,3F,40,41,(48)
+   * 
+   * 00!, (03), 04!,[05,] (0B), 0C!,[0D,] 1F!, 20!, 21!, 30!, 40!, 41!, (48)
+   * 
    */
-  public List<String> getSupportedPIDs(InputStream in, PrintWriter pwriter){
+  public static List<String> getSupportedPIDs(InputStream in, PrintWriter pwriter){
 	  List<String> results = new ArrayList<String>();
-	  String input;
+	  String hexInput;
+	  String binInput;
 	  
-	  input = run("01 00", in, pwriter);
+	  hexInput = run("01 00", in, pwriter);
+	  //delete whitespaces 
+	  hexInput=hexInput.replaceAll("\\s+","");
 	  //cut the first 4 Bytes
-	  input = input.substring(4);
-//	  command send: 01 00
-//	  response: 41 00 98 18 00 01
-//	  => 10011000000110000000000000000001 binary
-//	  if last bit is 1 -> there are more supported pids
-//	  -> run  01 20 
-//	  = 00,04,05,0C,0D,20 supported
+	  hexInput = hexInput.substring(4); 
 	  
-	  
-	  if (input.matches("([0-9A-F]{2})+")){
-		  input = new BigInteger(input, 16).toString(2);
-		  for (int i = 0; i < input.length(); i++) {
-			  char c = input.charAt(i);
+	  if (hexInput.matches("([0-9A-F]{2})+")){
+		  binInput = new BigInteger(hexInput, 16).toString(2);
+		  while (binInput.length() < hexInput.length()){
+			  //fill leading Zeros
+			  binInput = "0"+binInput;
+		  }
+		  for (int i = 0; i < binInput.length(); i++) {
+			  char c = binInput.charAt(i);
 			  if (c == '1'){
 				  String hex = Integer.toHexString(i);
-				  results.add("01" + hex);
+				  hex=hex.toUpperCase();
+				  if(hex.length() == 1){
+					  hex = "0"+hex;
+				  }
+				  results.add("01 " + hex);
 			  }
 		  }			
-		  if (input.charAt(input.length()-1) == 1){ //if there are more supported PIDs
-			  getMoreSupportedPIDs(results, 00 ,in, pwriter);
+		  if (binInput.charAt(binInput.length()-1) == '1'){ //if there are more supported PIDs
+			  getMoreSupportedPIDs(results, 0 ,in, pwriter);
 		  }
 	  }
 	  return results;
@@ -763,25 +776,40 @@ public class ELMBluetooth implements DiscoveryListener {
    * @param pwriter Outputstream
    * Recursively adds remaining supported PIDs to result
    */
-  private void getMoreSupportedPIDs(List<String> results, Integer cmd,
+  private static void getMoreSupportedPIDs(List<String> results, Integer cmd,
 		InputStream in, PrintWriter pwriter) {
 	  Integer cmdRange = cmd + 20;
-	  String newCmd = "01" + cmdRange.toString();
-	  String input;
-	  input = run(newCmd, in, pwriter);
+	  Integer cmdRange2 = cmd + 30;
+	  String newCmd = "01 " + cmdRange.toString();
+	  String newCmd2 = cmdRange2.toString();
+	  String hexInput;
+	  String binInput;
+	  hexInput = run(newCmd, in, pwriter);
+	  //delete whitespaces 
+	  hexInput = hexInput.replaceAll("\\s+","");
 	  //cut the first 4 Bytes
-	  input = input.substring(4);
-	  if (input.matches("([0-9A-F]{2})+")){
-		  input = new BigInteger(input, 16).toString(2);
-		  for (int i = 0; i < input.length(); i++) {
-			  char c = input.charAt(i);
+	  hexInput = hexInput.substring(4);
+	  if (hexInput.matches("([0-9A-F]{2})+")){
+		  binInput = new BigInteger(hexInput, 16).toString(2);
+		  while (binInput.length() < hexInput.length()){
+			  //fill leading Zeros
+			  binInput = "0"+binInput;
+		  }
+		  for (int i = 0; i < binInput.length(); i++) {
+			  char c = binInput.charAt(i);
 			  if (c == '1'){
-				  String hex = Integer.toHexString(i+cmdRange);
-				  results.add("01" + hex);
+				  String hex = Integer.toHexString(i);
+				  hex=hex.toUpperCase();
+				  if(hex.length() == 1){ //F = 3F
+					  hex = newCmd.charAt(3) + hex;
+				  } else { //1F but really is 3F
+					  hex = Character.toString(newCmd2.charAt(0)) + hex.charAt(1);
+				  }
+				  results.add("01 " + hex);
 			  }
 		  }			
-		  if (input.charAt(input.length()-1) == 1){ //if there are more supported PIDs
-			  getMoreSupportedPIDs(results, cmdRange ,in, pwriter);
+		  if (binInput.charAt(binInput.length()-1) == '1'){ //if there are more supported PIDs
+			  getMoreSupportedPIDs(results, cmd + 20  ,in, pwriter);
 		  }
 	  }
 	  
@@ -794,7 +822,7 @@ public class ELMBluetooth implements DiscoveryListener {
    * @param pwriter Outputstream
    * @return raw reply
    */
-public String run(String command, InputStream in, PrintWriter pwriter) {
+public static String run(String command, InputStream in, PrintWriter pwriter) {
 	  pwriter.write(command + "\r");
       pwriter.flush();
       
