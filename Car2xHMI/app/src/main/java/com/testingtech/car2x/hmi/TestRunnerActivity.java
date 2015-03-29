@@ -2,6 +2,7 @@ package com.testingtech.car2x.hmi;
 
 import android.content.Intent;
 import android.graphics.drawable.AnimationDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.support.v7.app.ActionBarActivity;
@@ -17,47 +18,46 @@ import android.widget.TableLayout;
 import android.widget.TextView;
 
 import com.testingtech.car2x.hmi.driver.Driver;
+import com.testingtech.car2x.hmi.testcase.TestCase;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Locale;
 
 public class TestRunnerActivity extends ActionBarActivity {
 
-    private TextView statusText;
-    private TextView noticeText;
-    private ScrollView progress;
-    private ProgressBar progressBar;
-    private Button btnStart;
-    private Button btnStop;
-    private AnimationDrawable logoAnimation;
-    private TextToSpeech speech;
-    private int stageCount, testNumber;
+    private  int testNumber;
+    private static TableLayout table;
+    private static TextToSpeech speech;
+    public static PrintWriter writer;
+    public static GuiUpdater guiUpdater;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_test_runner);
-
-        Globals.view = this;
-
+        // get data from the parent activity
         Intent intent = getIntent();
         testNumber = intent.getIntExtra(TestSelectorActivity.TEST_NUMBER, 0);
         String testTitle = intent.getStringExtra(TestSelectorActivity.TEST_TITLE);
         String[] testStages = intent.getStringArrayExtra(TestSelectorActivity.TEST_STAGES);
+        int stageCount = testStages.length;
 
+        createGuiUpdater(stageCount);
+
+        Globals.view = this;
+        // set and create GUI elements
         setTitle(testTitle);
-        TableLayout table = (TableLayout) findViewById(R.id.tableStages);
-        for(int stage = 0; stage < testStages.length; stage++){
+        table = (TableLayout) findViewById(R.id.tableStages);
+        for(String stage : testStages){
             TextView stageText = new TextView(this);
             stageText.setGravity(Gravity.CENTER);
             stageText.setTextSize(28);
-            stageText.setText(testStages[stage]);
+            stageText.setText(stage);
             table.addView(stageText);
         }
-
-        ImageView logoImage = (ImageView) findViewById(R.id.status_animation);
-        logoImage.setBackgroundResource(R.drawable.animation_logo);
-        logoAnimation = (AnimationDrawable) logoImage.getBackground();
-
+        // init text to speech component
         speech = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
             @Override
             public void onInit(int status) {
@@ -66,42 +66,70 @@ public class TestRunnerActivity extends ActionBarActivity {
                 }
             }
         });
-        statusText = (TextView) findViewById(R.id.status_text);
-        noticeText = (TextView) findViewById(R.id.notification);
-        progress = (ScrollView) findViewById(R.id.progress);
-        progressBar = (ProgressBar) findViewById(R.id.progressbar);
-        btnStart = (Button) findViewById(R.id.button_start);
-        btnStop = (Button) findViewById(R.id.button_stop);
-        stageCount = testStages.length;
+        // init log
+        initLogFile();
+    }
+
+    private void createGuiUpdater(int stageCount){
+        // get components from current activity
+        TextView statusRunningText = (TextView) findViewById(R.id.status_text);
+        TextView noticeText = (TextView) findViewById(R.id.notification);
+        ScrollView stages = (ScrollView) findViewById(R.id.progress);
+        ProgressBar progressBar = (ProgressBar) findViewById(R.id.progressbar);
+        Button btnStart = (Button) findViewById(R.id.button_start);
+        Button btnStop = (Button) findViewById(R.id.button_stop);
+        ImageView logoImage = (ImageView) findViewById(R.id.status_animation);
+        logoImage.setBackgroundResource(R.drawable.animation_logo);
+        AnimationDrawable logoAnimation = (AnimationDrawable) logoImage.getBackground();
+        // start the gui updater
+        guiUpdater = new GuiUpdater(progressBar, logoAnimation, btnStart, btnStop,
+                noticeText, statusRunningText, stages, table, stageCount);
+    }
+
+    private void initLogFile(){
+        File path = getExternalFilesDir(null);//new File(Environment.getExternalStorageDirectory() + "TestingTech");
+        File file = new File(path, "Log.txt");
+        try {
+            // Make sure the directory exists
+            //path.mkdirs();
+            //file.createNewFile();
+            writer = new PrintWriter(file);
+        }catch(IOException ioe){
+            ioe.printStackTrace();
+        }
     }
 
     /**
      * Start the test. Create a new AsyncThread and run it.
-     * @param view Not used.
+     * @param view The parent view.
      */
     public void startTest(View view) {
-        /*socketClient = new SocketClient(this, noticeText, progress, progressBar, logoAnimation,
-                statusText, btnStart, btnStop, speech, stageCount, testNumber);
-        socketClient.execute();*/
-
-        new Thread( new Driver()).start();
-        //new Thread(new TestConn()).start();
-        Button b = (Button) findViewById(R.id.button_start);
-        b.setEnabled(false);
-        Button b2 = (Button) findViewById(R.id.button_stop);
-        b2.setEnabled(true);
+        new Thread(new Driver(TestCase.values()[testNumber])).start();
+        guiUpdater.enableStartButton(false);
+        guiUpdater.animateLogo(true);
+        guiUpdater.setStatusText(getString(R.string.textview_running));
     }
 
     /**
      * Stop the running test. Cancel the AsyncThread and close the Socket.
-     * @param view Not used.
+     * @param view The parent view.
      */
     public void stopTest(View view) {
-        // TODO interrupt threads
-        Button b = (Button) findViewById(R.id.button_start);
-        b.setEnabled(true);
-        Button b2 = (Button) findViewById(R.id.button_stop);
-        b2.setEnabled(false);
+        // TODO interrupt threads, send stop message
+        guiUpdater.enableStartButton(true);
+        guiUpdater.animateLogo(false);
+        guiUpdater.setStatusText(getString(R.string.textview_not_running));
+    }
+
+    @SuppressWarnings("deprecation")
+    public static void speakStageText(int stageNum){
+        TextView text = (TextView) table.getChildAt(stageNum);
+        String toSpeak = text.getText().toString();
+        if(Build.VERSION.SDK_INT < 21){
+            speech.speak(toSpeak, TextToSpeech.QUEUE_FLUSH, null);
+        } else{
+            speech.speak(toSpeak, TextToSpeech.QUEUE_FLUSH, null, "speak");
+        }
     }
 
     @Override
@@ -131,5 +159,12 @@ public class TestRunnerActivity extends ActionBarActivity {
         super.onDestroy();
         if(speech != null)
             speech.shutdown();
+        writer.close();
     }
+
+    public static void writeLog(String msg){
+        writer.println(msg);
+        writer.flush();
+    }
+
 }

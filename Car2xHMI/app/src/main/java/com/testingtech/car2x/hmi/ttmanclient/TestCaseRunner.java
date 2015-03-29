@@ -3,6 +3,7 @@ package com.testingtech.car2x.hmi.ttmanclient;
 import android.util.Log;
 
 import com.testingtech.car2x.hmi.Globals;
+import com.testingtech.car2x.hmi.TestRunnerActivity;
 import com.testingtech.car2x.hmi.testcase.TestCase;
 import com.testingtech.car2x.hmi.testcase.TestCaseVerdict;
 import com.testingtech.car2x.hmi.testcase.Utils;
@@ -35,50 +36,39 @@ public class TestCaseRunner implements Runnable, ITestCaseRunner {
    * Initialize TTman server connection using the file based configuration parameters.
    */
   private void initServerConnection() throws IOException {
-
-      String clientAddress = "";
-      final String clientPortString = "10280";
-      final int clientPort = Integer.parseInt(clientPortString);
-
-      final String serverAddress = "192.168.87.148";//Globals.serverIp;
-      final String serverPortString = "10279";
-      final int serverPort;
-
-      try{
-          Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces();
-          while(en.hasMoreElements()) {
-              NetworkInterface intf = en.nextElement();
-              if (intf.getName().equalsIgnoreCase("eth0") ||
-                      intf.getName().equalsIgnoreCase("wlan0")) {
-                  Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses();
-                  while(enumIpAddr.hasMoreElements()) {
-                      InetAddress inetAddress = enumIpAddr.nextElement();
-                      String hostAddress = inetAddress.getHostAddress();
-                      if(!hostAddress.contains(":")) {
-                          clientAddress = hostAddress;
-                      }
-                  }
-              }
-          }
-          Log.i("TESTCASERUNNER", "Host address " + clientAddress);
-      } catch (SocketException se) {
-          se.printStackTrace();
-      }
-
-      if (serverPortString == null) {
-          serverPort = IExecutionServer.DEFAULT_SERVER_PORT_NUMBER;
-      } else {
-          serverPort = Integer.parseInt(serverPortString);
-      }
+      InetAddress clientIp = getOwnIp();
+      TestRunnerActivity.writeLog("TESTCASERUNNER: Host address " + clientIp.getHostAddress());
 
       final String user = "user";
       final String password = "password";
       final Credentials credentials = new Credentials(user, password);
 
-      this.client = new ExecutionServerFactory().
-              createClient(InetAddress.getByName(clientAddress), clientPort);
-      this.client.connect(serverAddress, serverPort, credentials, this.notificationHandler);
+      this.client = new ExecutionServerFactory().createClient(clientIp, Globals.clientPort);
+      this.client.connect(Globals.serverIp, Globals.serverPort, credentials, this.notificationHandler);
   }
+
+    private InetAddress getOwnIp(){
+        try{
+            Enumeration<NetworkInterface> enumNetwork = NetworkInterface.getNetworkInterfaces();
+            while(enumNetwork.hasMoreElements()) {
+                NetworkInterface netInterface = enumNetwork.nextElement();
+                if (netInterface.getName().equalsIgnoreCase("eth0") ||
+                        netInterface.getName().equalsIgnoreCase("wlan0")) {
+                    Enumeration<InetAddress> enumIpAddr = netInterface.getInetAddresses();
+                    while(enumIpAddr.hasMoreElements()) {
+                        InetAddress inetAddress = enumIpAddr.nextElement();
+                        if(!inetAddress.getHostAddress().contains(":")) {
+                            return inetAddress;
+                        }
+                    }
+                }
+            }
+        } catch (SocketException se) {
+            se.printStackTrace(TestRunnerActivity.writer);
+            TestRunnerActivity.writer.flush();
+        }
+        return null;
+    }
 
   private void initTestSuite() throws IOException {
     final String testProject = "TTCN3_Project";
@@ -104,7 +94,7 @@ public class TestCaseRunner implements Runnable, ITestCaseRunner {
       String testCaseModule = "Car2X_Testcases";
       execJob = client.executeTestCase(testCaseModule, this.currentTestCase.name(), null);
 
-      Log.i("TESTCASERUNNER", "Waiting for test case execution");
+      TestRunnerActivity.writeLog("TESTCASERUNNER: Waiting for test case execution");
       boolean executionDone = false;
       while (! executionDone) {
         // sleep until server finished job execution
@@ -112,18 +102,18 @@ public class TestCaseRunner implements Runnable, ITestCaseRunner {
         try {
           execJob.join();
         } catch (InterruptedException e) {
-          Log.e("TESTCASERUNNER", e.getMessage());
+            TestRunnerActivity.writeLog("TESTCASERUNNER:" + e.getMessage());
         }
         JobStatus jobStatus = execJob.getStatus();
         executionDone = (jobStatus == JobStatus.CANCELLED) || (jobStatus == JobStatus.FINISHED);
       }
-      Log.i("TESTCASERUNNER", "End of test case execution");
+        TestRunnerActivity.writeLog("TESTCASERUNNER: End of test case execution");
 
       String verdictLabel = execJob.getTestCaseStatus().getVerdictKind().getString();
       this.verdict = Utils.toTestCaseVerdict(verdictLabel);
 
     } catch (IOException ioex) {
-      Log.e("TESTCASERUNNER", ioex.getMessage());
+        TestRunnerActivity.writeLog("TESTCASERUNNER: " + ioex.getMessage());
     }
   }
 
@@ -137,7 +127,7 @@ public class TestCaseRunner implements Runnable, ITestCaseRunner {
     try {
       this.client.disconnect();
     } catch (IOException ioex) {
-      Log.w("TESTCASERUNNER", ioex.getMessage());
+        TestRunnerActivity.writeLog("TESTCASERUNNER: " + ioex.getMessage());
     }
   }
 
