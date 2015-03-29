@@ -46,6 +46,8 @@ public class Car2XEntryUpdater implements Runnable {
 
 	private Hashtable<String, Car2XEntry> car2xEntries;
 	private InetSocketAddress address;
+	
+	private boolean isRunning = false;
 
 	/**
 	 * Connects to the openXC simulator and updates openXC respectively obd2
@@ -64,6 +66,7 @@ public class Car2XEntryUpdater implements Runnable {
 	 * updated requested (at least one entry exists).
 	 */
 	public void run() {
+		isRunning = true;
 		Socket socket = null;
 		Scanner scanner = null;
 		try {
@@ -88,11 +91,16 @@ public class Car2XEntryUpdater implements Runnable {
 			System.err.println("[EntryUpdater] Could not connect to "
 					+ address.getHostName() + " on port " + address.getPort());
 		} finally {
+			isRunning = false;
 			System.out
 					.println("[EntryUpdater] No more entries to update. Shutting down.");
 			close(scanner);
 			close(socket);
 		}
+	}
+	
+	public boolean isRunning() {
+		return isRunning;
 	}
 
 	private void close(Scanner scanner) {
