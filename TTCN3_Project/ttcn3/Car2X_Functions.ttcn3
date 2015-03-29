@@ -773,7 +773,7 @@ module Car2X_Functions {
 		// map the tester port to the system port
 		map(self:filterPort, system:filterPort);
 		
-		var charstring filterServiceId := start_Filter(TCP_REMOTE_HOST, TCP_REMOTE_PORT);
+		var charstring filterServiceId := startFilter(TCP_REMOTE_HOST, TCP_REMOTE_PORT);
 		if (lengthof(filterServiceId) == 0) {
 		  setverdict(fail, "Could not start CAN filter service.");
 		} else {
@@ -910,7 +910,7 @@ module Car2X_Functions {
 	 */
 	function f_tearDown() runs on TesterComponentType  {
 		unmap(self:filterPort, system:filterPort);
-		if (not stop_Filter()) {
+		if (not stopFilter()) {
 		  log("Could not stop CAN filter service.");
 		}
 		stop;
