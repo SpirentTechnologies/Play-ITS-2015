@@ -121,7 +121,7 @@ public class ELMBluetooth implements DiscoveryListener {
 
         System.out
             .println("If Problems occur, run AT Z");
-        System.out.println(getSupportedPIDs(inStream, pwriter));
+        System.out.println(getSupportedPIDs(in, pwriter));
         while (true) {
           System.out.println("Enter Command: ");
           String command = br.readLine(); 
@@ -319,7 +319,6 @@ public class ELMBluetooth implements DiscoveryListener {
     		+"_voltage_oxygen_sensor current_ and_intake_manifold_absolute_pressure", "01 4F");
     openXCToOBD2Map.put("maximum_value_for_air_flow_rate_from_mass_air_flow_sensor", "01 50");
     openXCToOBD2Map.put("fuel_type", "01 51");
-    
     openXCToOBD2Map.put("ethanol_fuel_percent", "01 52");
     openXCToOBD2Map.put("absolute_evap_system_vapor_pressure", "01 53");
     openXCToOBD2Map.put("evap_system_vapor_pressure", "01 54");
@@ -327,7 +326,6 @@ public class ELMBluetooth implements DiscoveryListener {
     openXCToOBD2Map.put("long_term_secondary_oxygen_sensor_trim_bank1_and_bank3", "01 56");
     openXCToOBD2Map.put("short_term_secondary_oxygen_sensor_trim_bank2_and_bank4", "01 57");
     openXCToOBD2Map.put("long_term_secondary_oxygen_sensor_trim_bank2_and_bank4", "01 58");  
-    
     openXCToOBD2Map.put("Fuel_rail_pressure_absolute", "01 59");
     openXCToOBD2Map.put("relative_accelerator_pedal_position", "01 5A");
     openXCToOBD2Map.put("hybrid_battery_pack_remaining_life", "01 5B");
@@ -697,12 +695,9 @@ public class ELMBluetooth implements DiscoveryListener {
 	    		break;
 	    	}
 	    }
-
 	    return result;
-
 	  }
   
- 
   /**
    * 
    * @param in Inputstream
@@ -818,7 +813,6 @@ public class ELMBluetooth implements DiscoveryListener {
 public static String run(String command, BufferedReader in, PrintWriter pwriter) {
 	  pwriter.write(command + "\r");
       pwriter.flush();
-      
       try {
 		Thread.sleep(200);
 	} catch (InterruptedException e) {
@@ -838,10 +832,8 @@ public static String run(String command, BufferedReader in, PrintWriter pwriter)
 	}
        //ELM sends like this: 41 0F 05 with whitespaces
       rawData = res.toString().trim();
-
       //no "WAITING" or "INIT BUS", just the data itself
       rawData = rawData.substring(rawData.lastIndexOf(13) + 1);
-      
       return rawData;
   }
 
