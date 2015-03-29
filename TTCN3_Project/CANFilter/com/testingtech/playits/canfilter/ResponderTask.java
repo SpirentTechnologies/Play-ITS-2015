@@ -81,7 +81,7 @@ public class ResponderTask extends TimerTask {
       System.err
           .println("[ResponderTask] Error while sending response for "
               + key + ": " + e.getMessage());
-      cancel();
+      super.cancel();
     }
   }
 
