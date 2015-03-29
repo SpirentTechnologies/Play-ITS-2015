@@ -1,11 +1,6 @@
 package com.testingtech.car2x.hmi.publish;
 
-import android.os.AsyncTask;
-import android.util.Log;
-import android.widget.ProgressBar;
-
-import com.testingtech.car2x.hmi.Globals;
-import com.testingtech.car2x.hmi.R;
+import com.testingtech.car2x.hmi.TestRunnerActivity;
 import com.testingtech.car2x.hmi.testcase.TestCase;
 import com.testingtech.car2x.hmi.testcase.TestCaseProgress;
 import com.testingtech.car2x.hmi.testcase.TestCaseVerdict;
@@ -37,14 +32,13 @@ public class Publisher implements IPublisher {
 
   private boolean isCurrent(TestCase testCase) {
     if (currentTestCase == null) {
-      Log.e("PUBLISHER", "Current test case has not been set.");
+      TestRunnerActivity.writeLog("PUBLISHER: Current test case has not been set.");
     }
     return this.currentTestCase.compareTo(testCase) == 0;
   }
 
   @Override
   public void publishProgress(String testCaseName, String actionMessage) throws IOException {
-    System.out.println("PUBLISH PROGRESS!");
     TestCase testCase = Utils.toTestCase(testCaseName);
     TestCaseProgress testCaseProgress = null;
     int timeWindow = -1;
@@ -54,57 +48,48 @@ public class Publisher implements IPublisher {
       testCaseProgress = Utils.toTestCaseProgress(entryIndex);
       timeWindow = Integer.parseInt((String) values[1]);
     } catch (ParseException pex) {
-      Log.e("PUBLISHER", "MessageFormat error when parsing [" + actionMessage + "] ", pex);
+        TestRunnerActivity.writeLog("PUBLISHER: MessageFormat error when parsing [" + actionMessage + "] " + pex.getMessage());
     }
 
     if (isCurrent(testCase) && testCase != null && testCaseProgress != null && timeWindow > -1) {
-      System.out.println(String.format(
+        TestRunnerActivity.writeLog(String.format(
           progressFormatString,
           testCase.name(),
           testCaseProgress.name(),
           timeWindow
       ));
-      // Update GUI here
-        new Test(2).execute();
+      // Update GUI
+        if(testCaseProgress.ordinal() > 1) {
+            TestRunnerActivity.writeLog("Publishing progress");
+            TestRunnerActivity.guiUpdater.updateProgressBar(testCaseProgress.ordinal());
+            TestRunnerActivity.guiUpdater.scrollToStage(testCaseProgress.ordinal() - 1);
+            TestRunnerActivity.speakStageText(testCaseProgress.ordinal() - 1);
+        }
+    } else {
+        TestRunnerActivity.writeLog("Validation failed...");
     }
+
 
   }
 
   @Override
   public void publishVerdict(String testCaseName, String verdictLabel) throws IOException {
-    TestCase testCase = Utils.toTestCase(testCaseName);
-    TestCaseVerdict testCaseVerdict = Utils.toTestCaseVerdict(verdictLabel);
+      TestCase testCase = Utils.toTestCase(testCaseName);
+      TestCaseVerdict testCaseVerdict = Utils.toTestCaseVerdict(verdictLabel);
 
-    if (isCurrent(testCase) && testCase != null && testCaseVerdict != null) {
-      System.out.println(String.format(
-          verdictFormatString,
-          testCase.name(),
-          testCaseVerdict.name()
-      ));
-      // Update GUI here
-    }
+      if (isCurrent(testCase) && testCase != null && testCaseVerdict != null) {
+          TestRunnerActivity.writeLog(String.format(
+                  verdictFormatString,
+                  testCase.name(),
+                  testCaseVerdict.name()
+          ));
+          // Update GUI
+          TestRunnerActivity.writeLog("Publishing verdict");
+          TestRunnerActivity.guiUpdater.updateProgressBar(99);  // 99 for max value
+          TestRunnerActivity.guiUpdater.resetTestRunnerGui();
+      } else {
+          TestRunnerActivity.writeLog("Validation failed...");
+      }
   }
-
-    class Test extends AsyncTask<Void, Integer, Void>{
-
-        private int num;
-
-        public Test(int num){
-            this.num = num;
-        }
-
-        @Override
-        protected Void doInBackground(Void... p){
-            publishProgress(num);
-            return null;
-        }
-
-        protected void onProgressUpdate(Integer... h){
-            ProgressBar p = (ProgressBar) Globals.view.findViewById(R.id.progressbar);
-            p.setProgress(num / 5);
-            super.onProgressUpdate();
-        }
-    }
-
 
 }

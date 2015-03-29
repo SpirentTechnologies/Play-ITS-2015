@@ -10,8 +10,6 @@ import android.widget.EditText;
 
 public class MainActivity extends ActionBarActivity {
 
-    public static String WORKBENCH_IP = "ip";
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
