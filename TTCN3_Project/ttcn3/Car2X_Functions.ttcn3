@@ -6,7 +6,7 @@
  *   		 tear down configurations to reuse.
  */
 module Car2X_Functions {
-	import from Car2X_ModuleParameters {const c_timerOneSecond, c_timerTwoSeconds;}
+	import from Car2X_ModuleParameters {const c_timerOneSecond, c_timerTwoSeconds; modulepar TCP_REMOTE_HOST, TCP_REMOTE_PORT;}
 
 	import from Car2X_Templates {
 		template
@@ -47,6 +47,8 @@ module Car2X_Functions {
 	import from Car2X_Types {type DoorStatus, FilterResponse, IgnitionStatus, TransmissionGear;}
 
 	import from Car2X_ConfigSystem {type TesterComponentType;}
+	
+	import from Car2X_Control all;
 
 	/**
 	 * @desc Function to measure vehicle speed for a defined period of time.
@@ -770,6 +772,13 @@ module Car2X_Functions {
 		v_stage := 1;
 		// map the tester port to the system port
 		map(self:filterPort, system:filterPort);
+		
+		var charstring filterServiceId := start_Filter(TCP_REMOTE_HOST, TCP_REMOTE_PORT);
+		if (lengthof(filterServiceId) == 0) {
+		  setverdict(fail, "Could not start CAN filter service.");
+		} else {
+		  log("CAN filter service started.");
+		}
 	}
 
 	/**
@@ -901,6 +910,9 @@ module Car2X_Functions {
 	 */
 	function f_tearDown() runs on TesterComponentType  {
 		unmap(self:filterPort, system:filterPort);
+		if (not stop_Filter()) {
+		  log("Could not stop CAN filter service.");
+		}
 		stop;
 	}
 
