@@ -39,7 +39,7 @@ import java.util.Scanner;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class Car2XEntryUpdater extends Thread {
+public class Car2XEntryUpdater implements Runnable {
 
 	private static final String DEFAULT_SIMULATOR_HOST = "localhost";
 	private static final int DEFAULT_SIMULATOR_PORT = 50001;
