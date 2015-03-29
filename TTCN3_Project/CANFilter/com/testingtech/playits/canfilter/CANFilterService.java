@@ -28,6 +28,7 @@
  */
 package com.testingtech.playits.canfilter;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.lang.Thread.State;
 import java.net.InetSocketAddress;
@@ -47,12 +48,14 @@ public class CANFilterService {
   private static final String DEFAULT_SERVER_HOST = "localhost";
 
   private static Hashtable<String, Car2XEntry> car2xEntries = new Hashtable<>();
+  private static Thread entryUpdaterThread;
   private static Car2XEntryUpdater entryUpdater;
   private static TimeoutResponder timeoutResponder;
+  static CANFilterLog filterLog = new CANFilterLog();
 
   /**
-   * Provides TCP server functionality to handle JSON requests. Upon receiving 
-   * a start request, an entry updater thread which updates openXC / obd2 hash 
+   * Provides TCP server functionality to handle JSON requests. Upon receiving
+   * a start request, an entry updater thread which updates openXC / obd2 hash
    * table entries is started. Parallel timeout responder tasks periodically
    * send back updated JSON values from the hash table over a client socket.
    * 
@@ -60,19 +63,16 @@ public class CANFilterService {
    *            host, port
    */
   public static void main(String[] args) {
-    String host = DEFAULT_SERVER_HOST;
-    int port = DEFAULT_SERVER_PORT;
-
+    String host;
+    int port;
+    
     if (args.length != 2) {
-      System.err
-          .println("[CANFilterService] Usage: java CANFilterService "
-              + "<Server host>  <Server Port Number>");
-      System.err.println("  ... using default server host "
-          + DEFAULT_SERVER_HOST + " default server port "
-          + DEFAULT_SERVER_PORT);
+      filterLog.logCommandLineUsage();
+      host = DEFAULT_SERVER_HOST;
+      port = DEFAULT_SERVER_PORT;
     } else {
-      host = args[0];
-      port = extractPortNumber(args, 1, DEFAULT_SERVER_PORT);
+      host = PatternMatchUtils.matchHost(args[0], DEFAULT_SERVER_HOST);
+      port = PatternMatchUtils.matchPortNumber(args[1], DEFAULT_SERVER_PORT);
     }
 
     InetSocketAddress address = new InetSocketAddress(host, port);
@@ -80,65 +80,45 @@ public class CANFilterService {
     ServerSocket serverSocket = null;
     try {
       serverSocket = createServerSocket(address);
-      System.out.println("[CANFilterService] Listening on "
-              + serverSocket.getInetAddress().getHostName() + ":"
-              + serverSocket.getLocalPort());
+      filterLog.logStartListening(serverSocket.getInetAddress().getHostName(), serverSocket.getLocalPort());
+      
       socket = serverSocket.accept();
       timeoutResponder = new TimeoutResponder(socket, car2xEntries);
+      entryUpdater = new Car2XEntryUpdater(car2xEntries);
       JSONTokener jsonTokener = new JSONTokener(socket.getInputStream());
       while (jsonTokener.more()) {
         try {
           Object nextValue = jsonTokener.nextValue();
           if (nextValue instanceof JSONObject) {
-            System.out
-                .println("[CANFilterService] Incoming request: "
-                    + nextValue);
+            filterLog.logIncomingRequest(nextValue.toString());
             // TODO maybe add a kill request to exit loop
             handleRequest((JSONObject) nextValue);
           } else {
-            System.err
-                .println("[CANFilterService] Could not process json request."
-                    + nextValue);
+            filterLog.logJSONError(nextValue.toString());
           }
         } catch (JSONException e) {
-          System.err.println("[CANFilterService] Could not process"
-              + " request. " + e.getMessage());
+          filterLog.logJSONError(e.getMessage());
         }
       }
 
     } catch (IOException e) {
-      System.err.println("[CANFilterService] Error listening on port "
-          + address.getPort() + ": " + e);
+      filterLog.logSocketError(e.getMessage());
     } catch (JSONException e) {
-      System.err
-          .println("[CANFilterService] Error while reading json objects from input stream");
+      filterLog.logJsonErrror();
     } finally {
-      System.out
-          .println("[CANFilterService] No more requests. Closing sockets");
+      filterLog.logNoMoreRequests();
       close(socket);
       close(serverSocket);
     }
   }
 
-  private static void close(ServerSocket serverSocket) {
-    try {
-      if (serverSocket != null) {
-        serverSocket.close();
-      }
-    } catch (IOException e) {
-      System.err.println("[CANFilterService] Could not close socket: "
-          + e.getMessage());
-    }
-  }
-
-  private static void close(Socket socket) {
+  private static void close(Closeable socket) {
     try {
       if (socket != null) {
         socket.close();
       }
     } catch (IOException e) {
-      System.err.println("[CANFilterService] Could not close socket: "
-          + e.getMessage());
+      filterLog.logSocketClose(e.getMessage());
     }
   }
 
@@ -154,15 +134,15 @@ public class CANFilterService {
       JSONException {
     JSONArray data = request.getJSONArray("reqData");
     switch (request.getString("reqType")) {
-      case "start":
-        addEntries(data);
-        break;
-      case "stop":
-        removeEntries(data);
-        break;
-      default:
-        System.err.println("[CANFilterService] Unsupported request");
-        break;
+    case "start":
+      addEntries(data);
+      break;
+    case "stop":
+      removeEntries(data);
+      break;
+    default:
+      filterLog.logUnsupportedRequest();
+      break;
     }
   }
 
@@ -174,13 +154,14 @@ public class CANFilterService {
   }
 
   private static void addEntry(String key, int interval) {
-    System.out.println("[CANFilterService] Adding entry " + key
-        + " with interval " + interval);
+    filterLog.logEntryAddition(key, interval);
     car2xEntries.put(key, new Car2XEntry());
-    if (entryUpdater == null || entryUpdater.getState() != State.RUNNABLE) {
-      System.out.println("[CANFilterService] Starting entry updater");
-      entryUpdater = new Car2XEntryUpdater(car2xEntries);
-      entryUpdater.start();
+
+    if (entryUpdaterThread == null
+        || entryUpdaterThread.getState() != State.RUNNABLE) {
+      filterLog.logStartEntryUpdater();
+      entryUpdaterThread = new Thread(entryUpdater);
+      entryUpdaterThread.start();
     }
     timeoutResponder.addTimer(key, interval);
   }
@@ -193,24 +174,8 @@ public class CANFilterService {
   }
 
   private static void removeEntry(String key) {
-    System.out.println("[CANFilterService] Removing enty " + key);
+    filterLog.logEntryRemoval(key);
     car2xEntries.remove(key);
     timeoutResponder.removeTimer(key);
-  }
-
-  private static int extractPortNumber(String[] args, int pos,
-      int defaultValue) {
-    int portNumber = defaultValue;
-
-    try {
-      if (args.length > pos) {
-        portNumber = Integer.parseInt(args[pos]);
-      }
-    } catch (NumberFormatException e) {
-      System.err.println("[CANFilterService] Wrong port format ("
-          + args[pos] + ") using " + defaultValue);
-    }
-
-    return portNumber;
   }
 }
