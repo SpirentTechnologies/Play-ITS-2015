@@ -26,8 +26,8 @@ public class Car2XControlExternalFunctionProvider extends
    *            port
    * @return process id
    */
-  @ExternalFunction(name = "start_Filter", module = "Car2X_Control")
-  public CharstringValue start_Filter(CharstringValue host,
+  @ExternalFunction(name = "startFilter", module = "Car2X_Control")
+  public CharstringValue startFilter(CharstringValue host,
       IntegerValue portNumber) {
     return start_Filter(
         // CANFilterService.class.getCanonicalName()
@@ -80,8 +80,8 @@ public class Car2XControlExternalFunctionProvider extends
    * Stops the CAN filter service process.
    * @return true (service could successfully be stopped)
    */
-  @ExternalFunction(name = "stop_Filter", module = "Car2X_Control")
-  public BooleanValue stop_Filter() {
+  @ExternalFunction(name = "stopFilter", module = "Car2X_Control")
+  public BooleanValue stopFilter() {
     logInfo("Stopping CAN service filter.");
 
     if (process != null) {
