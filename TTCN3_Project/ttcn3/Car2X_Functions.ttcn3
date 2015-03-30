@@ -12,6 +12,7 @@ module Car2X_Functions {
 	}
 
 	import from Car2X_Templates {
+		altstep a_defaultFailAndInconcAltstep;
 		template
 			m_FilterAcceleratorPedalStart,
 			m_FilterAcceleratorPedalStop,
@@ -480,13 +481,25 @@ module Car2X_Functions {
 	 * @param p_timeout intervall until timeout (in sec)
 	 */
 	function f_HEADLAMP_STATUS(boolean p_Status, float p_timeout) runs on TesterComponentType return verdicttype  {
-		var verdicttype v_ret := inconc;
+		var verdicttype v_ret := none;
+		timer t_TC := c_timerFiveSeconds;
+		var default test := activate(a_defaultFailAndInconcAltstep(t_TC, v_ret));
+		
 		// start ignition status request
 		filterPort.send(m_FilterHeadLampStatusStart);
+		// start global timer
 		t_TC_Global.start(p_timeout);
 
 		while (t_TC_Global.running) {
-			v_ret := f_HeadlampStatusSub(p_Status, c_timerTwoSeconds);
+    		t_TC.start(c_timerTwoSeconds);
+    
+    		alt {
+    			[] filterPort.receive(mw_FilterResponseHeadLampStatus(p_Status)) {
+    				t_TC.stop;
+    				v_ret := pass;
+    			}
+				[] a_defaultFailAndInconcAltstep(t_TC, v_ret)
+			}
 			if (v_ret == pass) {
 				t_TC_Global.stop;
 			}
@@ -498,36 +511,6 @@ module Car2X_Functions {
 		if (v_ret != pass) {
 			setverdict(v_ret);
 			f_tearDown();
-		}
-		return v_ret;
-	}
-
-	/**
-	 * @desc Receives values from CAN filter. Test body of
-	 * @see f_HEADLAMP_STATUS
-	 * @param p_Status Target status of headlamp; <b>true</b> headlamp on;
-	 *   <b>false</b> headlamp off
-	 * @param p_interval Time until timeout
-	 */
-	function f_HeadlampStatusSub(boolean p_Status, float p_interval) runs on TesterComponentType return verdicttype  {
-		var verdicttype v_ret := none;
-		var template FilterResponse v_headLampStatus;
-		timer t_TC := c_timerFiveSeconds;
-		t_TC.start(p_interval);
-
-		alt {
-			// store received template into value
-			[] filterPort.receive(mw_FilterResponseHeadLampStatus(p_Status)) {
-				t_TC.stop;
-				v_ret := pass;
-			}
-			[] filterPort.receive {
-				t_TC.stop;
-				v_ret := fail;
-			}
-			[] t_TC.timeout {
-				v_ret := inconc;
-			}
 		}
 		return v_ret;
 	}
