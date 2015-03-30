@@ -433,8 +433,7 @@ public class Elm327 {
 private static String getRawPIDs(String range) {
 	String rawResponse = "";
     if (usedConnection == BLUETOOTH) {
-      rawResponse = ELMBluetooth.run("01 " + range, ELMBluetooth.in,
-          ELMBluetooth.pwriter);
+      rawResponse = ELMBluetooth.run("01 " + range);
     } else if (usedConnection == RS232) {
       rawResponse = ELMRS232.run("01 " + range);
     }
@@ -464,8 +463,7 @@ private static String getRawPIDs(String range) {
   private static String run(String cmd) {
     String doubleCheck = "";
     if (usedConnection == BLUETOOTH) {
-      doubleCheck = ELMBluetooth.run(cmd, ELMBluetooth.in,
-          ELMBluetooth.pwriter);
+      doubleCheck = ELMBluetooth.run(cmd);
     } else if (usedConnection == RS232) {
       doubleCheck = ELMRS232.run(cmd);
     }

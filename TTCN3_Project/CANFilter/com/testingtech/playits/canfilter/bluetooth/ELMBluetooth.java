@@ -174,8 +174,7 @@ public class ELMBluetooth implements DiscoveryListener {
 	 *            Outputstream
 	 * @return raw reply
 	 */
-	public static String run(String command, BufferedReader in,
-			PrintWriter pwriter) {
+	public static String run(String command) {
 		pwriter.write(command + "\r");
 		pwriter.flush();
 		try {
