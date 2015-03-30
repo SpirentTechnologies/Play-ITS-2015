@@ -7,7 +7,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.util.Hashtable;
 import java.util.Vector;
 
 import javax.bluetooth.DeviceClass;
@@ -33,13 +32,11 @@ public class ELMBluetooth implements DiscoveryListener {
 
 	private String connectionURL = null;
 
-	public Hashtable<String, String> openXCToOBD2Map = new Hashtable<String, String>();
-
 	public BufferedReader br;
 	public PrintWriter pwriter;
 	public BufferedReader in;
 
-	 ELMBluetooth obj = new ELMBluetooth();
+	 ELMBluetooth obj;
 
 	/**
 	 * @param RemoteDevice
