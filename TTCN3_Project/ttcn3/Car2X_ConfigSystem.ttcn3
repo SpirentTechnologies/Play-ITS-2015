@@ -35,7 +35,6 @@ module Car2X_ConfigSystem {
 	 * @member filtererPort @see Car2X_ConfigSystem.FiltererPortType
 	 */
 	type component TesterComponentType {
-		timer t_TC := 5.0;
 		timer t_TC_Global := 5.0;
 		var integer v_stage := 1;
 		port ElmPortType elmPort;
