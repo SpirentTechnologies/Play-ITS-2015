@@ -15,9 +15,9 @@ public class ELMRS232 {
 	static Socket sock = null;
 	static Hashtable<String, String> commandHashTable = new Hashtable<String, String>();
 
-	private static String portName = "COM4";
+	private String portName = "COM4";
 
-	private static SerialPort serialPort = new SerialPort(portName);
+	private SerialPort serialPort = new SerialPort(portName);
 
 	/**
 	 * Runs the given command, waits 200ms and returns the raw Reply without
@@ -26,7 +26,7 @@ public class ELMRS232 {
 	 * @param command
 	 * @return raw Reply
 	 */
-	public static String run(String command) {
+	public String run(String command) {
 		try {
 			serialPort.writeString(command + "\r");
 		} catch (SerialPortException e) {
@@ -45,7 +45,7 @@ public class ELMRS232 {
 	 * 
 	 * @return raw data without INIT, WAITING etc
 	 */
-	public static String getResponse() {
+	public String getResponse() {
 		StringBuilder res = new StringBuilder();
 		String rawResponse = null;
 		byte[] input = null;
@@ -70,7 +70,7 @@ public class ELMRS232 {
 	/**
 	 * Inits the serialPort Connection
 	 */
-	public static void init(String portname) {
+	public void init(String portname) {
 		try {
 			if (!(portname == "")) {
 				serialPort = new SerialPort(portname);

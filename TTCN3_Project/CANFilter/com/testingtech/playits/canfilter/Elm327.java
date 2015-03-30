@@ -15,13 +15,20 @@ import com.testingtech.playits.canfilter.rs232.ELMRS232;
 
 public class Elm327 {
   private static final String TWO_HEX_BYTES = "([0-9A-F]{2})+";
-  private static int RS232 = 0;
-  private static int BLUETOOTH = 1;
-  private static int usedConnection;
+  private static final int RS232 = 0;
+  private static final int BLUETOOTH = 1;
+  private int usedConnection;
 
-  public static Hashtable<String, String> openXCToOBD2Map = new Hashtable<String, String>();
+  public Hashtable<String, String> openXCToOBD2Map = new Hashtable<String, String>();
 
-  public static Hashtable<String, Car2XEntry> car2xEntries = new Hashtable<>();
+  public Hashtable<String, Car2XEntry> car2xEntries = new Hashtable<>();
+private ELMBluetooth elmBluetooth;
+private ELMRS232 elmRS232;
+
+public Elm327() {
+	elmBluetooth = new ELMBluetooth();
+	elmRS232 = new ELMRS232();
+}
 
   /**
    * 
@@ -29,7 +36,7 @@ public class Elm327 {
    * @return see http://en.wikipedia.org/wiki/OBD-II_PIDs adds possible
    *         available PID Codes
    */
-  public static void initOpenXCToOBD2Map() {
+  public void initOpenXCToOBD2Map() {
     // TODO Error-Handling if there is no OBD2 Key(here 00)
 
     openXCToOBD2Map.put("steering_wheel_angle", "00");
@@ -218,7 +225,7 @@ public class Elm327 {
    * @param value
    * @return
    */
-  public static <T, E> T getKeyByValue(Map<T, E> map, E value) {
+  public <T, E> T getKeyByValue(Map<T, E> map, E value) {
     for (Entry<T, E> entry : map.entrySet()) {
       if (value.equals(entry.getValue())) {
         return entry.getKey();
@@ -234,7 +241,7 @@ public class Elm327 {
    * @return true if hex or starts with AT primarily to check the Command
    *         sending to ELM327
    */
-  public static boolean checkIfHexOrAT(String input) {
+  public boolean checkIfHexOrAT(String input) {
     String rawData = input.replaceAll("\\s", "");
     return rawData.matches(TWO_HEX_BYTES) || (rawData.startsWith("AT"));
   }
@@ -247,7 +254,7 @@ public class Elm327 {
    *         Hex-Bytes means 00 - FF = 0 - 255. To get the percentage:
    *         Data/255*100
    */
-  public static String convertOBD2Response(String response) {
+  public String convertOBD2Response(String response) {
     Float result;
     if (!((response.replaceAll("\\s+", "")).matches(TWO_HEX_BYTES))) {
       return response;
@@ -353,7 +360,7 @@ public class Elm327 {
    *         [04,05,0C,0D,21,22,30,31,42,49]
    * 
    */
-  public static List<String> getSupportedPIDs() {
+  public List<String> getSupportedPIDs() {
     List<String> pids = new ArrayList<String>();
     for (int i = 0; i < 8; i += 2) {
       String binaryPIDs = getBinaryPIDs(String.valueOf(i) + "0");
@@ -367,7 +374,7 @@ public class Elm327 {
     return pids;
   }
 
-  private static Collection<? extends String> getPIDs(String binaryPIDs) {
+  private Collection<? extends String> getPIDs(String binaryPIDs) {
     List<String> pids = new ArrayList<String>();
     for (int i = 0; i < binaryPIDs.length(); i++) { 
         if (binaryPIDs.charAt(i) == '1') {
@@ -383,7 +390,7 @@ public class Elm327 {
    * @param hexadecimalPIDs
    * @return the given hex String to Binary String
    */
-  private static String getBinaryPIDs(String range) {
+  private String getBinaryPIDs(String range) {
 	  String hexadecimalPIDs = getHexadecimalPIDs(range);
 	  String binaryPIDs = "";
     if (hexadecimalPIDs.matches(TWO_HEX_BYTES)) {
@@ -401,7 +408,7 @@ public class Elm327 {
    * @param i position in binary field
    * @return hex value of that position
    */
-  private static String intPositionInBinaryField2Hex(int i) {
+  private String intPositionInBinaryField2Hex(int i) {
     String hex = Integer.toHexString(i + 1);
     hex = hex.toUpperCase();
     if (hex.length() == 1) {
@@ -415,7 +422,7 @@ public class Elm327 {
    * @param range e.g. 20 --> 01 20
    * @return the supported 01 PIDs for the given range
    */
-  private static String getHexadecimalPIDs(String range) {
+  private String getHexadecimalPIDs(String range) {
     String rawResponse = getRawPIDs(range);
     // delete whitespaces
     rawResponse = rawResponse.replaceAll("\\s+", "");
@@ -430,12 +437,12 @@ public class Elm327 {
  * @param range
  * @return
  */
-private static String getRawPIDs(String range) {
+private String getRawPIDs(String range) {
 	String rawResponse = "";
     if (usedConnection == BLUETOOTH) {
-      rawResponse = ELMBluetooth.run("01 " + range);
+      rawResponse = elmBluetooth.run("01 " + range);
     } else if (usedConnection == RS232) {
-      rawResponse = ELMRS232.run("01 " + range);
+      rawResponse = elmRS232.run("01 " + range);
     }
 	return rawResponse;
 }
@@ -445,7 +452,7 @@ private static String getRawPIDs(String range) {
    * 
    * @param pids
    */
-  private static void doubleCheck(List<String> pids) {
+  private void doubleCheck(List<String> pids) {
     String doubleCheck;
     for (String pid : pids) {
       doubleCheck = run(pid);
@@ -460,12 +467,12 @@ private static String getRawPIDs(String range) {
    * @param cmd
    * @return
    */
-  private static String run(String cmd) {
+  private String run(String cmd) {
     String doubleCheck = "";
     if (usedConnection == BLUETOOTH) {
-      doubleCheck = ELMBluetooth.run(cmd);
+      doubleCheck = elmBluetooth.run(cmd);
     } else if (usedConnection == RS232) {
-      doubleCheck = ELMRS232.run(cmd);
+      doubleCheck = elmRS232.run(cmd);
     }
     return doubleCheck.replaceAll("\\s+", "");
   }

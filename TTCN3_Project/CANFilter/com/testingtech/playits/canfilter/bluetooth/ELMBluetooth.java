@@ -27,19 +27,19 @@ import javax.microedition.io.StreamConnection;
  */
 public class ELMBluetooth implements DiscoveryListener {
 
-	private static Object lock = new Object();
+	private Object lock = new Object();
 
-	private static Vector<RemoteDevice> remdevices = new Vector<RemoteDevice>();
+	private Vector<RemoteDevice> remdevices = new Vector<RemoteDevice>();
 
-	private static String connectionURL = null;
+	private String connectionURL = null;
 
-	public static Hashtable<String, String> openXCToOBD2Map = new Hashtable<String, String>();
+	public Hashtable<String, String> openXCToOBD2Map = new Hashtable<String, String>();
 
-	public static BufferedReader br;
-	public static PrintWriter pwriter;
-	public static BufferedReader in;
+	public BufferedReader br;
+	public PrintWriter pwriter;
+	public BufferedReader in;
 
-	static ELMBluetooth obj = new ELMBluetooth();
+	 ELMBluetooth obj = new ELMBluetooth();
 
 	/**
 	 * @param RemoteDevice
@@ -104,7 +104,7 @@ public class ELMBluetooth implements DiscoveryListener {
 	 * 
 	 * @throws IOException
 	 */
-	public static void init() throws IOException {
+	public void init() throws IOException {
 		br = new BufferedReader(new InputStreamReader(System.in));
 		obj = new ELMBluetooth();
 		LocalDevice locdevice = LocalDevice.getLocalDevice();
@@ -174,7 +174,7 @@ public class ELMBluetooth implements DiscoveryListener {
 	 *            Outputstream
 	 * @return raw reply
 	 */
-	public static String run(String command) {
+	public String run(String command) {
 		pwriter.write(command + "\r");
 		pwriter.flush();
 		try {
