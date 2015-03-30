@@ -47,11 +47,13 @@ module Car2X_Functions {
 			mw_FilterResponseVehicleSpeed;
 	}
 
-	import from Car2X_Types {type DoorStatus, FilterResponse, IgnitionStatus, TransmissionGear;}
+	import from Car2X_Types {
+		type DoorStatus, FilterResponse, IgnitionStatus, TransmissionGear;
+	}
 
 	import from Car2X_ConfigSystem {type TesterComponentType;}
 	
-	import from Car2X_Control all;
+	import from Car2X_Control {function startFilter, stopFilter;}
 
 	/**
 	 * @desc Function to measure vehicle speed for a defined period of time.
@@ -508,7 +510,7 @@ module Car2X_Functions {
 	 * @param p_interval Time until timeout
 	 */
 	function f_HeadlampStatusSub(boolean p_Status, float p_interval) runs on TesterComponentType return verdicttype  {
-		var verdicttype v_ret := inconc;
+		var verdicttype v_ret := none;
 		var template FilterResponse v_headLampStatus;
 		timer t_TC := c_timerFiveSeconds;
 		t_TC.start(p_interval);

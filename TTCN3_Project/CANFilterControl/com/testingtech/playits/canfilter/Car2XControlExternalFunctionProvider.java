@@ -45,8 +45,10 @@ public class Car2XControlExternalFunctionProvider extends
     logInfo("Starting " + mainClass + " with parameters: \""
         + join(parameters, "\" \"") + "\"");
 
+    String pathSeparator = System.getProperty("path.separator");
     try {
-      process = Runtime.getRuntime().exec("java -classpath build/CANFilter;libs/java-json.jar "
+    	
+      process = Runtime.getRuntime().exec("java -classpath build/CANFilter"+ pathSeparator +"libs/java-json.jar "
               + mainClass + " " + join(parameters, " "));
 
       new StreamForwarder(process.getInputStream(), System.out)
