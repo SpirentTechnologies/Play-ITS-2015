@@ -65,12 +65,6 @@ module Car2X_Functions {
 		var verdicttype v_ret := inconc;
 		t_TC_Global.start(p_timeOut);
 		filterPort.send(m_FilterVehicleSpeedStart);
-//		alt {
-//		}
-		
-		
-		
-		
 		
 		while (t_TC_Global.running) {
 			v_ret := f_VehicleSpeedSub(p_speed, p_holding_time, p_variance, c_timerTwoSeconds);
@@ -104,13 +98,12 @@ module Car2X_Functions {
 		// start the timer
 		t_TC.start(p_interval);
 		alt {
-			[v_ret == pass] filterPort.receive(mw_FilterResponseVehicleSpeed(p_speed, p_variance)) {
+			[] filterPort.receive(mw_FilterResponseVehicleSpeed(p_speed, p_variance)) {
 				t_TC.stop;
 				t_holding.start(p_holding_time);
 				while (t_holding.running and v_ret == pass) {
 					alt {
 						[] filterPort.receive(mw_FilterResponseVehicleSpeed(p_speed, p_variance)) {
-//							t_holding.stop;
 							v_ret := pass;
 						}
 						[] filterPort.receive {
@@ -947,10 +940,11 @@ module Car2X_Functions {
 	 *   TODO: new stage as return
 	 */
 	function f_setVerdictAndStage(verdicttype p_verdict, integer p_stage, float p_globalTimer)
-		runs on TesterComponentType  {
+		runs on TesterComponentType return integer {
 		setverdict(p_verdict);
 		p_stage := p_stage + 1;
 		// send stage information
 		action("stage:" & int2str(p_stage) & ",timeWindow:" & int2str(float2int(p_globalTimer)));
+		return p_stage;
 	}
 }

@@ -6,6 +6,7 @@
     <library name="../../libs/java-json.jar"/>
     <library name="../../libs/bluecove-2.1.0.jar"/>
     <library name="../../libs/jssc.jar"/>
+    <library name="../../CANFilter"/>
   </runtime>
   <dependency/>
   <extension point="com.testingtech.ttcn.extension.ExternalFunctionsProvider">
