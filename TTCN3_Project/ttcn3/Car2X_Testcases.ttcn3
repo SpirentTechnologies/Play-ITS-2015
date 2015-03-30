@@ -24,7 +24,9 @@ module Car2X_Testcases {
 			c_steeringWheelMin,
 			c_steeringWheelVariance50,
 			c_timerFiveSeconds,
+			c_timerFortySeconds,
 			c_timerOneSecond,
+			c_timerSixtySeconds,
 			c_timerTenSeconds,
 			c_timerThirtySeconds,
 			c_timerTwentySeconds,
@@ -67,7 +69,7 @@ module Car2X_Testcases {
 	testcase TC_VEHICLE_SPEED_OVER_50_10_SEC() runs on TesterComponentType system SystemComponentType {
 		var verdicttype v_ret := inconc;
 
-		var float v_timerValue := c_timerThirtySeconds;
+		var float v_timerValue := c_timerSixtySeconds;
 
 		// set up configuration
 		f_setUp();
@@ -92,7 +94,7 @@ module Car2X_Testcases {
 	 */
 	testcase TC_OBD2_TESTCASE() runs on TesterComponentType system SystemComponentType {
 		var verdicttype v_ret := inconc;
-		var float v_timerValue := c_timerTwentySeconds;
+		var float v_timerValue := c_timerFortySeconds;
 		// set up configuration
 		f_setUp();
 
@@ -101,8 +103,8 @@ module Car2X_Testcases {
 
 		// executing stage 1 - start engine; use battery status
 		v_ret := f_BATTERY_STATUS(c_batteryStatus12, c_batteryStatusVarrianceHalf, c_timerOneSecond, c_timerTwoSeconds);
-		v_timerValue := c_timerTwentySeconds;
-		f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
+		v_timerValue := c_timerFortySeconds;
+		v_stage := f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
 
 		// 	executing stage 2 - speed up engine
 		v_ret := f_ENGINE_SPEED(c_engineSpeed2500, c_timerOneSecond, c_engineSpeedVar100, c_timerThirtySeconds);
@@ -119,7 +121,7 @@ module Car2X_Testcases {
 	 */
 	testcase TC_FULL_BRAKE_OVER_60() runs on TesterComponentType system SystemComponentType {
 		var verdicttype v_ret := inconc;
-		var float v_timerValue := c_timerTwentySeconds;
+		var float v_timerValue := c_timerFortySeconds;
 		// set up configuration
 		f_setUp();
 
@@ -128,15 +130,15 @@ module Car2X_Testcases {
 
 		// executing stage 1 - start engine
 		v_ret := f_IGNITION_STATUS(e_start,v_timerValue);
-		v_timerValue := c_timerThirtySeconds;
-		f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
+		v_timerValue := c_timerSixtySeconds;
+		v_stage := f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
 
 		// executing stage 2 - speed up to 60
 		v_ret :=
 			f_VEHICLE_SPEED(c_vehicleSpeed50 + c_vehicleSpeed10, c_timerOneSecond, c_vehicleSpeedVar5,
 							v_timerValue);
-		v_timerValue := c_timerTenSeconds + c_timerFiveSeconds;
-		f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
+		v_timerValue := c_timerThirtySeconds;
+		v_stage := f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
 
 		// 	executing stage 3 - brake down
 		v_ret := f_BRAKE_PEDAL(c_brakePedalStatusPressed, c_timerOneSecond, v_timerValue);
@@ -154,7 +156,7 @@ module Car2X_Testcases {
 	 */
 	testcase TC_ENGINE_ROTATION_SPEED() runs on TesterComponentType system SystemComponentType {
 		var verdicttype v_ret := inconc;
-		var float v_timerValue := c_timerTwentySeconds;
+		var float v_timerValue := c_timerFortySeconds;
 		// set up configuration
 		f_setUp();
 
@@ -163,18 +165,18 @@ module Car2X_Testcases {
 
 		// executing stage 1 - start engine
 		v_ret := f_IGNITION_STATUS(e_start, v_timerValue);
-		v_timerValue := c_timerTenSeconds;
-		f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
+		v_timerValue := c_timerTwentySeconds;
+		v_stage := f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
 
 		// executing stage 2 - change to gear neutral
 		v_ret := f_TRANSMISSION_GEAR_STATUS(e_neutral, v_timerValue);
-		v_timerValue := c_timerThirtySeconds;
-		f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
+		v_timerValue := c_timerSixtySeconds;
+		v_stage := f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
 
 		// 	executing stage 3 - speed up engine
 		v_ret := f_ENGINE_SPEED(c_engineSpeed2500, c_timerOneSecond, c_engineSpeedVar100, v_timerValue);
-		v_timerValue := c_timerTenSeconds;
-		f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
+		v_timerValue := c_timerTwentySeconds;
+		v_stage := f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
 
 		// 	executing stage 4 - release gas pedal
 		v_ret :=
@@ -219,7 +221,7 @@ module Car2X_Testcases {
 	 */
 	testcase TC_OPEN_DOOR_AT_SPEED_50() runs on TesterComponentType system SystemComponentType {
 		var verdicttype v_ret := inconc;
-		var float v_timerValue := c_timerTwentySeconds;
+		var float v_timerValue := c_timerFortySeconds;
 		// set up configuration
 		f_setUp();
 
@@ -228,17 +230,17 @@ module Car2X_Testcases {
 
 		// executing stage 1 - start engine
 		v_ret := f_IGNITION_STATUS(e_start, v_timerValue);
-		v_timerValue := c_timerThirtySeconds;
-		f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
+		v_timerValue := c_timerSixtySeconds;
+		v_stage := f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
 
 		// executing stage 2 - speed up o 50
 		v_ret := f_VEHICLE_SPEED(c_vehicleSpeed50, c_timerOneSecond, c_vehicleSpeedVar5, v_timerValue);
-		v_timerValue := c_timerTenSeconds + c_timerFiveSeconds;
-		f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
+		v_timerValue := c_timerThirtySeconds;
+		v_stage := f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
 
 		// 	executing stage 3 - open driver door
 		v_ret := f_DOOR_STATUS(e_driver, c_doorStatusOpen, v_timerValue);
-		f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
+		v_stage := f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
 
 		// 	executing stage 4 - close driver door
 		v_ret := f_DOOR_STATUS(e_driver, c_doorStatusClose, v_timerValue);
@@ -256,7 +258,7 @@ module Car2X_Testcases {
 	 */
 	testcase TC_PARKING_BRAKE_STATUS() runs on TesterComponentType system SystemComponentType {
 		var verdicttype v_ret := inconc;
-		var float v_timerValue := c_timerTwentySeconds;
+		var float v_timerValue := c_timerFortySeconds;
 		// set up configuration
 		f_setUp();
 		// send stage information
@@ -264,16 +266,16 @@ module Car2X_Testcases {
 
 		// executing stage 1 - ignition status to accessory
 		v_ret := f_IGNITION_STATUS(e_accessory,v_timerValue);
-		v_timerValue := c_timerTenSeconds;
-		f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
+		v_timerValue := c_timerTwentySeconds;
+		v_stage := f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
 
 		// executing stage 2 - disengage parking brake (optionally)
 		v_ret := f_PARKING_BRAKE_STATUS(c_parkingBrakeStatusReleased, v_timerValue);
-		f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
+		v_stage := f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
 
 		// executing stage 3 - engage parking brake
 		v_ret := f_PARKING_BRAKE_STATUS(c_parkingBrakeStatusPressed, v_timerValue);
-		f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
+		v_stage := f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
 
 		setverdict(v_ret);
 		// tear down configuration
@@ -287,7 +289,7 @@ module Car2X_Testcases {
 	 */
 	testcase TC_HEADLAMP_STATUS() runs on TesterComponentType system SystemComponentType {
 		var verdicttype v_ret := inconc;
-		var float v_timerValue := c_timerTwentySeconds;
+		var float v_timerValue := c_timerFortySeconds;
 
 		// set up configuration
 		f_setUp();
@@ -296,16 +298,16 @@ module Car2X_Testcases {
 
 		// executing stage 1 - engine to start
 		v_ret := f_IGNITION_STATUS(e_run, v_timerValue);
-		v_timerValue := c_timerTenSeconds;
-		f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
+		v_timerValue := c_timerTwentySeconds;
+		v_stage := f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
 
 		// executing stage 2 - turn off head lamp (optional)
 		v_ret := f_HEADLAMP_STATUS(c_headLampOff, v_timerValue);
-		f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
+		v_stage := f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
 
 		// executing stage 3 - turn on head lamp
 		v_ret := f_HEADLAMP_STATUS(c_headLampOn, v_timerValue);
-		f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
+		v_stage := f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
 
 		// executing stage 4 - turn off head lamp
 		v_ret := f_HEADLAMP_STATUS(c_headLampOff, v_timerValue);
@@ -321,7 +323,7 @@ module Car2X_Testcases {
 	 */
 	testcase TC_IGNITION_STATE_DUMMY() runs on TesterComponentType system SystemComponentType {
 		var verdicttype v_ret := inconc;
-		var float v_timerValue := 10.0;
+		var float v_timerValue := c_timerTenSeconds;
 
 		// set up configuration
 		f_setUp();
@@ -344,7 +346,7 @@ module Car2X_Testcases {
 	 */
 	testcase TC_STEERING_WHEEL_ANGLE() runs on TesterComponentType system SystemComponentType {
 		var verdicttype v_ret := inconc;
-		var float v_timerValue := c_timerTwentySeconds;
+		var float v_timerValue := c_timerFortySeconds;
 
 		// set up configuration
 		f_setUp();
@@ -354,16 +356,16 @@ module Car2X_Testcases {
 
 		// executing stage 1
 		v_ret := f_IGNITION_STATUS(e_accessory, v_timerValue);
-		v_timerValue := c_timerTenSeconds;
-		f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
+		v_timerValue := c_timerTwentySeconds;
+		v_stage := f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
 
 		// executing stage 2
 		v_ret := f_STEERING_WHEEL_ANGLE(c_steeringWheelMin, c_steeringWheelVariance50, v_timerValue);
-		f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
+		v_stage := f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
 
 		// 	executing stage 3
 		v_ret := f_STEERING_WHEEL_ANGLE(c_steeringWheelMax, c_steeringWheelVariance50, v_timerValue);
-		f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
+		v_stage := f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
 
 		// 	executing stage 4
 		v_ret := f_STEERING_WHEEL_ANGLE(c_steeringWheel0, c_steeringWheelVariance50, v_timerValue);
@@ -380,7 +382,7 @@ module Car2X_Testcases {
 	 */
 	testcase TC_DRIVE_IN_REVERSE() runs on TesterComponentType{
 		var verdicttype v_ret := inconc;
-    	var float v_timerValue := c_timerTwentySeconds;    
+    	var float v_timerValue := c_timerFortySeconds;    
     	// set up configuration
     	f_setUp();    
     	// send stage information
@@ -388,23 +390,23 @@ module Car2X_Testcases {
     
     	// executing stage 1 -change to ignition status start
     	v_ret := f_IGNITION_STATUS(e_start, v_timerValue);
-    	v_timerValue := c_timerTenSeconds;
-    	f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
+    	v_timerValue := c_timerTwentySeconds;
+		v_stage := f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
     
     	// 	executing stage 2 - change to gear status reverse
     	v_ret := f_TRANSMISSION_GEAR_STATUS(e_reverse,v_timerValue);
-		v_timerValue := c_timerTwentySeconds;
-		f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
+		v_timerValue := c_timerFortySeconds;
+		v_stage := f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
 		
 		// 	executing stage 3 - speed up to 10 km/h
 		v_ret := f_VEHICLE_SPEED(c_vehicleSpeed10, c_timerOneSecond, c_vehicleSpeedVar0, v_timerValue);
-		v_timerValue := c_timerTwentySeconds;
-		f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
+		v_timerValue := c_timerFortySeconds;
+		v_stage := f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
 		
 		// 	executing stage 4 - slow down to 0 km/h
 		v_ret := f_VEHICLE_SPEED(c_vehicleSpeedMin, c_timerOneSecond, c_vehicleSpeedVar0, v_timerValue);
-		v_timerValue := c_timerTenSeconds;
-		f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
+		v_timerValue := c_timerTwentySeconds;
+		v_stage := f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
 		
 		//executing stage 5 -  activate parking brake
 		v_ret := f_PARKING_BRAKE_STATUS(c_parkingBrakeStatusPressed,v_timerValue);
@@ -420,7 +422,7 @@ module Car2X_Testcases {
 	 */
 	testcase TC_SPEED_UP_50_SLOW_DOWN_30() runs on TesterComponentType {
 		var verdicttype v_ret := inconc;
-		var float v_timerValue := c_timerTwentySeconds;
+		var float v_timerValue := c_timerFortySeconds;
 
 		// set up configuration
 		f_setUp();
@@ -430,18 +432,18 @@ module Car2X_Testcases {
 
 		// executing stage 1
 		v_ret := f_IGNITION_STATUS(e_start, v_timerValue);
-		v_timerValue := c_timerThirtySeconds;
-		f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
+		v_timerValue := c_timerSixtySeconds;
+		v_stage := f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
 
 		// 	executing stage 2 - speed up to 50
 		v_ret := f_VEHICLE_SPEED(c_vehicleSpeed50, c_timerOneSecond, c_vehicleSpeedVar5, v_timerValue);
-		v_timerValue := c_timerThirtySeconds;
-		f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
+		v_timerValue := c_timerSixtySeconds;
+		v_stage := f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
 
 		// 	executing stage 3 - slow down to 30
 		v_ret := f_VEHICLE_SPEED(c_vehicleSpeed30, c_timerOneSecond, c_vehicleSpeedVar5, v_timerValue);
-		v_timerValue := c_timerThirtySeconds;
-		f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
+		v_timerValue := c_timerSixtySeconds;
+		v_stage := f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
 		
 		// 	executing stage 3 - keep speed between 10 and 30
 		v_ret := f_VEHICLE_SPEED(c_vehicleSpeed10+c_vehicleSpeed10, c_timerFiveSeconds, c_vehicleSpeedVar10, v_timerValue);
@@ -457,7 +459,7 @@ module Car2X_Testcases {
 	 */
 	testcase TC_SPEED_UP_30_AND_STOP() runs on TesterComponentType{
     	var verdicttype v_ret := inconc;
-    	var float v_timerValue := c_timerTwentySeconds;
+    	var float v_timerValue := c_timerFortySeconds;
     
     	// set up configuration
     	f_setUp();
@@ -467,18 +469,18 @@ module Car2X_Testcases {
     
     	// executing stage 1
     	v_ret := f_IGNITION_STATUS(e_start, v_timerValue);
-    	v_timerValue := c_timerThirtySeconds;
-    	f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
+    	v_timerValue := c_timerSixtySeconds;
+		v_stage := f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
     
     	// 	executing stage 2 - speed up to 30
     	v_ret := f_VEHICLE_SPEED(c_vehicleSpeed30, c_timerOneSecond, c_vehicleSpeedVar5, v_timerValue);
-		v_timerValue := c_timerThirtySeconds;
-		f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
+		v_timerValue := c_timerSixtySeconds;
+		v_stage := f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
 		
 		// 	executing stage 3 - slow down to 0
 		v_ret := f_VEHICLE_SPEED(c_vehicleSpeedMin, c_timerOneSecond, c_vehicleSpeedVar5, v_timerValue);
-		v_timerValue := c_timerTenSeconds;
-		f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
+		v_timerValue := c_timerTwentySeconds;
+		v_stage := f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
 		
 		//executing stage 4 -  activate parking brake
 		v_ret := f_PARKING_BRAKE_STATUS(c_parkingBrakeStatusPressed,v_timerValue);
