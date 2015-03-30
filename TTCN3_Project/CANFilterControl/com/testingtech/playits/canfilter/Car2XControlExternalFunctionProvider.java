@@ -37,27 +37,32 @@ public class Car2XControlExternalFunctionProvider extends
   }
 
   private CharstringValue start_Filter(String mainClass, String[] parameters) {
-    if (process != null && process.isAlive()) {
-      return newCharstringValue(processId);
-    }
-    processId = UUID.randomUUID().toString();
-
-    logInfo("Starting " + mainClass + " with parameters: \""
-        + join(parameters, "\" \"") + "\"");
-
     try {
-      process = Runtime.getRuntime().exec("java -classpath build/CANFilter;libs/java-json.jar "
-              + mainClass + " " + join(parameters, " "));
+      if (process == null || process.exitValue() == 0) {
+        processId = UUID.randomUUID().toString();
 
-      new StreamForwarder(process.getInputStream(), System.out)
-          .start();
-      new StreamForwarder(process.getErrorStream(), System.err)
-          .start();
-    } catch (IOException e) {
-      logError("Could not start CAN filter service: " + e.getMessage());
-      return newCharstringValue("");
+        logInfo("Starting " + mainClass + " with parameters: \""
+            + join(parameters, "\" \"") + "\"");
+
+        try {
+          process = Runtime.getRuntime().exec(
+              "java -classpath build/CANFilter;libs/java-json.jar "
+                  + mainClass + " " + join(parameters, " "));
+
+          new StreamForwarder(process.getInputStream(), System.out)
+              .start();
+          new StreamForwarder(process.getErrorStream(), System.err)
+              .start();
+        } catch (IOException e) {
+          logError("Could not start CAN filter service: "
+              + e.getMessage());
+          return newCharstringValue("");
+        }
+      }
+
+    } catch (IllegalThreadStateException e) {
+      // process is still running
     }
-
     return newCharstringValue(processId);
   }
 
@@ -78,6 +83,7 @@ public class Car2XControlExternalFunctionProvider extends
 
   /**
    * Stops the CAN filter service process.
+   * 
    * @return true (service could successfully be stopped)
    */
   @ExternalFunction(name = "stopFilter", module = "Car2X_Control")
