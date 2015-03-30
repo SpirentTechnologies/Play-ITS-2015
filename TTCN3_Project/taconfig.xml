@@ -50,4 +50,4 @@
 		<parameter id="portType" value="Car2X_ConfigSystem.FilterPortType" />
 		<parameter id="default" value="true" />
 	</port>
-</testadapter>
+</testadapter> 
