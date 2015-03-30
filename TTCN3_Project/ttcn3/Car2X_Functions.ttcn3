@@ -31,8 +31,8 @@ module Car2X_Functions {
 			m_FilterParkingBrakeStatusStart,
 			m_FilterSteeringWheelStart,
 			m_FilterSteeringWheelStop,
-			m_FilterTransmissionGearStart,
-			m_FilterTransmissionGearStop,
+			m_FilterGearLeverStart,
+			m_FilterGearLeverStop,
 			m_FilterVehicleSpeedStart,
 			m_FilterVehicleSpeedStop,
 			mw_FilterResponseAcceleratorPedal,
@@ -44,13 +44,11 @@ module Car2X_Functions {
 			mw_FilterResponseIgnitionStatus,
 			mw_FilterResponseParkingBrakeStatus,
 			mw_FilterResponseSteeringWheel,
-			mw_FilterResponseTransmissionGear,
+			mw_FilterResponseGearLever,
 			mw_FilterResponseVehicleSpeed;
 	}
 
-	import from Car2X_Types {
-		type DoorStatus, FilterResponse, IgnitionStatus, TransmissionGear;
-	}
+	import from Car2X_Types {type DoorStatus, FilterResponse, IgnitionStatus, GearLever;}
 
 	import from Car2X_ConfigSystem {type TesterComponentType;}
 	
@@ -70,7 +68,7 @@ module Car2X_Functions {
 		filterPort.send(m_FilterVehicleSpeedStart);
 		
 		while (t_TC_Global.running) {
-			v_ret := f_VehicleSpeedSub(p_speed, p_holding_time, p_variance, c_timerTwoSeconds);
+			v_ret := f_VehicleSpeedSub(p_speed, p_holding_time, p_variance, c_timerOneSecond);
 			if (v_ret == pass) {
 				t_TC_Global.stop;
 			}
@@ -103,6 +101,7 @@ module Car2X_Functions {
 		alt {
 			[] filterPort.receive(mw_FilterResponseVehicleSpeed(p_speed, p_variance)) {
 				t_TC.stop;
+				v_ret := pass;
 				t_holding.start(p_holding_time);
 				while (t_holding.running and v_ret == pass) {
 					alt {
@@ -645,19 +644,19 @@ module Car2X_Functions {
 	 * @param p_interval time until timeout
 	 * @verdict
 	 */
-	function f_TRANSMISSION_GEAR_STATUS(TransmissionGear gear, float p_interval)
+	function f_GEAR_LEVER_STATUS(GearLever gear, float p_interval)
 		runs on TesterComponentType return verdicttype  {
 		var verdicttype v_ret := inconc;
 		t_TC_Global.start(p_interval);
-		filterPort.send(m_FilterTransmissionGearStart);
+		filterPort.send(m_FilterGearLeverStart);
 
 		while (t_TC_Global.running) {
-			v_ret := f_transmissionGearStatusSub(gear, c_timerOneSecond);
+			v_ret := f_GearLeverStatusSub(gear, c_timerOneSecond);
 			if (v_ret == pass) {
 				t_TC_Global.stop;
 			}
 		}
-		filterPort.send(m_FilterTransmissionGearStop);
+		filterPort.send(m_FilterGearLeverStop);
 
 		if (v_ret != pass) {
 			setverdict(v_ret);
@@ -675,7 +674,7 @@ module Car2X_Functions {
 	 *   m_FilterTransmissionGearStart
 	 * @verdict
 	 */
-	function f_transmissionGearStatusSub(TransmissionGear p_gear, float p_interval)
+	function f_GearLeverStatusSub(GearLever p_gear, float p_interval)
 		runs on TesterComponentType return verdicttype  {
 		var verdicttype v_ret := inconc;
 		var template FilterResponse v_gearStatus;
@@ -683,7 +682,7 @@ module Car2X_Functions {
 		t_TC.start(p_interval);
 
 		alt {
-			[] filterPort.receive(mw_FilterResponseTransmissionGear(p_gear)) {
+			[] filterPort.receive(mw_FilterResponseGearLever(p_gear)) {
 				t_TC.stop;
 				v_ret := pass;
 			}
@@ -861,7 +860,7 @@ module Car2X_Functions {
 	 * @param gear The gear status to cast
 	 * @return The gear status as charstring
 	 */
-	function f_gearStatus2Str(TransmissionGear p_gear) return charstring  {
+	function f_gearStatus2Str(GearLever p_gear) return charstring  {
 		select (p_gear) {
 			case (e_first) {
 				return "first";

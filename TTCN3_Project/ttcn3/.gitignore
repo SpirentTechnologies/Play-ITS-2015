@@ -9,3 +9,9 @@
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
+/Car2X_ConfigSystem.jar
+/Car2X_Main.jar
+/Car2X_ModuleParameters.jar
+/Car2X_Templates.jar
+/Car2X_Testcases.jar
+/Car2X_Types.jar
