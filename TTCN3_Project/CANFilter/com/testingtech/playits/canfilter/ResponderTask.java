@@ -14,6 +14,10 @@ public class ResponderTask extends TimerTask {
   private String key;
   private Car2XEntry car2xEntry;
   private Socket socket;
+  static CANFilterLog canFilterLog = new CANFilterLog(
+			ResponderTask.class.getSimpleName());
+  
+  private JSONObject response = new JSONObject();
 
 //  /**
 //   * Periodically sends a key-value pair encoded as a JSON String over a
@@ -30,32 +34,37 @@ public class ResponderTask extends TimerTask {
     this.key = key;
     this.car2xEntry = car2xEntry;
     this.socket = socket;
+    createResponseTemplate(key, car2xEntry);
   }
+
+private void createResponseTemplate(String key, Car2XEntry car2xEntry) {
+	try {
+		response.put("OpenXCKey", key);
+		response.put("OBD2Key", car2xEntry.getOBD2key());
+	} catch (JSONException e) {
+	}
+}
 
   @Override
   public void run() {
     try {
-      JSONObject response = createResponse();
-      System.out.println("[ResponderTask] Sending " + response);
+      JSONObject response = updateResponse();
+      canFilterLog.logInfo(FilterLogMessages.SENDING_RESPONSE, response.toString());
       sendJSONObject(response);
     } catch (JSONException e) {
-      System.out.println("[ResponderTask] Error creating JSON response. "
-          + e.getMessage());
+      canFilterLog.logError(FilterLogMessages.JSON_ERROR, e.getMessage());
     }
   }
 
-  private JSONObject createResponse() throws JSONException {
+  private JSONObject updateResponse() throws JSONException {
     // INFO: omits key if value is empty
-    JSONObject response = new JSONObject();
-    response.put("OpenXCKey", key);
-    response.put("OBD2Key", car2xEntry.getOBD2key());
-    response.put("car2XValue", getValue());
+    response.put("car2XValue", createValue());
     response.put("eventValue", car2xEntry.getEvent());
     response.put("respTimestamp", car2xEntry.getTimestamp());
     return response;
   }
 
-  private JSONObject getValue() throws JSONException {
+  private JSONObject createValue() throws JSONException {
     JSONObject valueObject = new JSONObject();
     Object value = car2xEntry.getValue();
     if (value instanceof String) {
@@ -78,9 +87,7 @@ public class ResponderTask extends TimerTask {
     try {
       sendBytes(bytes);
     } catch (IOException e) {
-      System.err
-          .println("[ResponderTask] Error while sending response for "
-              + key + ": " + e.getMessage());
+    	canFilterLog.logError(FilterLogMessages.SENDING_RESPONSE, key, e.getMessage());
       cancel();
     }
   }

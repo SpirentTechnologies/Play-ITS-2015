@@ -9,6 +9,8 @@ public class TimeoutResponder {
   private Hashtable<String, Timer> timers = new Hashtable<>();
   private Hashtable<String, Car2XEntry> car2xEntries;
   private Socket socket;
+  static CANFilterLog canFilterLog = new CANFilterLog(
+		  TimeoutResponder.class.getSimpleName());
 
   /**
    * Starts and stops tasks that periodically send openXC / obd-2 values 
@@ -42,8 +44,7 @@ public class TimeoutResponder {
     }
     timer = new Timer();
     timers.put(key, timer);
-    System.out.println("[TimeoutResponder] Starting response of "
-        + key + " every " + interval + " milliseconds");
+    canFilterLog.logInfo(FilterLogMessages.STARTING_RESPONSE, key);
     // TODO set 2nd parameter to zero if immediate response is desired
     timer.schedule(new ResponderTask(key, car2xEntries.get(key), socket),
         interval, interval);
@@ -56,8 +57,7 @@ public class TimeoutResponder {
    *            openXC key
    */
   public void removeTimer(String key) {
-    System.out.println("[TimeoutResponder] Stopping periodic response of "
-        + key);
+	canFilterLog.logInfo(FilterLogMessages.STOPPING_RESPONSE, key);
     Timer timer = timers.get(key);
     if (timer != null) {
       timer.cancel();

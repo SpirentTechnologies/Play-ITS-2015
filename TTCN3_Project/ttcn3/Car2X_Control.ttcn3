@@ -1,4 +1,4 @@
 module Car2X_Control {
-	external function start_Filter(in charstring host, in integer portNumber) return charstring;
-	external function stop_Filter() return boolean;
+	external function startFilter(in charstring host, in integer portNumber) return charstring;
+	external function stopFilter() return boolean;
 }

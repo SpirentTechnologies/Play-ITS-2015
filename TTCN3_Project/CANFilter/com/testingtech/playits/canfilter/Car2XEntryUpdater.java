@@ -39,13 +39,17 @@ import java.util.Scanner;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class Car2XEntryUpdater extends Thread {
+public class Car2XEntryUpdater implements Runnable {
 
 	private static final String DEFAULT_SIMULATOR_HOST = "localhost";
 	private static final int DEFAULT_SIMULATOR_PORT = 50001;
 
 	private Hashtable<String, Car2XEntry> car2xEntries;
 	private InetSocketAddress address;
+
+	private boolean isRunning = false;
+	static CANFilterLog canFilterLog = new CANFilterLog(
+			Car2XEntryUpdater.class.getSimpleName());
 
 	/**
 	 * Connects to the openXC simulator and updates openXC respectively obd2
@@ -64,15 +68,13 @@ public class Car2XEntryUpdater extends Thread {
 	 * updated requested (at least one entry exists).
 	 */
 	public void run() {
+		isRunning = true;
 		Socket socket = null;
 		Scanner scanner = null;
 		try {
 			socket = new Socket();
-			System.out
-					.println("[EntryUpdater] Connecting to openXC simulator at "
-							+ address.getHostName()
-							+ " on local port "
-							+ address.getPort());
+			canFilterLog.logInfo(FilterLogMessages.OPENXC_CONNECTION,
+					address.getHostName(), String.valueOf(address.getPort()));
 			socket.connect(address);
 
 			scanner = new Scanner(socket.getInputStream()).useDelimiter(String
@@ -82,17 +84,26 @@ public class Car2XEntryUpdater extends Thread {
 				parseString(scanner.next());
 			}
 		} catch (SocketTimeoutException e) {
-			System.out.println("[EntryUpdater] Timeout: Could not connect to "
-					+ address.getHostName() + ":" + address.getPort());
+			canFilterLog.logError(FilterLogMessages.SOCKET_TIMEOUT,
+					address.getHostName(), String.valueOf(address.getPort()), e.getMessage());
 		} catch (IOException ioe) {
-			System.err.println("[EntryUpdater] Could not connect to "
-					+ address.getHostName() + " on port " + address.getPort());
+			canFilterLog.logError(FilterLogMessages.SOCKET_CONNECT,
+					address.getHostName(), String.valueOf(address.getPort()), ioe.getMessage());
 		} finally {
-			System.out
-					.println("[EntryUpdater] No more entries to update. Shutting down.");
+			isRunning = false;
+			canFilterLog.logInfo(FilterLogMessages.NO_MORE_ENTRIES);
 			close(scanner);
 			close(socket);
 		}
+	}
+
+	/**
+	 * 
+	 * @return true if the entry updater is still updating entries, otherwise
+	 *         false.
+	 */
+	public boolean isRunning() {
+		return isRunning;
 	}
 
 	private void close(Scanner scanner) {
@@ -106,8 +117,7 @@ public class Car2XEntryUpdater extends Thread {
 			try {
 				socket.close();
 			} catch (IOException e) {
-				System.out.println("[EntryUpdater] Could not close socket: "
-						+ e.getMessage());
+				canFilterLog.logError(FilterLogMessages.SOCKET_ERROR, e.getMessage());
 			}
 		}
 	}
@@ -115,8 +125,6 @@ public class Car2XEntryUpdater extends Thread {
 	private void parseString(String jsonString) {
 		// TODO enable to debug
 //		 System.out.println("[EntryUpdater] Incoming object: " + jsonString);
-		if (jsonString.contains("parking_brake_status"))
-				System.out.println(jsonString);
 		try {
 			JSONObject jsonObject = new JSONObject(jsonString);
 			Car2XEntry car2xEntry = car2xEntries.get(jsonObject
@@ -125,8 +133,7 @@ public class Car2XEntryUpdater extends Thread {
 				updateEntry(car2xEntry, jsonObject);
 			}
 		} catch (JSONException jsone) {
-			System.err.println("[EntryUpdater] Could not parse json string: "
-					+ jsonString);
+			canFilterLog.logError(FilterLogMessages.JSON_ERROR);
 		}
 	}
 
