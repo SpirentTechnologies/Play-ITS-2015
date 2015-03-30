@@ -380,7 +380,7 @@ module Car2X_Testcases {
 	 * @desc testcase for reverse gear
 	 * @verdict 
 	 */
-	testcase TC_DRIVE_IN_REVERSE() runs on TesterComponentType{
+	testcase TC_DRIVE_IN_REVERSE() runs on TesterComponentType system SystemComponentType{
 		var verdicttype v_ret := inconc;
     	var float v_timerValue := c_timerFortySeconds;    
     	// set up configuration
@@ -399,16 +399,21 @@ module Car2X_Testcases {
 		v_stage := f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
 		
 		// 	executing stage 3 - speed up to 10 km/h
-		v_ret := f_VEHICLE_SPEED(c_vehicleSpeed10, c_timerOneSecond, c_vehicleSpeedVar0, v_timerValue);
+		v_ret := f_VEHICLE_SPEED(c_vehicleSpeed10, c_timerOneSecond, c_vehicleSpeedVar5, v_timerValue);
 		v_timerValue := c_timerFortySeconds;
 		v_stage := f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
 		
-		// 	executing stage 4 - slow down to 0 km/h
-		v_ret := f_VEHICLE_SPEED(c_vehicleSpeedMin, c_timerOneSecond, c_vehicleSpeedVar0, v_timerValue);
+		// 	executing stage 4 - hold speed for 10 seconds
+		v_ret := f_VEHICLE_SPEED(c_vehicleSpeed10, c_timerTenSeconds, c_vehicleSpeedVar5, v_timerValue);
+		v_timerValue := c_timerFortySeconds;
+		v_stage := f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
+		
+		// 	executing stage 5 - slow down to 0 km/h
+		v_ret := f_VEHICLE_SPEED(c_vehicleSpeedMin, c_timerOneSecond, c_vehicleSpeedVar5, v_timerValue);
 		v_timerValue := c_timerTwentySeconds;
 		v_stage := f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
 		
-		//executing stage 5 -  activate parking brake
+		//executing stage 6 -  activate parking brake
 		v_ret := f_PARKING_BRAKE_STATUS(c_parkingBrakeStatusPressed,v_timerValue);
     	setverdict(v_ret);
     	// tear down configuration
@@ -420,7 +425,7 @@ module Car2X_Testcases {
 	 * @desc testcase - speed up to 50 km/h and then slow down to 30
 	 * @verdict 
 	 */
-	testcase TC_SPEED_UP_50_SLOW_DOWN_30() runs on TesterComponentType {
+	testcase TC_SPEED_UP_50_SLOW_DOWN_30() runs on TesterComponentType system SystemComponentType{
 		var verdicttype v_ret := inconc;
 		var float v_timerValue := c_timerFortySeconds;
 

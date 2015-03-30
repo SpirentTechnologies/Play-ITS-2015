@@ -47,9 +47,7 @@ module Car2X_Functions {
 			mw_FilterResponseVehicleSpeed;
 	}
 
-	import from Car2X_Types {
-		type DoorStatus, FilterResponse, IgnitionStatus, GearLever;
-	}
+	import from Car2X_Types {type DoorStatus, FilterResponse, IgnitionStatus, GearLever;}
 
 	import from Car2X_ConfigSystem {type TesterComponentType;}
 	
@@ -69,7 +67,7 @@ module Car2X_Functions {
 		filterPort.send(m_FilterVehicleSpeedStart);
 		
 		while (t_TC_Global.running) {
-			v_ret := f_VehicleSpeedSub(p_speed, p_holding_time, p_variance, c_timerTwoSeconds);
+			v_ret := f_VehicleSpeedSub(p_speed, p_holding_time, p_variance, c_timerOneSecond);
 			if (v_ret == pass) {
 				t_TC_Global.stop;
 			}
@@ -102,6 +100,7 @@ module Car2X_Functions {
 		alt {
 			[] filterPort.receive(mw_FilterResponseVehicleSpeed(p_speed, p_variance)) {
 				t_TC.stop;
+				v_ret := pass;
 				t_holding.start(p_holding_time);
 				while (t_holding.running and v_ret == pass) {
 					alt {

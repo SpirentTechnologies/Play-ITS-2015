@@ -118,6 +118,7 @@ module Car2X_ModuleParameters {
 	const float c_vehicleSpeedVar15 := 15.0;
 	const float c_vehicleSpeedVar10 := 10.0;
 	const float c_vehicleSpeedVar5 := 5.0;
+	const float c_vehicleSpeedVar1 := 1.0;
 	const float c_vehicleSpeedVar0 := 0.0;
 	
 	//engine speed
