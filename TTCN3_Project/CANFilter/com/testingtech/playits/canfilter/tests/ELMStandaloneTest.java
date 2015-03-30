@@ -36,7 +36,7 @@ public class ELMStandaloneTest{
 		case "3":
 			return;
 		default:
-			break;
+			return;
 		}
 		
 		System.out.println("now displaying all converted supported PIDs:");
