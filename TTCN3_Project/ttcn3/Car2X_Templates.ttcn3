@@ -5,7 +5,33 @@
 module Car2X_Templates {
 	import from Car2X_ConfigSystem all;
 	import from Car2X_Functions all;
-	import from Car2X_ModuleParameters all;
+	import from Car2X_ModuleParameters {
+		const
+			c_ElmVehicleSpeed,
+			c_FilterInterval1000,
+			c_FilterInterval1500,
+			c_FilterInterval500,
+			c_acceleratorPedalPosition,
+			c_batteryStatus,
+			c_brakePedalStatus,
+			c_doorStatus,
+			c_engineSpeed,
+			c_gearLeverPosition,
+			c_headlampStatus,
+			c_ignitionStatus,
+			c_modePrefix01,
+			c_parkingBrakeStatus,
+			c_startRequest,
+			c_steeringWheelAngle,
+			c_stopRequest,
+			c_transmissionGearPosition,
+			c_vehicleSpeed,
+			cvd_AcceleratorPedal,
+			cvd_batteryStatus,
+			cvd_engineSpeed,
+			cvd_steeringWheel,
+			cvd_vehicleSpeed;
+	}
 	import from Car2X_Types all;
 
 
@@ -79,15 +105,15 @@ module Car2X_Templates {
 	/**
 	 * @desc Template to start transmission gear request with interval 1000
 	 */
-	template FilterRequest m_FilterTransmissionGearStart() := {
-		reqType := c_startRequest, reqData := {{key := c_transmissionGearPosition, interval := c_FilterInterval1000}}
+	template FilterRequest m_FilterGearLeverStart() := {
+		reqType := c_startRequest, reqData := {{key := c_gearLeverPosition, interval := c_FilterInterval1000}}
 	}
 
 	/**
 	 * @desc Template to stop steering gear request with interval 1000
 	 */
-	template FilterRequest m_FilterTransmissionGearStop() := {
-		reqType := c_stopRequest, reqData := {{key := c_transmissionGearPosition}}
+	template FilterRequest m_FilterGearLeverStop() := {
+		reqType := c_stopRequest, reqData := {{key := c_gearLeverPosition}}
 	}
 
 	/**
@@ -194,8 +220,8 @@ module Car2X_Templates {
 	/**
 	 * @desc Template for transmission gear reponse
 	 */
-	template FilterResponse mw_FilterResponseTransmissionGear(TransmissionGear p_gear) := {
-		OpenXCKey := c_transmissionGearPosition,
+	template FilterResponse mw_FilterResponseGearLever(GearLever p_gear) := {
+		OpenXCKey := c_gearLeverPosition,
 		OBD2Key := ?,
 		car2XValue := {stringValue := f_gearStatus2Str(p_gear)},
 		eventValue := ?,

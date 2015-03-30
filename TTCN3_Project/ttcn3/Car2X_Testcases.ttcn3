@@ -39,7 +39,7 @@ module Car2X_Testcases {
 			c_vehicleSpeedVar10,
 			c_vehicleSpeedVar5;
 	}
-	import from Car2X_Types {type DoorStatus, IgnitionStatus, TransmissionGear;}
+	import from Car2X_Types {type DoorStatus, IgnitionStatus, GearLever;}
 
 	import from Car2X_ConfigSystem all;
 	import from Car2X_Functions {
@@ -53,7 +53,7 @@ module Car2X_Testcases {
 			f_IGNITION_STATUS,
 			f_PARKING_BRAKE_STATUS,
 			f_STEERING_WHEEL_ANGLE,
-			f_TRANSMISSION_GEAR_STATUS,
+			f_GEAR_LEVER_STATUS,
 			f_VEHICLE_SPEED,
 			f_setUp,
 			f_setVerdictAndStage,
@@ -169,7 +169,7 @@ module Car2X_Testcases {
 		v_stage := f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
 
 		// executing stage 2 - change to gear neutral
-		v_ret := f_TRANSMISSION_GEAR_STATUS(e_neutral, v_timerValue);
+		v_ret := f_GEAR_LEVER_STATUS(e_neutral, v_timerValue);
 		v_timerValue := c_timerSixtySeconds;
 		v_stage := f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
 
@@ -394,7 +394,7 @@ module Car2X_Testcases {
 		v_stage := f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
     
     	// 	executing stage 2 - change to gear status reverse
-    	v_ret := f_TRANSMISSION_GEAR_STATUS(e_reverse,v_timerValue);
+    	v_ret := f_GEAR_LEVER_STATUS(e_reverse,v_timerValue);
 		v_timerValue := c_timerFortySeconds;
 		v_stage := f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
 		

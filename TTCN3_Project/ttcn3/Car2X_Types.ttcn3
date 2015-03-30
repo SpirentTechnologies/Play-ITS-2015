@@ -126,7 +126,7 @@ module Car2X_Types {
 	 * @member e_reverse
 	 * @member e_neutral
 	 */
-	type enumerated TransmissionGear {
+	type enumerated GearLever {
 		e_first,
 		e_second,
 		e_third,
@@ -138,7 +138,11 @@ module Car2X_Types {
 		e_nineth,
 		e_tenth,
 		e_reverse,
-		e_neutral
+		e_neutral,
+		e_park,
+		e_drive,
+		e_sport,
+		e_low
 	}
 	
 	/**
