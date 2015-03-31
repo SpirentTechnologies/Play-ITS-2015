@@ -387,58 +387,23 @@ module Car2X_Functions {
 	function f_BATTERY_STATUS(float p_batteryStatus, float p_variance,
 							  float p_holdingTime, float p_timeOut)
 		runs on TesterComponentType return verdicttype  {
-		var verdicttype v_ret := inconc;
-		t_TC_Global.start(p_timeOut);
-		filterPort.send(m_FilterBatteryStatusStart);
-		while (t_TC_Global.running) {
-			v_ret :=
-				f_batteryStatusSub(p_batteryStatus, p_variance, p_holdingTime,
-								   c_timerTwoSeconds);
-			if (v_ret == pass) {
-				t_TC_Global.stop;
-			}
-		}
-		filterPort.send(m_FilterBatteryStatusStop);
-
-		if (v_ret != pass) {
-			setverdict(v_ret);
-			f_tearDown();
-		}
-		return v_ret;
-	}
-
-	/**
-	 * @desc request battery status from CAN filter
-	 * @param p_batteryStatus target status to reach (in V)
-	 * @param p_variance Variance of target voltage
-	 * @param p_holding_time Time with target voltage (in V)
-	 * @param p_globalTime Time until timeout (in sec)
-	 * @return
-	 * @verdict
-	 */
-	function f_batteryStatusSub(float p_batteryStatus, float p_variance,
-								float p_holdingTime, float p_globalTime)
-		runs on TesterComponentType return verdicttype  {
-		var verdicttype v_ret := pass;
-		var template FilterResponse v_battery;
-		timer t_TC := c_timerFiveSeconds;
+		var verdicttype v_ret := none;
 		timer t_holding;
-
-		// start the timer
-		t_TC.start(p_globalTime);
-		alt {
-			[] filterPort
-			   .receive(mw_FilterResponseBatteryStatus(p_batteryStatus,
-													   p_variance)) {
-				t_TC.stop;
+		
+		// start battery status request
+		filterPort.send(m_FilterBatteryStatusStart);
+		// start global timer
+		t_TC_Global.start(p_timeOut);
+		
+		while (t_TC_Global.running) {
+			alt {
+				[] filterPort.receive(mw_FilterResponseBatteryStatus(p_batteryStatus, p_variance)) {
+				// timer to check whether the value can be hold for a given timespan
 				t_holding.start(p_holdingTime);
+				
 				while (t_holding.running and v_ret == pass) {
 					alt {
-						[] filterPort
-						   .receive(mw_FilterResponseBatteryStatus(p_batteryStatus
-																   ,
-																   p_variance))
-						{
+						[] filterPort.receive(mw_FilterResponseBatteryStatus(p_batteryStatus, p_variance)){
 							v_ret := pass;
 						}
 						[] filterPort.receive {
@@ -448,12 +413,18 @@ module Car2X_Functions {
 				}
 			}
 			[] filterPort.receive {
-				t_TC.stop;
 				v_ret := fail;
 			}
-			[] t_TC.timeout {
+			[] t_TC_Global.timeout {
 				v_ret := inconc;
 			}
+		}
+		}
+		filterPort.send(m_FilterBatteryStatusStop);
+
+		if (v_ret != pass) {
+			setverdict(v_ret);
+			f_tearDown();
 		}
 		return v_ret;
 	}
@@ -469,7 +440,7 @@ module Car2X_Functions {
 		runs on TesterComponentType return verdicttype  {
 		var verdicttype v_ret := none;
 		
-		// start steering Wheel request
+		// start steering wheel request
 		filterPort.send(m_FilterSteeringWheelStart);
 		// start global timer
 		t_TC_Global.start(p_globalTime);
