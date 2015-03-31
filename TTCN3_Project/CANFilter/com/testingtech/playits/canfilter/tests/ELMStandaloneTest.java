@@ -7,14 +7,13 @@ import java.util.List;
 
 import com.testingtech.playits.canfilter.Elm327;
 
-
-public class ELMStandaloneTest{
-	public static void main(String[] args) throws IOException{
+public class ELMStandaloneTest {
+	public static void main(String[] args) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		Elm327 elm327 = new Elm327();
 		System.out.println("Please choose:");
 		System.out.println("[1] = Bluetooth  [2] = RS232  [3] = Exit");
-		String command = br.readLine(); 
+		String command = br.readLine();
 		switch (command) {
 		case "1":
 			elm327.usedConnection = elm327.BLUETOOTH;
@@ -24,15 +23,16 @@ public class ELMStandaloneTest{
 			break;
 		case "2":
 			elm327.usedConnection = elm327.RS232;
-			System.out.println("You choosed RS232, please enter the used COM-Port(like COM3) or press Enter");
+			System.out
+					.println("You choosed RS232, please enter the used COM-Port(like COM3) or press Enter");
 			String portname = br.readLine();
-			if (portname.startsWith("COM")){
+			if (portname.startsWith("COM")) {
 				elm327.init(portname);
 			} else {
 				elm327.init("");
 			}
 			break;
-			
+
 		case "3":
 			return;
 		default:
@@ -42,26 +42,35 @@ public class ELMStandaloneTest{
 		elm327.initOpenXCToOBD2Map();
 		List<String> supportedPids = elm327.getSupportedPIDs();
 		for (String hexPids : supportedPids) {
-			System.out.println(elm327.getKeyByValue(elm327.openXCToOBD2Map,hexPids) + " = " + hexPids);
+			System.out.println(elm327.getKeyByValue(elm327.openXCToOBD2Map,
+					hexPids) + " = " + hexPids);
 		}
-		
+
 		System.out.println("Please enter one of the Strings above");
 		System.out.println("To Exit simply enter 'EXIT");
-		System.out.println("If there are Problems with ELM, run the Command AT Z");
-		while(true){
-			command = br.readLine(); 
+		System.out
+				.println("If there are Problems with ELM, run the Command AT Z");
+		while (true) {
+			command = br.readLine();
 			if (command.equals("EXIT")) {
 				return;
-			} else  {
-				if (command.startsWith("01")){
-					System.out.println("Entered Command: " + command + " = as OpenXCKey: " + elm327.getKeyByValue(elm327.openXCToOBD2Map, command));
+			} else {
+				if (command.startsWith("01")) {
+					System.out.println("Entered Command: "
+							+ command
+							+ " = as OpenXCKey: "
+							+ elm327.getKeyByValue(elm327.openXCToOBD2Map,
+									command));
 				} else {
-					System.out.println("Entered Command: " + command + " = as PID: " + elm327.openXCToOBD2Map.get(command));
+					System.out.println("Entered Command: " + command
+							+ " = as PID: "
+							+ elm327.openXCToOBD2Map.get(command));
 				}
 				String response = elm327.run(command);
-				System.out.println("Response: " + response + " = Converted : " + elm327.convertOBD2Response(response));
+				System.out.println("Response: " + response + " = Converted : "
+						+ elm327.convertOBD2Response(response));
 			}
 		}
-		
+
 	}
 }

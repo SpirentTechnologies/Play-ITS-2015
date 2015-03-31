@@ -26,15 +26,15 @@ import javax.microedition.io.StreamConnection;
  */
 public class ELMBluetooth implements DiscoveryListener {
 
-	private Object lock = new Object();
+	private static Object lock = new Object();
 
-	private Vector<RemoteDevice> remdevices = new Vector<RemoteDevice>();
+	private static Vector<RemoteDevice> remdevices = new Vector<RemoteDevice>();
 
-	private String connectionURL = null;
+	private static String connectionURL = null;
 
 	public BufferedReader br;
-	public PrintWriter pwriter;
-	public BufferedReader in;
+	private static PrintWriter pwriter;
+	private static BufferedReader in;
 
 	 ELMBluetooth obj;
 
@@ -97,19 +97,23 @@ public class ELMBluetooth implements DiscoveryListener {
 		br = new BufferedReader(new InputStreamReader(System.in));
 		obj = new ELMBluetooth();
 		LocalDevice locdevice = LocalDevice.getLocalDevice();
+		    String add = locdevice.getBluetoothAddress();
+		    String friendlyName = locdevice.getFriendlyName();
+	
+		    System.out.println("Local Bluetooth Address : " + add);
+		    System.out.println("" + "" + "Local Friendly name : " + friendlyName);
 	    DiscoveryAgent disAgent = locdevice.getDiscoveryAgent();
 	    System.out.println("********Locating Devices******");
 	    disAgent.startInquiry(DiscoveryAgent.GIAC, obj);
 		try {
 			synchronized (lock) {
-				System.out.println("one");
+				System.out.println("Lock Set");
 				lock.wait();
-				System.out.println("two");
+				System.out.println("Lock Released");
 			}
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-
 		if (remdevices.size() <= 0) {
 			System.out.println("No devices found");
 
@@ -144,7 +148,6 @@ public class ELMBluetooth implements DiscoveryListener {
 
 			if (connectionURL == null) {
 				System.out.println("Device does not support SPP");
-				// TODO Error Handling ("Device does not support SPP.");
 			} else {
 				System.out.println("Device supports SPP.");
 				StreamConnection stConnect = (StreamConnection) Connector

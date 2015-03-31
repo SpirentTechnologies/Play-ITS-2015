@@ -41,7 +41,7 @@ public class Elm327 {
 	public void initOpenXCToOBD2Map() {
 		File file = new File("resources\\openXCToOBD2Map.txt");
 		try {
-			Scanner scanner = new Scanner(file); //.useDelimiter("\n")
+			Scanner scanner = new Scanner(file); // .useDelimiter("\n")
 			while (scanner.hasNext()) {
 				addKeyValuePair(scanner.nextLine());
 			}
@@ -94,13 +94,14 @@ public class Elm327 {
 	public String convertOBD2Response(String response) {
 		Float result;
 		int value2 = 0;
-		if (!((response.replaceAll("\\s+", "")).matches(TWO_HEX_BYTES)) || response.length() < 6) {
+		if (!((response.replaceAll("\\s+", "")).matches(TWO_HEX_BYTES))
+				|| response.length() < 6) {
 			return response;
 		} else {
 			String[] data = response.split("\\s"); // (response =
 			// "41 0C 0C FC") 41,0C,0C,FC, data[0] = Bus, data[1] = Command
 			int value1 = Integer.parseInt(data[2], 16);
-			if (data.length > 3){
+			if (data.length > 3) {
 				value2 = Integer.parseInt(data[3], 16);
 			}
 			switch (data[1]) {
@@ -221,7 +222,7 @@ public class Elm327 {
 				pids.add("01 " + intPositionInBinaryField2Hex(i, range));
 			}
 		}
-//		doubleCheck(pids); //TODO ConcurrentModificationException..
+		// doubleCheck(pids); //TODO ConcurrentModificationException..
 		return pids;
 	}
 
@@ -245,18 +246,19 @@ public class Elm327 {
 
 	/**
 	 * 
-	 * @param i position in binary field
+	 * @param i
+	 *            position in binary field
 	 * @return hex value of that position
 	 */
 	private String intPositionInBinaryField2Hex(int i, int range) {
-		String hex = Integer.toHexString(i + 1); //TODO change to i ?
+		String hex = Integer.toHexString(i + 1); // TODO change to i ?
 		hex = hex.toUpperCase();
 		if (hex.length() == 1) {
-			//F -> 0F, or F-> 2F
-			hex = Integer.toString(range) + hex; 
-		} else if (hex.length() == 2){
-			//1F -> 3F
-			hex = Integer.toString(range+1) + hex.charAt(1);
+			// F -> 0F, or F-> 2F
+			hex = Integer.toString(range) + hex;
+		} else if (hex.length() == 2) {
+			// 1F -> 3F
+			hex = Integer.toString(range + 1) + hex.charAt(1);
 		}
 		return hex;
 	}
@@ -312,7 +314,7 @@ public class Elm327 {
 	public void init() throws IOException {
 		elmBluetooth.init();
 	}
-	
+
 	public void init(String portname) throws IOException {
 		elmRS232.init(portname);
 	}
@@ -325,16 +327,16 @@ public class Elm327 {
 	 */
 	public String run(String cmd) {
 		String response = "";
-		
-		if(cmd != null){
-			if(openXCToOBD2Map.contains(cmd)){ //PID or AT Command directly 
+
+		if (cmd != null) {
+			if (openXCToOBD2Map.contains(cmd)) { // PID or AT Command directly
 				if (usedConnection == BLUETOOTH || cmd.startsWith("AT")) {
 					response = elmBluetooth.run(cmd);
 				} else if (usedConnection == RS232) {
 					response = elmRS232.run(cmd);
 				}
 				return response;
-			} else if (openXCToOBD2Map.containsKey(cmd)){ //openXCKey
+			} else if (openXCToOBD2Map.containsKey(cmd)) { // openXCKey
 				if (usedConnection == BLUETOOTH) {
 					response = elmBluetooth.run(openXCToOBD2Map.get(cmd));
 				} else if (usedConnection == RS232) {
