@@ -497,7 +497,6 @@ module Car2X_Functions {
 				}
 			}
 		}
-		// stop ignition status request
 		filterPort.send(m_FilterHeadLampStatusStop);
 
 		// stage failed -> end whole TC

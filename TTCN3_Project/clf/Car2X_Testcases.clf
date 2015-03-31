@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE campaignloader PUBLIC "-//TESTING TECH//DTD MLF//2.0" "mlf.dtd">
 <campaignloader>
-  <campaign Name="Car2X_Testcases.clf" Control="false">
+  <campaign Name="Car2X_Testcases" Control="false">
     <testadapter Name="com.testingtech.ttcn.tri.PluginTestAdapter" File="">
       <description></description>
     </testadapter>
