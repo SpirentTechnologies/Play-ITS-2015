@@ -30,12 +30,10 @@ module Car2X_Testcases {
 			c_timerTenSeconds,
 			c_timerThirtySeconds,
 			c_timerTwentySeconds,
-			c_timerTwoSeconds,
 			c_vehicleSpeed10,
 			c_vehicleSpeed30,
 			c_vehicleSpeed50,
 			c_vehicleSpeedMin,
-			c_vehicleSpeedVar0,
 			c_vehicleSpeedVar10,
 			c_vehicleSpeedVar5;
 	}
