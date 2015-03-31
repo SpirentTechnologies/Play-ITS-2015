@@ -467,18 +467,26 @@ module Car2X_Functions {
 	function f_STEERING_WHEEL_ANGLE(float p_targetAngle, float p_variance,
 									float p_globalTime)
 		runs on TesterComponentType return verdicttype  {
-		var verdicttype v_ret := inconc;
-		t_TC_Global.start(p_globalTime);
+		var verdicttype v_ret := none;
+		
 		// start steering Wheel request
 		filterPort.send(m_FilterSteeringWheelStart);
+		// start global timer
+		t_TC_Global.start(p_globalTime);
 
 		while (t_TC_Global.running) {
-			v_ret :=
-				f_SteeringWheelAngleSub(p_targetAngle, p_variance,
-										c_timerTwoSeconds);
-			if (v_ret == pass) {
-				t_TC_Global.stop;
-			}
+    		alt {
+    			[] filterPort.receive(mw_FilterResponseSteeringWheel(p_targetAngle, p_variance)) {
+    				v_ret := pass;
+    				t_TC_Global.stop;
+    			}
+    			[] filterPort.receive {
+    				v_ret := fail;
+    			}
+    			[] t_TC_Global.timeout {
+    				v_ret := inconc;
+    			}
+    		}
 		}
 		// stop steering wheel request
 		filterPort.send(m_FilterSteeringWheelStop);
@@ -486,39 +494,6 @@ module Car2X_Functions {
 		if (v_ret != pass) {
 			setverdict(v_ret);
 			f_tearDown();
-		}
-		return v_ret;
-	}
-
-	/**
-	 * @desc Requests steering wheel angle from the CAN filter. Test body of
-	 * @see f_STEERING_WHEEL_ANGLE
-	 * @param p_targetAngle Angle which should be reached
-	 * @param p_variance Variance of the target angle
-	 * @param p_globalTime time until timeout; should be greater then the
-	 *   intervall time in m_Filter_doorStatus_Start
-	 */
-	function f_SteeringWheelAngleSub(float p_targetAngle, float p_variance,
-									 float p_globalTime)
-		runs on TesterComponentType return verdicttype  {
-		var verdicttype v_ret := inconc;
-		timer t_TC := c_timerFiveSeconds;
-
-		t_TC.start(p_globalTime);
-		alt {
-			[] filterPort
-			   .receive(mw_FilterResponseSteeringWheel(p_targetAngle,
-													   p_variance)) {
-				v_ret := pass;
-				t_TC.stop;
-			}
-			[] filterPort.receive {
-				v_ret := fail;
-				t_TC.stop;
-			}
-			[] t_TC.timeout {
-				v_ret := inconc;
-			}
 		}
 		return v_ret;
 	}
@@ -539,8 +514,7 @@ module Car2X_Functions {
 
 		while (t_TC_Global.running) {
 			alt {
-				[] filterPort
-				   .receive(mw_FilterResponseHeadLampStatus(p_Status)) {
+				[] filterPort.receive(mw_FilterResponseHeadLampStatus(p_Status)) {
 					t_TC_Global.stop;
 					v_ret := pass;
 				}
@@ -572,7 +546,7 @@ module Car2X_Functions {
 							   float p_globalTime)
 		runs on TesterComponentType return verdicttype  {
 		var verdicttype v_ret := none;
-		
+
 		// start ignition status request
 		filterPort.send(m_FilterIgnitionStateStart);
 		// start global timer
@@ -580,8 +554,7 @@ module Car2X_Functions {
 
 		while (t_TC_Global.running) {
 			alt {
-				[] filterPort
-				   .receive(mw_FilterResponseIgnitionStatus(p_ignitionStatus)) {
+				[] filterPort.receive(mw_FilterResponseIgnitionStatus(p_ignitionStatus)) {
 					t_TC_Global.stop;
 					v_ret := pass;
 				}
@@ -643,7 +616,7 @@ module Car2X_Functions {
 		}
 		return v_ret;
 	}
-	
+
 	/**
 	 * @desc Measures transmission gear and compare with target state
 	 * @param gear Target state; enum value of type TransmissionGear
@@ -658,7 +631,7 @@ module Car2X_Functions {
 		filterPort.send(m_FilterGearLeverStart);
 		// start global timer
 		t_TC_Global.start(p_globalTime);
-		
+
 		while (t_TC_Global.running) {
 			alt {
 				[] filterPort.receive(mw_FilterResponseGearLever(p_gear)) {
@@ -695,25 +668,25 @@ module Car2X_Functions {
 						   float p_timeOut)
 		runs on TesterComponentType return verdicttype  {
 		var verdicttype v_ret := none;
-		
+
 		// start gear lever status request
 		filterPort.send(m_FilterDoorStatusStart);
 		// start global timer
 		t_TC_Global.start(p_timeOut);
 
 		while (t_TC_Global.running) {
-    		alt {
-    			[] filterPort.receive(mw_FilterResponseDoorStatus(p_door, p_status)) {
-    				t_TC_Global.stop;
-    				v_ret := pass;
-    			}
-    			[] filterPort.receive {
-    				v_ret := fail;
-    			}
-    			[] t_TC_Global.timeout {
-    				v_ret := inconc;
-    			}
-    		}
+			alt {
+				[] filterPort.receive(mw_FilterResponseDoorStatus(p_door, p_status)) {
+					t_TC_Global.stop;
+					v_ret := pass;
+				}
+				[] filterPort.receive {
+					v_ret := fail;
+				}
+				[] t_TC_Global.timeout {
+					v_ret := inconc;
+				}
+			}
 		}
 		filterPort.send(m_FilterDoorStatusStop);
 
@@ -731,7 +704,6 @@ module Car2X_Functions {
 	 *   		 Maps the port of the tester to the system port.
 	 */
 	function f_setUp() runs on TesterComponentType  {
-
 		// create an instance of the tester
 		var TesterComponentType Tester;
 		Tester := TesterComponentType.create;
@@ -739,9 +711,7 @@ module Car2X_Functions {
 		// map the tester port to the system port
 		map(self:filterPort, system:filterPort);
 
-		var
-		charstring
-			filterServiceId := startFilter(TCP_REMOTE_HOST, TCP_REMOTE_PORT);
+		var charstring filterServiceId := startFilter(TCP_REMOTE_HOST, TCP_REMOTE_PORT);
 		if (lengthof(filterServiceId) == 0) {
 			setverdict(fail, "Could not start CAN filter service.");
 		} else {
@@ -894,8 +864,7 @@ module Car2X_Functions {
 	 * @return integer The new stage.
 	 *   TODO: new stage as return
 	 */
-	function f_setVerdictAndStage(verdicttype p_verdict, integer p_stage,
-								  float p_globalTimer)
+	function f_setVerdictAndStage(verdicttype p_verdict, integer p_stage, float p_globalTimer)
 		runs on TesterComponentType return integer  {
 		setverdict(p_verdict);
 		p_stage := p_stage + 1;
