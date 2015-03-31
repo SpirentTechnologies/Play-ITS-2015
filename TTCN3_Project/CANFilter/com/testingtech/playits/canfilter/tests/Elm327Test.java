@@ -15,13 +15,13 @@ public class Elm327Test {
 	public void setUp() {
 		line = "bank1_sensor3_oxygen_sensor_voltage=01 16";
 	}
-	
-	
-	
+
 	@Test
-	public void parsesOpenXCKey(){
+	public void parsesOpenXCKey() {
 		elm327.addKeyValuePair(line);
-		assertEquals("01 16", elm327.openXCToOBD2Map.get("bank1_sensor3_oxygen_sensor_voltage"));
+		assertEquals("01 16",
+				elm327.openXCToOBD2Map
+						.get("bank1_sensor3_oxygen_sensor_voltage"));
 	}
-	
+
 }
