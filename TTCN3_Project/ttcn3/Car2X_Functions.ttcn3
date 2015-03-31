@@ -148,16 +148,40 @@ module Car2X_Functions {
 								 float p_time_out)
 		runs on TesterComponentType return verdicttype  {
 		var verdicttype v_ret := inconc;
-		t_TC_Global.start;
+		var boolean holding := false;
+		timer t_holding;
+		
 		filterPort.send(m_FilterAcceleratorPedalStart);
-		while (t_TC_Global.running) {
-			v_ret :=
-				f_AcceleratorPedalSub(p_accelerator_pedal, p_variance,
-									  p_holding_time, c_timerTwoSeconds);
-			if (v_ret == pass) {
-				t_TC_Global.stop;
+		t_TC_Global.start(p_time_out);
+		
+		alt {
+			[not holding] filterPort.receive(mw_FilterResponseAcceleratorPedal(p_accelerator_pedal, p_variance)) {
+				t_holding.start(p_holding_time);
+				holding := true;
+				repeat;				
+			}
+			[not holding] filterPort.receive {
+				v_ret := fail;
+				repeat;
+			}
+			[holding] filterPort.receive(mw_FilterResponseAcceleratorPedal(p_accelerator_pedal,	p_variance)) {
+				v_ret := inconc;
+				repeat;
+			}
+			[holding] filterPort.receive {
+				v_ret := fail;
+				t_holding.stop;
+				holding := false;
+				repeat;
+			}
+			[holding]t_holding.timeout{
+				v_ret := pass
+			}
+			[] t_TC_Global.timeout {
+				v_ret := inconc;
 			}
 		}
+			
 		filterPort.send(m_FilterAcceleratorPedalStop);
 		if (v_ret != pass) {
 			setverdict(v_ret);
@@ -166,57 +190,7 @@ module Car2X_Functions {
 		return v_ret;
 	}
 
-	/**
-	 * @desc Requests accelerator pedal from CAN filter. Test body for
-	 * @see f_ACCELERATOR_PEDAL
-	 * @param p_accelerator_pedal Target accelerator status to reach (in
-	 *   percent) (0.0..1.0)
-	 * @param p_variance Variance of target accelerator
-	 * @param p_holding_time Time with aceelerator status (in sec)
-	 * @param p_globalTime Time until timeout (in sec)
-	 * @return
-	 * @verdict
-	 */
-	function f_AcceleratorPedalSub(float p_accelerator_pedal, float p_variance,
-								   float p_holding_time, float p_globalTime)
-		runs on TesterComponentType return verdicttype  {
-		var verdicttype v_ret := pass;
-		var template FilterResponse v_accelerator;
-		timer t_TC := c_timerFiveSeconds;
-		timer t_holding;
-
-		// start the timer
-		t_TC.start(p_globalTime);
-		alt {
-			[] filterPort
-			   .receive(mw_FilterResponseAcceleratorPedal(p_accelerator_pedal,
-														  p_variance)) {
-				t_TC.stop;
-				t_holding.start(p_holding_time);
-				while (t_holding.running and v_ret == pass) {
-					alt {
-						[] filterPort
-						   .receive(mw_FilterResponseAcceleratorPedal
-									(p_accelerator_pedal, p_variance)) {
-							v_ret := pass;
-						}
-						[] filterPort.receive {
-							v_ret := fail;
-						}
-					}
-				}
-			}
-			[] filterPort.receive {
-				t_TC.stop;
-				v_ret := fail;
-			}
-			[] t_TC.timeout {
-				v_ret := inconc;
-			}
-		}
-		return v_ret;
-	}
-
+	
 	/**
 	 * @desc function to get brake pedal status
 	 * @param p_pedal_status target pedal status; true = press, false = release
@@ -477,28 +451,24 @@ module Car2X_Functions {
 	function f_HEADLAMP_STATUS(boolean p_Status, float p_timeout)
 		runs on TesterComponentType return verdicttype  {
 		var verdicttype v_ret := none;
-
 		// start ignition status request
 		filterPort.send(m_FilterHeadLampStatusStart);
 		// start global timer
 		t_TC_Global.start(p_timeout);
-
-		while (t_TC_Global.running) {
-			alt {
-				[] filterPort.receive(mw_FilterResponseHeadLampStatus(p_Status)) {
-					t_TC_Global.stop;
-					v_ret := pass;
-				}
-				[] filterPort.receive {
-					v_ret := fail;
-				}
-				[] t_TC_Global.timeout {
-					v_ret := inconc;
-				}
+		alt {
+			[] filterPort.receive(mw_FilterResponseHeadLampStatus(p_Status)) {
+				t_TC_Global.stop;
+				v_ret := pass;
+			}
+			[] filterPort.receive {
+				v_ret := fail;
+				repeat;
+			}
+			[] t_TC_Global.timeout {
+				v_ret := inconc;
 			}
 		}
 		filterPort.send(m_FilterHeadLampStatusStop);
-
 		// stage failed -> end whole TC
 		if (v_ret != pass) {
 			setverdict(v_ret);
@@ -638,24 +608,21 @@ module Car2X_Functions {
 						   float p_timeOut)
 		runs on TesterComponentType return verdicttype  {
 		var verdicttype v_ret := none;
-
 		// start gear lever status request
 		filterPort.send(m_FilterDoorStatusStart);
 		// start global timer
 		t_TC_Global.start(p_timeOut);
-
-		while (t_TC_Global.running) {
-			alt {
-				[] filterPort.receive(mw_FilterResponseDoorStatus(p_door, p_status)) {
-					t_TC_Global.stop;
-					v_ret := pass;
-				}
-				[] filterPort.receive {
-					v_ret := fail;
-				}
-				[] t_TC_Global.timeout {
-					v_ret := inconc;
-				}
+		alt {
+			[] filterPort.receive(mw_FilterResponseDoorStatus(p_door, p_status)) {
+				t_TC_Global.stop;
+				v_ret := pass;
+			}
+			[] filterPort.receive {
+				v_ret := fail;
+				repeat;
+			}
+			[] t_TC_Global.timeout {
+				v_ret := inconc;
 			}
 		}
 		filterPort.send(m_FilterDoorStatusStop);
