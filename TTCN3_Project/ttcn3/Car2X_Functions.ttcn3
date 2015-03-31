@@ -23,6 +23,8 @@ module Car2X_Functions {
 			m_FilterDoorStatusStop,
 			m_FilterEngineSpeedStart,
 			m_FilterEngineSpeedStop,
+			m_FilterGearLeverStart,
+			m_FilterGearLeverStop,
 			m_FilterHeadLampStatusStart,
 			m_FilterHeadLampStatusStop,
 			m_FilterIgnitionStateStart,
@@ -30,8 +32,6 @@ module Car2X_Functions {
 			m_FilterParkingBrakeStatusStart,
 			m_FilterSteeringWheelStart,
 			m_FilterSteeringWheelStop,
-			m_FilterGearLeverStart,
-			m_FilterGearLeverStop,
 			m_FilterVehicleSpeedStart,
 			m_FilterVehicleSpeedStop,
 			mw_FilterResponseAcceleratorPedal,
@@ -39,11 +39,11 @@ module Car2X_Functions {
 			mw_FilterResponseBrakePedalStatus,
 			mw_FilterResponseDoorStatus,
 			mw_FilterResponseEngineSpeed,
+			mw_FilterResponseGearLever,
 			mw_FilterResponseHeadLampStatus,
 			mw_FilterResponseIgnitionStatus,
 			mw_FilterResponseParkingBrakeStatus,
 			mw_FilterResponseSteeringWheel,
-			mw_FilterResponseGearLever,
 			mw_FilterResponseVehicleSpeed;
 	}
 
@@ -484,13 +484,20 @@ module Car2X_Functions {
 		filterPort.send(m_FilterHeadLampStatusStart);
 		t_TC_Global.start(p_timeout);
 
-		while (t_TC_Global.running) {
-			v_ret := f_HeadlampStatusSub(p_Status, c_timerTwoSeconds);
-			if (v_ret == pass) {
+		alt {
+			// store received template into value
+			[] filterPort.receive(mw_FilterResponseHeadLampStatus(p_Status)) {
 				t_TC_Global.stop;
+				//TODO bug fixing
+				v_ret := pass;
+			}
+			[] filterPort.receive(mw_FilterResponseHeadLampStatus(not p_Status)) {
+				repeat;
+			}
+			[] t_TC_Global.timeout {
+				v_ret := inconc;
 			}
 		}
-		// stop ignition status request
 		filterPort.send(m_FilterHeadLampStatusStop);
 
 		// stage failed -> end whole TC
@@ -501,36 +508,7 @@ module Car2X_Functions {
 		return v_ret;
 	}
 
-	/**
-	 * @desc Receives values from CAN filter. Test body of
-	 * @see f_HEADLAMP_STATUS
-	 * @param p_Status Target status of headlamp; <b>true</b> headlamp on;
-	 *   <b>false</b> headlamp off
-	 * @param p_interval Time until timeout
-	 */
-	function f_HeadlampStatusSub(boolean p_Status, float p_interval) runs on TesterComponentType return verdicttype  {
-		var verdicttype v_ret := none;
-		var template FilterResponse v_headLampStatus;
-		timer t_TC := c_timerFiveSeconds;
-		t_TC.start(p_interval);
-
-		alt {
-			// store received template into value
-			[] filterPort.receive(mw_FilterResponseHeadLampStatus(p_Status)) {
-				t_TC.stop;
-				v_ret := pass;
-			}
-			[] filterPort.receive {
-				t_TC.stop;
-				v_ret := fail;
-			}
-			[] t_TC.timeout {
-				v_ret := inconc;
-			}
-		}
-		return v_ret;
-	}
-
+	
 	/**
 	 * @desc Measures the ignition status.
 	 * @param ignitionStatus Enum value of type IgnitionStatus
