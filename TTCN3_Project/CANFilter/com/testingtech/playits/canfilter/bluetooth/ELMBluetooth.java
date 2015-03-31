@@ -38,63 +38,54 @@ public class ELMBluetooth implements DiscoveryListener {
 
 	 ELMBluetooth obj;
 
-	/**
-	 * @param RemoteDevice
-	 * @param DeviceClass
-	 *            used by javax.bluetooth import
-	 */
-	public void deviceDiscovered(RemoteDevice btDevice, DeviceClass cod) {
-		if (!remdevices.contains(btDevice)) {
-			remdevices.addElement(btDevice);
-		}
-	}
+	  /**
+	   * @param RemoteDevice
+	   * @param DeviceClass
+	   * using javax.bluetooth import
+	   */
+	  public void deviceDiscovered(RemoteDevice btDevice, DeviceClass cod) {
+	    if (!remdevices.contains(btDevice)) {
+	      remdevices.addElement(btDevice);
+	    }
+	  }
 
-	/**
-	 * used by javax.bluetooth import
-	 */
-	@Override
-	public void servicesDiscovered(int transID, ServiceRecord[] servRecord) {
-		if (!(servRecord == null) && servRecord.length > 0) {
-			connectionURL = servRecord[0].getConnectionURL(0, false);
-		}
+	  @Override
+	  public void servicesDiscovered(int transID, ServiceRecord[] servRecord) {
+	    if (!(servRecord == null) && servRecord.length > 0) {
+	      connectionURL = servRecord[0].getConnectionURL(0, false);
+	    }
 
-	}
+	  }
 
-	/**
-	 * used by javax.bluetooth import
-	 */
-	@Override
-	public void serviceSearchCompleted(int transID, int respCode) {
-		synchronized (lock) {
-			lock.notify();
-		}
-	}
+	  @Override
+	  public void serviceSearchCompleted(int transID, int respCode) {
+	    synchronized (lock) {
+	      lock.notify();
+	    }
+	  }
 
-	/**
-	 * used by javax.bluetooth import
-	 */
-	@Override
-	public void inquiryCompleted(int discType) {
-		synchronized (lock) {
-			lock.notify();
-		}
-		switch (discType) {
-		case DiscoveryListener.INQUIRY_COMPLETED:
-			System.out.println("Inquiry Completed");
-			break;
+	  @Override
+	  public void inquiryCompleted(int discType) {
+	    synchronized (lock) {
+	      lock.notify();
+	    }
+	    switch (discType) {
+	      case DiscoveryListener.INQUIRY_COMPLETED:
+	        System.out.println("Inquiry Completed");
+	        break;
 
-		case DiscoveryListener.INQUIRY_TERMINATED:
-			System.out.println("Inquiry Terminated");
-			break;
+	      case DiscoveryListener.INQUIRY_TERMINATED:
+	        System.out.println("Inquiry Terminated");
+	        break;
 
-		case DiscoveryListener.INQUIRY_ERROR:
-			System.out.println("Inquiry Error");
-			break;
+	      case DiscoveryListener.INQUIRY_ERROR:
+	        System.out.println("Inquiry Error");
+	        break;
 
-		default:
-			System.out.println("Unknown Response Code");
-		}
-	}
+	      default:
+	        System.out.println("Unknown Response Code");
+	    }
+	  }
 
 	/**
 	 * Inits the Bluetooth Connection
@@ -102,15 +93,18 @@ public class ELMBluetooth implements DiscoveryListener {
 	 * @throws IOException
 	 */
 	public void init() throws IOException {
+		//TODO Fix(hangs @ Inquiry complete)
 		br = new BufferedReader(new InputStreamReader(System.in));
 		obj = new ELMBluetooth();
 		LocalDevice locdevice = LocalDevice.getLocalDevice();
-		DiscoveryAgent disAgent = locdevice.getDiscoveryAgent();
-		disAgent.startInquiry(DiscoveryAgent.GIAC, obj);
+	    DiscoveryAgent disAgent = locdevice.getDiscoveryAgent();
+	    System.out.println("********Locating Devices******");
+	    disAgent.startInquiry(DiscoveryAgent.GIAC, obj);
 		try {
-
 			synchronized (lock) {
+				System.out.println("one");
 				lock.wait();
+				System.out.println("two");
 			}
 		} catch (InterruptedException e) {
 			e.printStackTrace();
@@ -121,9 +115,11 @@ public class ELMBluetooth implements DiscoveryListener {
 
 		} else {
 			int index = 0;
+			System.out.println(("available Bluetooth Device:"));
 			for (int value = 0; value < remdevices.size(); value++) {
 				RemoteDevice remoteDevice = (RemoteDevice) remdevices
 						.elementAt(value);
+				System.out.println(remoteDevice.getFriendlyName(false));
 				// TODO check if all elm327 are named this way
 				if ((remoteDevice.getFriendlyName(true) == "OBDII")
 						|| (remoteDevice.getFriendlyName(true) == "ELM327")) {
@@ -147,6 +143,7 @@ public class ELMBluetooth implements DiscoveryListener {
 			}
 
 			if (connectionURL == null) {
+				System.out.println("Device does not support SPP");
 				// TODO Error Handling ("Device does not support SPP.");
 			} else {
 				System.out.println("Device supports SPP.");

@@ -23,4 +23,5 @@ public class Elm327Test {
 		elm327.addKeyValuePair(line);
 		assertEquals("01 16", elm327.openXCToOBD2Map.get("bank1_sensor3_oxygen_sensor_voltage"));
 	}
+	
 }

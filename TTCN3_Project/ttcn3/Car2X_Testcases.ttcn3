@@ -102,8 +102,7 @@ module Car2X_Testcases {
 		action("stage:" & int2str(v_stage) & ",timeWindow:" & int2str(float2int(v_timerValue)));
 
 		// executing stage 1 - start engine; use battery status
-		v_ret := f_BATTERY_STATUS(c_batteryStatus12, c_batteryStatusVarrianceHalf, c_timerOneSecond, c_timerTwoSeconds);
-		v_timerValue := c_timerFortySeconds;
+		v_ret := f_BATTERY_STATUS(c_batteryStatus12, c_batteryStatusVarrianceHalf, c_timerOneSecond, v_timerValue);
 		v_stage := f_setVerdictAndStage(v_ret, v_stage, v_timerValue);
 
 		// 	executing stage 2 - speed up engine
@@ -113,7 +112,6 @@ module Car2X_Testcases {
 		// tear down configuration
 		f_tearDown();
 	}
-
 
 	/**
 	 * @desc speed up to 60 and full brake
@@ -149,7 +147,6 @@ module Car2X_Testcases {
 		f_tearDown();
 	}
 
-	
 	/**
 	 * @desc For these Testcase, the tester should start the engine and turn up
 	 *   the engine rotation
@@ -282,7 +279,6 @@ module Car2X_Testcases {
 		f_tearDown();
 	}
 
-	
 	/**
 	 * @desc testcase for testing headlamp status
 	 * @verdict

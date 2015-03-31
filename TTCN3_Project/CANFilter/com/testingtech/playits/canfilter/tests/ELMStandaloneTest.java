@@ -19,8 +19,8 @@ public class ELMStandaloneTest{
 		case "1":
 			elm327.usedConnection = elm327.BLUETOOTH;
 			System.out.println("You choosed Bluetooth");
-			elm327.init();
 			System.out.println("Bluetooth Init takes about 20s..");
+			elm327.init();
 			break;
 		case "2":
 			elm327.usedConnection = elm327.RS232;
@@ -38,12 +38,11 @@ public class ELMStandaloneTest{
 		default:
 			return;
 		}
-		
 		System.out.println("now displaying all converted supported PIDs:");
 		elm327.initOpenXCToOBD2Map();
 		List<String> supportedPids = elm327.getSupportedPIDs();
 		for (String hexPids : supportedPids) {
-			System.out.println(elm327.getKeyByValue(elm327.openXCToOBD2Map,hexPids));
+			System.out.println(elm327.getKeyByValue(elm327.openXCToOBD2Map,hexPids) + " = " + hexPids);
 		}
 		
 		System.out.println("Please enter one of the Strings above");
@@ -54,7 +53,7 @@ public class ELMStandaloneTest{
 			if (command.equals("EXIT")) {
 				return;
 			} else  {
-				if (command.startsWith("01 ")){
+				if (command.startsWith("01")){
 					System.out.println("Entered Command: " + command + " = as OpenXCKey: " + elm327.getKeyByValue(elm327.openXCToOBD2Map, command));
 				} else {
 					System.out.println("Entered Command: " + command + " = as PID: " + elm327.openXCToOBD2Map.get(command));

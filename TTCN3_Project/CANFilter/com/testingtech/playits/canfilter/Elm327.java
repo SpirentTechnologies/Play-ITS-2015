@@ -39,10 +39,12 @@ public class Elm327 {
 	 *         available PID Codes
 	 */
 	public void initOpenXCToOBD2Map() {
-		File file = new File("\\resources\\openXCToOBD2Map.txt");
+		File file = new File("resources\\openXCToOBD2Map.txt");
 		try {
 			Scanner scanner = new Scanner(file); //.useDelimiter("\n")
-			addKeyValuePair(scanner.nextLine());
+			while (scanner.hasNext()) {
+				addKeyValuePair(scanner.nextLine());
+			}
 			scanner.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -91,13 +93,16 @@ public class Elm327 {
 	 */
 	public String convertOBD2Response(String response) {
 		Float result;
-		if (!((response.replaceAll("\\s+", "")).matches(TWO_HEX_BYTES))) {
+		int value2 = 0;
+		if (!((response.replaceAll("\\s+", "")).matches(TWO_HEX_BYTES)) || response.length() < 6) {
 			return response;
 		} else {
 			String[] data = response.split("\\s"); // (response =
 			// "41 0C 0C FC") 41,0C,0C,FC, data[0] = Bus, data[1] = Command
 			int value1 = Integer.parseInt(data[2], 16);
-			int value2 = Integer.parseInt(data[3], 16);
+			if (data.length > 3){
+				value2 = Integer.parseInt(data[3], 16);
+			}
 			switch (data[1]) {
 			case "06":
 			case "07":
@@ -200,7 +205,7 @@ public class Elm327 {
 		for (int i = 0; i < 8; i += 2) {
 			String binaryPIDs = getBinaryPIDs(String.valueOf(i) + "0");
 			if (binaryPIDs.length() > 1) {
-				pids.addAll(getPIDs(binaryPIDs));
+				pids.addAll(getPIDs(binaryPIDs, i));
 				if (binaryPIDs.charAt(binaryPIDs.length() - 1) == '0') {
 					break;
 				}
@@ -209,14 +214,14 @@ public class Elm327 {
 		return pids;
 	}
 
-	private Collection<? extends String> getPIDs(String binaryPIDs) {
+	private Collection<? extends String> getPIDs(String binaryPIDs, int range) {
 		List<String> pids = new ArrayList<String>();
 		for (int i = 0; i < binaryPIDs.length(); i++) {
 			if (binaryPIDs.charAt(i) == '1') {
-				pids.add("01 " + intPositionInBinaryField2Hex(i + 1));
+				pids.add("01 " + intPositionInBinaryField2Hex(i, range));
 			}
 		}
-		doubleCheck(pids);
+//		doubleCheck(pids); //TODO ConcurrentModificationException..
 		return pids;
 	}
 
@@ -240,15 +245,18 @@ public class Elm327 {
 
 	/**
 	 * 
-	 * @param i
-	 *            position in binary field
+	 * @param i position in binary field
 	 * @return hex value of that position
 	 */
-	private String intPositionInBinaryField2Hex(int i) {
-		String hex = Integer.toHexString(i + 1);
+	private String intPositionInBinaryField2Hex(int i, int range) {
+		String hex = Integer.toHexString(i + 1); //TODO change to i ?
 		hex = hex.toUpperCase();
 		if (hex.length() == 1) {
-			hex = "0" + hex;
+			//F -> 0F, or F-> 2F
+			hex = Integer.toString(range) + hex; 
+		} else if (hex.length() == 2){
+			//1F -> 3F
+			hex = Integer.toString(range+1) + hex.charAt(1);
 		}
 		return hex;
 	}
@@ -316,33 +324,28 @@ public class Elm327 {
 	 * @return
 	 */
 	public String run(String cmd) {
-		String doubleCheck = "";
-		if (checkIfCorrectCommand(cmd)){
-			if (usedConnection == BLUETOOTH) {
-				doubleCheck = elmBluetooth.run(cmd);
-			} else if (usedConnection == RS232) {
-				doubleCheck = elmRS232.run(cmd);
+		String response = "";
+		
+		if(cmd != null){
+			if(openXCToOBD2Map.contains(cmd)){ //PID or AT Command directly 
+				if (usedConnection == BLUETOOTH || cmd.startsWith("AT")) {
+					response = elmBluetooth.run(cmd);
+				} else if (usedConnection == RS232) {
+					response = elmRS232.run(cmd);
+				}
+				return response;
+			} else if (openXCToOBD2Map.containsKey(cmd)){ //openXCKey
+				if (usedConnection == BLUETOOTH) {
+					response = elmBluetooth.run(openXCToOBD2Map.get(cmd));
+				} else if (usedConnection == RS232) {
+					response = elmRS232.run(openXCToOBD2Map.get(cmd));
+				}
+				return response;
+			} else {
+				return "Please enter a vaild Command!";
 			}
-			return doubleCheck.replaceAll("\\s+", "");
-		} else if (cmd.startsWith("AT")) {
-			if (usedConnection == BLUETOOTH) {
-				doubleCheck = elmBluetooth.run(cmd);
-			} else if (usedConnection == RS232) {
-				doubleCheck = elmRS232.run(cmd);
-			}
-			return doubleCheck.replaceAll("\\s+", "");
 		} else {
-			return "Not a supported Command";
+			return "no Command entered!";
 		}
-	}
-
-	
-	/**
-	 *  Checks if command is runable
-	 * @param cmd
-	 * @return
-	 */
-	public boolean checkIfCorrectCommand(String cmd){
-		return (cmd != null && (getKeyByValue(openXCToOBD2Map,cmd).length() > 0 || openXCToOBD2Map.contains(cmd)));
 	}
 }
