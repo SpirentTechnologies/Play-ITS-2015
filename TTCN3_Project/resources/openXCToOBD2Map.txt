@@ -1,4 +1,4 @@
-battery_status=ATRV
+battery_status=AT RV
 pid_supported_0120=01 00
 pid_supported_2140=01 20
 pid_supported_4160=01 40
@@ -35,6 +35,7 @@ bank2_sensor2_oxygen_sensor_voltage=01 19
 bank2_sensor3_oxygen_sensor_voltage=01 1A
 bank2_sensor4_oxygen_sensor_voltage=01 1B
 obd_standard_this_vehicle_conforms_to=01 1C
+oxygen_sensors_present=01 1D
 auxiliary_input_status=01 1E
 runtime_since_last_start=01 1F
 distance_traveled_with_malfunction_indicator_lamp_on=01 21
