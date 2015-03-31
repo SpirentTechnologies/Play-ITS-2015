@@ -2,6 +2,7 @@ package com.testingtech.car2x.hmi;
 
 import android.content.Intent;
 import android.graphics.drawable.AnimationDrawable;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
@@ -27,6 +28,7 @@ public class TestRunnerActivity extends ActionBarActivity {
     private static TextToSpeech speech;
     public static GuiUpdater guiUpdater;
     private Driver driver;
+    private AsyncTimer timer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,7 +94,9 @@ public class TestRunnerActivity extends ActionBarActivity {
         guiUpdater.animateLogo(true);
         guiUpdater.setStatusText(getString(R.string.textview_running));
         TextView noticeText = (TextView) findViewById(R.id.notification);
-        new AsyncTimer(noticeText, 5).execute();
+        Button btnStop = (Button) findViewById(R.id.button_stop);
+        timer = new AsyncTimer(btnStop, noticeText, 6);
+        timer.execute();
     }
 
     /**
@@ -105,7 +109,9 @@ public class TestRunnerActivity extends ActionBarActivity {
         guiUpdater.enableStartButton(true);
         guiUpdater.animateLogo(false);
         guiUpdater.setStatusText(getString(R.string.textview_not_running));
-
+        if (timer.getStatus().equals(AsyncTask.Status.RUNNING)){
+            timer.cancel(true);
+        }
     }
 
     @SuppressWarnings("deprecation")

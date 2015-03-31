@@ -44,13 +44,17 @@ public class Driver {
             thread.start();
             Logger.writeLog("DRIVER: Started");
         } else{
-            Logger.writeLog("Test case could not be started: testCaseRunner is null");
+            Logger.writeLog("Test could not be started: testCaseRunner is null");
         }
     }
 
     public void interrupt() {
-        thread.getThreadGroup().interrupt();
-        thread.interrupt();
+        if(thread != null) {
+            thread.getThreadGroup().interrupt();
+            thread.interrupt();
+        }else{
+            Logger.writeLog("Test could not be interrupted: thread is null");
+        }
     }
 
 }
