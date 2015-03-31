@@ -20,8 +20,9 @@ public class AsyncTimer extends AsyncTask<Void, Integer, Void> {
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException ie) {
+                ie.printStackTrace(Logger.writer);
             }
-            if(isCancelled())
+            if (isCancelled())
                 return null;
             publishProgress(t);
         }

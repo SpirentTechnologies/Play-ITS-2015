@@ -44,6 +44,8 @@ public class GuiUpdater extends Activity{
                 for (int i = 0; i < table.getChildCount(); i++){
                     table.getChildAt(i).setBackgroundColor(Color.TRANSPARENT);
                 }
+                enableStartButton(true);
+                animateLogo(false);
             }
         });
     }
@@ -52,7 +54,9 @@ public class GuiUpdater extends Activity{
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if(stage > stageCount){
+                if(stage < 0){
+                    pBar.setProgress(0);
+                }else if(stage > stageCount){
                     pBar.setProgress(100);
                 }else {
                     pBar.setProgress(stage * 100 / stageCount);
@@ -96,9 +100,13 @@ public class GuiUpdater extends Activity{
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                Logger.writeLog("GUIUPDATER: scroll to stage " + stage);
                 if(stage < 0 || stage > stageCount)
                     return;
                 stages.smoothScrollTo(0, stage);
+                if(stage > 0){
+                    table.getChildAt(stage - 1).setBackgroundColor(Color.TRANSPARENT);
+                }
                 table.getChildAt(stage).setBackgroundResource(R.drawable.rectangle_border_red);
             }
         });

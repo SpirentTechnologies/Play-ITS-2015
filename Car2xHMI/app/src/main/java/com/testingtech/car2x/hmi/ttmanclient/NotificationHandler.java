@@ -1,6 +1,5 @@
 package com.testingtech.car2x.hmi.ttmanclient;
 
-import com.testingtech.car2x.hmi.publish.IPublisher;
 import java.io.IOException;
 import java.util.List;
 
@@ -17,10 +16,10 @@ import com.testingtech.tworkbench.ttman.server.impl.TEMessageRequest;
 
 public final class NotificationHandler implements IExecutionHandler {
 
-  private final IPublisher publisher;
+  private final Publisher publisher;
   private String testCaseName;
 
-  public NotificationHandler(IPublisher publisher) {
+  public NotificationHandler(Publisher publisher) {
     this.publisher = publisher;
   }
 

@@ -1,9 +1,7 @@
 package com.testingtech.car2x.hmi.ttmanclient;
 
-import android.util.Log;
-
 import com.testingtech.car2x.hmi.Globals;
-import com.testingtech.car2x.hmi.TestRunnerActivity;
+import com.testingtech.car2x.hmi.Logger;
 import com.testingtech.car2x.hmi.testcase.TestCase;
 import com.testingtech.car2x.hmi.testcase.TestCaseVerdict;
 import com.testingtech.car2x.hmi.testcase.Utils;
@@ -19,11 +17,11 @@ import java.util.Enumeration;
 import java.io.IOException;
 import java.net.InetAddress;
 
-public class TestCaseRunner implements Runnable, ITestCaseRunner {
+public class TestCaseRunner implements Runnable {
 
   private final NotificationHandler notificationHandler;
   private IExecutionServer client;
-  private TestCase currentTestCase;
+  private String currentTestCase;
   private TestCaseVerdict verdict;
 
   public TestCaseRunner(NotificationHandler handler) throws IOException {
@@ -37,9 +35,10 @@ public class TestCaseRunner implements Runnable, ITestCaseRunner {
    */
   private void initServerConnection() throws IOException {
       InetAddress clientIp = getOwnIp();
-      TestRunnerActivity.writeLog("TESTCASERUNNER: Host address " + clientIp.getHostAddress());
+      if(clientIp != null)
+        Logger.writeLog("TESTCASERUNNER: Host address " + clientIp.getHostAddress());
 
-      final String user = "user";
+      final String user = "user";       // TODO load from external file
       final String password = "password";
       final Credentials credentials = new Credentials(user, password);
 
@@ -64,8 +63,8 @@ public class TestCaseRunner implements Runnable, ITestCaseRunner {
                 }
             }
         } catch (SocketException se) {
-            se.printStackTrace(TestRunnerActivity.writer);
-            TestRunnerActivity.writer.flush();
+            se.printStackTrace(Logger.writer);
+            Logger.writer.flush();
         }
         return null;
     }
@@ -77,8 +76,7 @@ public class TestCaseRunner implements Runnable, ITestCaseRunner {
     this.client.loadTestSuiteFromFile(testProject, testFile);
   }
 
-  @Override
-  public void setCurrentTestCase(TestCase testCase) {
+  public void setCurrentTestCase(String testCase) {
     this.currentTestCase = testCase;
   }
 
@@ -92,9 +90,9 @@ public class TestCaseRunner implements Runnable, ITestCaseRunner {
     final ExecuteTestCaseJob execJob;
     try {
       String testCaseModule = "Car2X_Testcases";
-      execJob = client.executeTestCase(testCaseModule, this.currentTestCase.name(), null);
+      execJob = client.executeTestCase(testCaseModule, this.currentTestCase, null);
 
-      TestRunnerActivity.writeLog("TESTCASERUNNER: Waiting for test case execution");
+      Logger.writeLog("TESTCASERUNNER: Waiting for test case execution");
       boolean executionDone = false;
       while (! executionDone) {
         // sleep until server finished job execution
@@ -102,32 +100,30 @@ public class TestCaseRunner implements Runnable, ITestCaseRunner {
         try {
           execJob.join();
         } catch (InterruptedException e) {
-            TestRunnerActivity.writeLog("TESTCASERUNNER:" + e.getMessage());
+            Logger.writeLog("TESTCASERUNNER:" + e.getMessage());
         }
         JobStatus jobStatus = execJob.getStatus();
         executionDone = (jobStatus == JobStatus.CANCELLED) || (jobStatus == JobStatus.FINISHED);
       }
-        TestRunnerActivity.writeLog("TESTCASERUNNER: End of test case execution");
+        Logger.writeLog("TESTCASERUNNER: End of test case execution");
 
       String verdictLabel = execJob.getTestCaseStatus().getVerdictKind().getString();
       this.verdict = Utils.toTestCaseVerdict(verdictLabel);
 
     } catch (IOException ioex) {
-        TestRunnerActivity.writeLog("TESTCASERUNNER: " + ioex.getMessage());
+        Logger.writeLog("TESTCASERUNNER: " + ioex.getMessage());
     }
   }
 
-  @Override
   public TestCaseVerdict getVerdict() {
     return this.verdict;
   }
 
-  @Override
   public void closeServerConnection() {
     try {
       this.client.disconnect();
     } catch (IOException ioex) {
-        TestRunnerActivity.writeLog("TESTCASERUNNER: " + ioex.getMessage());
+        Logger.writeLog("TESTCASERUNNER: " + ioex.getMessage());
     }
   }
 

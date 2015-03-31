@@ -8,12 +8,18 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 
+import com.testingtech.car2x.hmi.testcases.XmlLoader;
+
 public class MainActivity extends ActionBarActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Globals.mainActivity = this;
+        Logger.getInstance();
+        XmlLoader.getInstance();
     }
 
     public void startActivityTest(View view) {
