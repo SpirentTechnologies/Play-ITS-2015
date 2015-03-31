@@ -49,7 +49,6 @@ public class XmlLoader {
         for (int iterator = 0; iterator < groupNodes.getLength(); iterator++) {
             Node currentGroup = groupNodes.item(iterator);
             String groupName = currentGroup.getAttributes().getNamedItem("name").getNodeValue();
-            System.out.println(groupName);
             // create group and set name
             TestCaseGroup group = new TestCaseGroup(groupName);
 
@@ -59,7 +58,6 @@ public class XmlLoader {
                 Node currentChild = groupChildNodes.item(iterator2);
                 if (currentChild.getNodeName().equalsIgnoreCase("testCase")) { // to omit text nodes
                     String testCaseId = currentChild.getAttributes().getNamedItem("id").getNodeValue();
-                    System.out.println("\t" + testCaseId);
                     // create test case and set test case id
                     TestCase testCase = new TestCase(testCaseId);
 
@@ -69,16 +67,13 @@ public class XmlLoader {
                         Node currentTestCaseChild = testCaseChildNodes.item(iterator3);
                         if (currentTestCaseChild.getNodeName().equalsIgnoreCase("title")) {
                             String testCaseTitle = currentTestCaseChild.getTextContent();
-                            System.out.println("\t\t" + testCaseTitle);
                             // set test case title
                             testCase.setTitle(testCaseTitle);
                         } else if (currentTestCaseChild.getNodeName().equalsIgnoreCase("stageLabel")) {
                             int stageId = Integer.parseInt(
                                     currentTestCaseChild.getAttributes().getNamedItem("stageId").getNodeValue()
                             );
-                            System.out.println("\t\t" + stageId);
                             String stageLabel = currentTestCaseChild.getTextContent();
-                            System.out.println("\t\t" + stageLabel);
                             // create test case stage and set stage id and label
                             TestCaseStage testCaseStage = new TestCaseStage(stageId, stageLabel);
                             // add stage to test case
@@ -143,7 +138,7 @@ public class XmlLoader {
       TestCase testCase = testCases.get(testCasePosition);
       return testCase.getId();
     } catch (IndexOutOfBoundsException e) {
-      e.printStackTrace();
+      e.printStackTrace(Logger.writer);
       return null;
     }
   }
