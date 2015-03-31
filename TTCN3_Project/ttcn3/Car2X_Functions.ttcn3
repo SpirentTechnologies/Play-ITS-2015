@@ -24,6 +24,8 @@ module Car2X_Functions {
 			m_FilterDoorStatusStop,
 			m_FilterEngineSpeedStart,
 			m_FilterEngineSpeedStop,
+			m_FilterGearLeverStart,
+			m_FilterGearLeverStop,
 			m_FilterHeadLampStatusStart,
 			m_FilterHeadLampStatusStop,
 			m_FilterIgnitionStateStart,
@@ -31,8 +33,6 @@ module Car2X_Functions {
 			m_FilterParkingBrakeStatusStart,
 			m_FilterSteeringWheelStart,
 			m_FilterSteeringWheelStop,
-			m_FilterGearLeverStart,
-			m_FilterGearLeverStop,
 			m_FilterVehicleSpeedStart,
 			m_FilterVehicleSpeedStop,
 			mw_FilterResponseAcceleratorPedal,
@@ -40,15 +40,17 @@ module Car2X_Functions {
 			mw_FilterResponseBrakePedalStatus,
 			mw_FilterResponseDoorStatus,
 			mw_FilterResponseEngineSpeed,
+			mw_FilterResponseGearLever,
 			mw_FilterResponseHeadLampStatus,
 			mw_FilterResponseIgnitionStatus,
 			mw_FilterResponseParkingBrakeStatus,
 			mw_FilterResponseSteeringWheel,
-			mw_FilterResponseGearLever,
 			mw_FilterResponseVehicleSpeed;
 	}
 
-	import from Car2X_Types {type DoorStatus, FilterResponse, IgnitionStatus, GearLever;}
+	import from Car2X_Types {
+		type DoorStatus, FilterResponse, IgnitionStatus, GearLever;
+	}
 
 	import from Car2X_ConfigSystem {type TesterComponentType;}
 	
@@ -481,26 +483,24 @@ module Car2X_Functions {
 	 */
 	function f_HEADLAMP_STATUS(boolean p_Status, float p_timeout) runs on TesterComponentType return verdicttype  {
 		var verdicttype v_ret := none;
-		timer t_TC := c_timerFiveSeconds;
-		var default test := activate(a_defaultFailAndInconcAltstep(t_TC, v_ret));
 		
 		// start ignition status request
 		filterPort.send(m_FilterHeadLampStatusStart);
 		// start global timer
 		t_TC_Global.start(p_timeout);
 
-		while (t_TC_Global.running) {
-    		t_TC.start(c_timerTwoSeconds);
-    
+		while (t_TC_Global.running) {    
     		alt {
     			[] filterPort.receive(mw_FilterResponseHeadLampStatus(p_Status)) {
-    				t_TC.stop;
+					t_TC_Global.stop;
     				v_ret := pass;
     			}
-				[] a_defaultFailAndInconcAltstep(t_TC, v_ret)
-			}
-			if (v_ret == pass) {
-				t_TC_Global.stop;
+				[] filterPort.receive {
+					v_ret := fail;
+				}
+				[] t_TC_Global.timeout {
+					v_ret := inconc;
+				}
 			}
 		}
 		// stop ignition status request
@@ -644,17 +644,27 @@ module Car2X_Functions {
 	 * @param p_interval time until timeout
 	 * @verdict
 	 */
-	function f_GEAR_LEVER_STATUS(GearLever gear, float p_interval)
+	function f_GEAR_LEVER_STATUS(GearLever p_gear, float p_interval)
 		runs on TesterComponentType return verdicttype  {
-		var verdicttype v_ret := inconc;
-		t_TC_Global.start(p_interval);
+		var verdicttype v_ret := none;
+		
+		// start gear lever status request
 		filterPort.send(m_FilterGearLeverStart);
-
+		// start global timer
+		t_TC_Global.start(p_interval);
 		while (t_TC_Global.running) {
-			v_ret := f_GearLeverStatusSub(gear, c_timerOneSecond);
-			if (v_ret == pass) {
-				t_TC_Global.stop;
-			}
+        	alt {
+        		[] filterPort.receive(mw_FilterResponseGearLever(p_gear)) {
+					t_TC_Global.stop;
+        			v_ret := pass;
+        		}
+        		[] filterPort.receive {
+        			v_ret := fail;
+        		}
+        		[] t_TC_Global.timeout {
+        			v_ret := inconc;
+        		}
+        	}
 		}
 		filterPort.send(m_FilterGearLeverStop);
 
@@ -662,37 +672,6 @@ module Car2X_Functions {
 			setverdict(v_ret);
 			// send verdict
 			f_tearDown();
-		}
-		return v_ret;
-	}
-
-	/**
-	 * @desc Receive transmission gear from CAN filter. Test body for
-	 * @see f_TRANSMISSION_GEAR_STATUS
-	 * @param gear The target gear
-	 * @param p_interval Time until timeout. Should be geater then
-	 *   m_FilterTransmissionGearStart
-	 * @verdict
-	 */
-	function f_GearLeverStatusSub(GearLever p_gear, float p_interval)
-		runs on TesterComponentType return verdicttype  {
-		var verdicttype v_ret := inconc;
-		var template FilterResponse v_gearStatus;
-		timer t_TC := c_timerFiveSeconds;
-		t_TC.start(p_interval);
-
-		alt {
-			[] filterPort.receive(mw_FilterResponseGearLever(p_gear)) {
-				t_TC.stop;
-				v_ret := pass;
-			}
-			[] filterPort.receive {
-				t_TC.stop;
-				v_ret := fail;
-			}
-			[] t_TC.timeout {
-				v_ret := inconc;
-			}
 		}
 		return v_ret;
 	}
