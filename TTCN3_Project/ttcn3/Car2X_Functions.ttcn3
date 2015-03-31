@@ -8,7 +8,7 @@
 module Car2X_Functions {
 	import from Car2X_ModuleParameters {
 		const c_timerFiveSeconds, c_timerOneSecond, c_timerTwoSeconds;
-		modulepar TCP_REMOTE_HOST, TCP_REMOTE_PORT;
+		modulepar SIMULATOR_HOST, SIMULATOR_PORT, TCP_REMOTE_HOST, TCP_REMOTE_PORT, SIMULATE;
 	}
 
 	import from Car2X_Templates {
@@ -681,7 +681,7 @@ module Car2X_Functions {
 		// map the tester port to the system port
 		map(self:filterPort, system:filterPort);
 
-		var charstring filterServiceId := startFilter(TCP_REMOTE_HOST, TCP_REMOTE_PORT);
+		var charstring filterServiceId := startFilter(TCP_REMOTE_HOST, TCP_REMOTE_PORT, SIMULATOR_HOST, SIMULATOR_PORT, SIMULATE);
 		if (lengthof(filterServiceId) == 0) {
 			setverdict(fail, "Could not start CAN filter service.");
 		} else {

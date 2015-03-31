@@ -28,15 +28,17 @@ public class Car2XControlExternalFunctionProvider extends
    */
   @ExternalFunction(name = "startFilter", module = "Car2X_Control")
   public CharstringValue startFilter(CharstringValue host,
-      IntegerValue portNumber) {
-    return start_Filter(
-        // CANFilterService.class.getCanonicalName()
-        "com.testingtech.playits.canfilter.CANFilterService",
+      IntegerValue portNumber, CharstringValue simulatorHost,
+      IntegerValue simulatorPortNumber) {
+    return startFilter(
+        "com.testingtech.playits.canfilter.CANFilterServiceMain",
         new String[] { host.getString(),
-            String.valueOf(portNumber.getInt()) });
+            String.valueOf(portNumber.getInt()),
+            simulatorHost.getString(),
+            String.valueOf(simulatorPortNumber.getInt()) });
   }
 
-  private CharstringValue start_Filter(String mainClass, String[] parameters) {
+  private CharstringValue startFilter(String mainClass, String[] parameters) {
     if (process != null && process.isAlive()) {
       return newCharstringValue(processId);
     }
@@ -46,18 +48,18 @@ public class Car2XControlExternalFunctionProvider extends
         + join(parameters, "\" \"") + "\"");
 
     String pathSeparator = System.getProperty("path.separator");
+    String execCommand = "java -classpath build/CANFilter" + pathSeparator
+            + "libs/java-json.jar " + mainClass + " "
+            + join(parameters, " "); 
     try {
-    	
-      process = Runtime.getRuntime().exec("java -classpath build/CANFilter"+ pathSeparator +"libs/java-json.jar "
-              + mainClass + " " + join(parameters, " "));
 
-      new StreamForwarder(process.getInputStream(), System.out)
-          .start();
-      new StreamForwarder(process.getErrorStream(), System.err)
-          .start();
+      process = Runtime.getRuntime().exec(execCommand);
+
+      new StreamForwarder(process.getInputStream(), System.out).start();
+      new StreamForwarder(process.getErrorStream(), System.err).start();
     } catch (IOException e) {
       logError("Could not start CAN filter service: " + e.getMessage());
-      return newCharstringValue("");
+      processId = "";
     }
 
     return newCharstringValue(processId);
@@ -80,6 +82,7 @@ public class Car2XControlExternalFunctionProvider extends
 
   /**
    * Stops the CAN filter service process.
+   * 
    * @return true (service could successfully be stopped)
    */
   @ExternalFunction(name = "stopFilter", module = "Car2X_Control")

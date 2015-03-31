@@ -5,26 +5,26 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
 
-import com.testingtech.playits.canfilter.Elm327;
+import com.testingtech.playits.canfilter.Elm327Connector;
 
 public class ELMStandaloneTest {
 	public static void main(String[] args) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		Elm327 elm327 = new Elm327();
+		Elm327Connector elm327 = new Elm327Connector(null);
 		System.out.println("Please choose:");
 		System.out.println("[1] = Bluetooth  [2] = RS232  [3] = Exit");
 		String command = br.readLine();
 		switch (command) {
 		case "1":
 			elm327.usedConnection = elm327.BLUETOOTH;
-			System.out.println("You choosed Bluetooth");
+			System.out.println("You choose Bluetooth");
 			System.out.println("Bluetooth Init takes about 20s..");
 			elm327.init();
 			break;
 		case "2":
 			elm327.usedConnection = elm327.RS232;
 			System.out
-					.println("You choosed RS232, please enter the used COM-Port(like COM3) or press Enter");
+					.println("You choose RS232, please enter the used COM-Port(like COM3) or press Enter");
 			String portname = br.readLine();
 			if (portname.startsWith("COM")) {
 				elm327.init(portname);

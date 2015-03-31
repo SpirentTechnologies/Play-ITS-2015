@@ -5,10 +5,10 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.testingtech.playits.canfilter.Elm327;
+import com.testingtech.playits.canfilter.Elm327Connector;
 
 public class Elm327Test {
-	Elm327 elm327 = new Elm327();
+	Elm327Connector elm327 = new Elm327Connector(null);
 	private String line;
 
 	@Before
