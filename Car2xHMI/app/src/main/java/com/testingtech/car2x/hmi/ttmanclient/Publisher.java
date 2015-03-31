@@ -1,5 +1,6 @@
-package com.testingtech.car2x.hmi.publish;
+package com.testingtech.car2x.hmi.ttmanclient;
 
+import com.testingtech.car2x.hmi.Logger;
 import com.testingtech.car2x.hmi.TestRunnerActivity;
 import com.testingtech.car2x.hmi.testcase.TestCase;
 import com.testingtech.car2x.hmi.testcase.TestCaseProgress;
@@ -12,12 +13,12 @@ import java.text.ParseException;
 /**
  * Maps TTman client notifications to user interface feedback.
  */
-public class Publisher implements IPublisher {
+public class Publisher {
 
   private final MessageFormat messageFormat;
   private final String progressFormatString;
   private final String verdictFormatString;
-  private TestCase currentTestCase;
+  private String currentTestCase;
 
   public Publisher() {
     this.messageFormat = new MessageFormat("\"stage:{0},timeWindow:{1}\"");
@@ -26,20 +27,18 @@ public class Publisher implements IPublisher {
     this.verdictFormatString = "publishVerdict: testCase[%s], testCaseVerdict[%s]";
   }
 
-  public void setCurrentTestCase(TestCase testCase) {
+  public void setCurrentTestCase(String testCase) {
     this.currentTestCase = testCase;
   }
 
-  private boolean isCurrent(TestCase testCase) {
+  private boolean isCurrent(String testCase) {
     if (currentTestCase == null) {
-      TestRunnerActivity.writeLog("PUBLISHER: Current test case has not been set.");
+      Logger.writeLog("PUBLISHER: Current test case has not been set.");
     }
-    return this.currentTestCase.compareTo(testCase) == 0;
+    return this.currentTestCase.equals(testCase);
   }
 
-  @Override
   public void publishProgress(String testCaseName, String actionMessage) throws IOException {
-    TestCase testCase = Utils.toTestCase(testCaseName);
     TestCaseProgress testCaseProgress = null;
     int timeWindow = -1;
     try {
@@ -48,47 +47,46 @@ public class Publisher implements IPublisher {
       testCaseProgress = Utils.toTestCaseProgress(entryIndex);
       timeWindow = Integer.parseInt((String) values[1]);
     } catch (ParseException pex) {
-        TestRunnerActivity.writeLog("PUBLISHER: MessageFormat error when parsing [" + actionMessage + "] " + pex.getMessage());
+        Logger.writeLog("PUBLISHER: MessageFormat error when parsing [" + actionMessage + "] " + pex.getMessage());
     }
 
-    if (isCurrent(testCase) && testCase != null && testCaseProgress != null && timeWindow > -1) {
-        TestRunnerActivity.writeLog(String.format(
-          progressFormatString,
-          testCase.name(),
-          testCaseProgress.name(),
-          timeWindow
-      ));
+    if (isCurrent(testCaseName) && testCaseName != null && testCaseProgress != null && timeWindow > -1) {
+        Logger.writeLog(String.format(
+                progressFormatString,
+                testCaseName,
+                testCaseProgress.name(),
+                timeWindow
+        ));
       // Update GUI
-        if(testCaseProgress.ordinal() > 1) {
-            TestRunnerActivity.writeLog("Publishing progress");
+        if(testCaseProgress.ordinal() > 0) {
+            Logger.writeLog("Publishing progress");
             TestRunnerActivity.guiUpdater.updateProgressBar(testCaseProgress.ordinal());
             TestRunnerActivity.guiUpdater.scrollToStage(testCaseProgress.ordinal() - 1);
             TestRunnerActivity.speakStageText(testCaseProgress.ordinal() - 1);
+            Logger.writeLog("testCaseProgress: " + testCaseProgress.ordinal());
         }
     } else {
-        TestRunnerActivity.writeLog("Validation failed...");
+        Logger.writeLog("Validation failed...");
     }
 
 
   }
 
-  @Override
   public void publishVerdict(String testCaseName, String verdictLabel) throws IOException {
-      TestCase testCase = Utils.toTestCase(testCaseName);
       TestCaseVerdict testCaseVerdict = Utils.toTestCaseVerdict(verdictLabel);
 
-      if (isCurrent(testCase) && testCase != null && testCaseVerdict != null) {
-          TestRunnerActivity.writeLog(String.format(
+      if (isCurrent(testCaseName) && testCaseName != null && testCaseVerdict != null) {
+          Logger.writeLog(String.format(
                   verdictFormatString,
-                  testCase.name(),
+                  testCaseName,
                   testCaseVerdict.name()
           ));
           // Update GUI
-          TestRunnerActivity.writeLog("Publishing verdict");
+          Logger.writeLog("Publishing verdict");
           TestRunnerActivity.guiUpdater.updateProgressBar(99);  // 99 for max value
           TestRunnerActivity.guiUpdater.resetTestRunnerGui();
       } else {
-          TestRunnerActivity.writeLog("Validation failed...");
+          Logger.writeLog("Validation failed...");
       }
   }
 
