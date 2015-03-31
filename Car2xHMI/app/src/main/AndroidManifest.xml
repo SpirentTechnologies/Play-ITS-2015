@@ -28,7 +28,7 @@
         </activity>
         <activity
             android:name="com.testingtech.car2x.hmi.TestRunnerActivity"
-            android:label="@string/title_activity_drive_test"
+            android:label="@string/title_activity_test_runner"
             android:parentActivityName="com.testingtech.car2x.hmi.TestSelectorActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

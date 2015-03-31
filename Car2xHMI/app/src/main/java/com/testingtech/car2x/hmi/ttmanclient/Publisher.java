@@ -2,7 +2,6 @@ package com.testingtech.car2x.hmi.ttmanclient;
 
 import com.testingtech.car2x.hmi.Logger;
 import com.testingtech.car2x.hmi.TestRunnerActivity;
-import com.testingtech.car2x.hmi.testcase.TestCase;
 import com.testingtech.car2x.hmi.testcase.TestCaseProgress;
 import com.testingtech.car2x.hmi.testcase.TestCaseVerdict;
 import com.testingtech.car2x.hmi.testcase.Utils;
