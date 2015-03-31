@@ -17,35 +17,32 @@ import android.widget.ScrollView;
 import android.widget.TableLayout;
 import android.widget.TextView;
 
-import com.testingtech.car2x.hmi.driver.Driver;
-import com.testingtech.car2x.hmi.testcase.TestCase;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
+import com.testingtech.car2x.hmi.ttmanclient.Driver;
 import java.util.Locale;
 
 public class TestRunnerActivity extends ActionBarActivity {
 
-    private  int testNumber;
+    private String testId;
     private static TableLayout table;
     private static TextToSpeech speech;
-    public static PrintWriter writer;
     public static GuiUpdater guiUpdater;
+    private Driver driver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_test_runner);
+
+
+
         // get data from the parent activity
         Intent intent = getIntent();
-        testNumber = intent.getIntExtra(TestSelectorActivity.TEST_NUMBER, 0);
+        testId = intent.getStringExtra(TestSelectorActivity.TEST_ID);
         String testTitle = intent.getStringExtra(TestSelectorActivity.TEST_TITLE);
         String[] testStages = intent.getStringArrayExtra(TestSelectorActivity.TEST_STAGES);
         int stageCount = testStages.length;
 
         createGuiUpdater(stageCount);
-
         Globals.view = this;
         // set and create GUI elements
         setTitle(testTitle);
@@ -66,8 +63,6 @@ public class TestRunnerActivity extends ActionBarActivity {
                 }
             }
         });
-        // init log
-        initLogFile();
     }
 
     private void createGuiUpdater(int stageCount){
@@ -86,28 +81,18 @@ public class TestRunnerActivity extends ActionBarActivity {
                 noticeText, statusRunningText, stages, table, stageCount);
     }
 
-    private void initLogFile(){
-        File path = getExternalFilesDir(null);//new File(Environment.getExternalStorageDirectory() + "TestingTech");
-        File file = new File(path, "Log.txt");
-        try {
-            // Make sure the directory exists
-            //path.mkdirs();
-            //file.createNewFile();
-            writer = new PrintWriter(file);
-        }catch(IOException ioe){
-            ioe.printStackTrace();
-        }
-    }
-
     /**
      * Start the test. Create a new AsyncThread and run it.
      * @param view The parent view.
      */
     public void startTest(View view) {
-        new Thread(new Driver(TestCase.values()[testNumber])).start();
+        driver = new Driver();//(TestCase.values()[testNumber]);  // TODO
+        driver.start(testId);
         guiUpdater.enableStartButton(false);
         guiUpdater.animateLogo(true);
         guiUpdater.setStatusText(getString(R.string.textview_running));
+        TextView noticeText = (TextView) findViewById(R.id.notification);
+        new AsyncTimer(noticeText, 5).execute();
     }
 
     /**
@@ -116,9 +101,11 @@ public class TestRunnerActivity extends ActionBarActivity {
      */
     public void stopTest(View view) {
         // TODO interrupt threads, send stop message
+        driver.interrupt();
         guiUpdater.enableStartButton(true);
         guiUpdater.animateLogo(false);
         guiUpdater.setStatusText(getString(R.string.textview_not_running));
+
     }
 
     @SuppressWarnings("deprecation")
@@ -159,12 +146,7 @@ public class TestRunnerActivity extends ActionBarActivity {
         super.onDestroy();
         if(speech != null)
             speech.shutdown();
-        writer.close();
-    }
-
-    public static void writeLog(String msg){
-        writer.println(msg);
-        writer.flush();
+        Logger.writer.close();
     }
 
 }

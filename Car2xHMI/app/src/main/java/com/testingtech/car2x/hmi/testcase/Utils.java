@@ -1,6 +1,6 @@
 package com.testingtech.car2x.hmi.testcase;
 
-import com.testingtech.car2x.hmi.TestRunnerActivity;
+import com.testingtech.car2x.hmi.Logger;
 
 public class Utils {
 
@@ -8,7 +8,7 @@ public class Utils {
     try {
       return TestCase.valueOf(testCaseName);
     } catch (IllegalArgumentException iae) {
-        TestRunnerActivity.writeLog("UTILS:" + iae.getMessage());
+        Logger.writeLog("UTILS:" + iae.getMessage());
       return null;
     }
   }
@@ -16,7 +16,7 @@ public class Utils {
   public static TestCaseProgress toTestCaseProgress(int entryIndex) {
     TestCaseProgress[] entries = TestCaseProgress.values();
     if (entryIndex < 0 || entryIndex >= entries.length) {
-        TestRunnerActivity.writeLog("UTILS: Invalid TestCaseProgress entry index provided [" + entryIndex + "].");
+        Logger.writeLog("UTILS: Invalid TestCaseProgress entry index provided [" + entryIndex + "].");
       return null;
     } else {
       return entries[entryIndex];
@@ -32,7 +32,7 @@ public class Utils {
       case "error (4)":
         return TestCaseVerdict.ERROR;
       default:
-          TestRunnerActivity.writeLog("UTILS: Verdict label [" + verdictLabel + "] unsupported.");
+          Logger.writeLog("UTILS: Verdict label [" + verdictLabel + "] unsupported.");
         return null;
     }
   }

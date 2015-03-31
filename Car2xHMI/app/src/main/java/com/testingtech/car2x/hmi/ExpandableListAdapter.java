@@ -41,15 +41,13 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
     @Override
     public View getChildView(final int groupPosition, final int childPosition,
                              boolean isLastChild, View convertView, ViewGroup parent) {
-        final String laptop = (String) getChild(groupPosition, childPosition);
-        LayoutInflater inflater = context.getLayoutInflater();
-
+        final String text = (String) getChild(groupPosition, childPosition);
         if (convertView == null) {
+            LayoutInflater inflater = context.getLayoutInflater();
             convertView = inflater.inflate(R.layout.child_item, null);
         }
-
         TextView item = (TextView) convertView.findViewById(R.id.laptop);
-        item.setText(laptop);
+        item.setText(text);
         return convertView;
     }
 

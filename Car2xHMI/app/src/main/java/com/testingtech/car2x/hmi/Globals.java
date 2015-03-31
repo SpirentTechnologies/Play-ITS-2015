@@ -1,7 +1,6 @@
 package com.testingtech.car2x.hmi;
 
-import android.content.Context;
-import android.view.View;
+import android.app.Activity;
 
 public class Globals {
 
@@ -9,5 +8,6 @@ public class Globals {
     public static int serverPort = 10279;
     public static int clientPort = 45000;
     public static TestRunnerActivity view;
+    public static Activity mainActivity;
 
 }
