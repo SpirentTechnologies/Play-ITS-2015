@@ -22,7 +22,6 @@ public class TestSelectorActivity extends ActionBarActivity {
     public final static String TEST_TITLE = "title";
     public final static String TEST_STAGES = "stages";
     private Map<String, List<String>> collection;
-    private ExpandableListView expListView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,7 +29,7 @@ public class TestSelectorActivity extends ActionBarActivity {
         setContentView(R.layout.activity_test_selector);
 
         createCollection();
-        expListView = (ExpandableListView) findViewById(R.id.listView);
+        ExpandableListView expListView = (ExpandableListView) findViewById(R.id.listView);
         final ExpandableListAdapter expListAdapter = new ExpandableListAdapter(
                 this, XmlLoader.getTestCaseGroupNames(), collection);
         expListView.setAdapter(expListAdapter);

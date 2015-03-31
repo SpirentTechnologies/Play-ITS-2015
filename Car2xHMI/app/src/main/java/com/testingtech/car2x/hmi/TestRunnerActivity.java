@@ -86,8 +86,8 @@ public class TestRunnerActivity extends ActionBarActivity {
      * @param view The parent view.
      */
     public void startTest(View view) {
-        driver = new Driver();//(TestCase.values()[testNumber]);  // TODO
-        driver.start(testId);
+        driver = new Driver(testId);  // TODO
+        //driver.start(testId);
         guiUpdater.enableStartButton(false);
         guiUpdater.animateLogo(true);
         guiUpdater.setStatusText(getString(R.string.textview_running));

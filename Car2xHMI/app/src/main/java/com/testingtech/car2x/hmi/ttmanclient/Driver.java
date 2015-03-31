@@ -23,13 +23,13 @@ public class Driver {
     private TestCaseRunner testCaseRunner;
     private static Thread thread;
 
-    public Driver(){
+    public Driver(String testCase){
         Logger.writeLog("DRIVER: Starting");
         try {
             publisher = new Publisher();
             notificationHandler = new NotificationHandler(publisher);
             testCaseRunner = new TestCaseRunner(notificationHandler);
-            //start(testCase);
+            start(testCase);
         }catch(IOException ioe){
             ioe.printStackTrace(Logger.writer);
             Logger.writer.flush();
@@ -37,11 +37,15 @@ public class Driver {
     }
 
     public void start(String testCase) {
-        testCaseRunner.setCurrentTestCase(testCase);
-        publisher.setCurrentTestCase(testCase);
-        thread = new Thread(testCaseRunner);
-        thread.start();
-        Logger.writeLog("DRIVER: Started");
+        if(testCaseRunner != null) {
+            testCaseRunner.setCurrentTestCase(testCase);
+            publisher.setCurrentTestCase(testCase);
+            thread = new Thread(testCaseRunner);
+            thread.start();
+            Logger.writeLog("DRIVER: Started");
+        } else{
+            Logger.writeLog("Test case could not be started: testCaseRunner is null");
+        }
     }
 
     public void interrupt() {

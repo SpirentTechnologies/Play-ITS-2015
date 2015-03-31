@@ -3,12 +3,14 @@
     <string name="app_name">Car2X HMI</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_main">Car2X HMI</string>
+    <string name="text_hint_main">Server IP</string>
     <string name="button_test_activity">Start</string>
 
     <!-- Test Selector Activity -->
     <string name="title_activity_test_selector">Choose Test</string>
 
     <!-- Test Runner Activity -->
+    <string name="title_activity_test_runner">Test Runner</string>
     <string name="button_start">Start</string>
     <string name="button_stop">Stop</string>
     <string name="textview_not_running">Test is not running.</string>
@@ -18,5 +20,7 @@
     <!-- colors -->
     <color name="red_background">#FBE9E9</color>
     <color name="white">#FFFFFF</color>
+
+    <string name="content_description">com.testingtech.car2x</string>
 
 </resources>
