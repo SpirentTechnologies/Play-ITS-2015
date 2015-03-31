@@ -573,10 +573,10 @@ module Car2X_Functions {
 		runs on TesterComponentType return verdicttype  {
 		var verdicttype v_ret := none;
 		
-		// start global timer
-		t_TC_Global.start(p_globalTime);
 		// start ignition status request
 		filterPort.send(m_FilterIgnitionStateStart);
+		// start global timer
+		t_TC_Global.start(p_globalTime);
 
 		while (t_TC_Global.running) {
 			alt {
@@ -658,6 +658,7 @@ module Car2X_Functions {
 		filterPort.send(m_FilterGearLeverStart);
 		// start global timer
 		t_TC_Global.start(p_globalTime);
+		
 		while (t_TC_Global.running) {
 			alt {
 				[] filterPort.receive(mw_FilterResponseGearLever(p_gear)) {
@@ -693,15 +694,26 @@ module Car2X_Functions {
 	function f_DOOR_STATUS(DoorStatus p_door, boolean p_status,
 						   float p_timeOut)
 		runs on TesterComponentType return verdicttype  {
-		var verdicttype v_ret := inconc;
-		t_TC_Global.start(p_timeOut);
+		var verdicttype v_ret := none;
+		
+		// start gear lever status request
 		filterPort.send(m_FilterDoorStatusStart);
+		// start global timer
+		t_TC_Global.start(p_timeOut);
 
 		while (t_TC_Global.running) {
-			v_ret := f_doorStatusSub(p_door, p_status, c_timerTwoSeconds);
-			if (v_ret == pass) {
-				t_TC_Global.stop;
-			}
+    		alt {
+    			[] filterPort.receive(mw_FilterResponseDoorStatus(p_door, p_status)) {
+    				t_TC_Global.stop;
+    				v_ret := pass;
+    			}
+    			[] filterPort.receive {
+    				v_ret := fail;
+    			}
+    			[] t_TC_Global.timeout {
+    				v_ret := inconc;
+    			}
+    		}
 		}
 		filterPort.send(m_FilterDoorStatusStop);
 
@@ -709,39 +721,6 @@ module Car2X_Functions {
 			setverdict(v_ret);
 			// send verdict
 			f_tearDown();
-		}
-		return v_ret;
-	}
-
-	/**
-	 * @desc Function receive door status from canfilter. Test body
-	 * @see f_DOOR_STATUS
-	 * @param p_door Enumeration value to define which door
-	 * @param p_status Status of the door; <b>true</b> for open door;
-	 *   <b>false</b> for close door
-	 * @param p_globalTime Time until timeout. Should be greater then the
-	 *   interval time in m_FilterDoorStatusStart
-	 */
-	function f_doorStatusSub(DoorStatus p_door, boolean p_status,
-							 float p_globalTime)
-		runs on TesterComponentType return verdicttype  {
-		var verdicttype v_ret := inconc;
-		var template FilterResponse v_doorStatus;
-		timer t_TC := c_timerFiveSeconds;
-		t_TC.start(p_globalTime);
-
-		alt {
-			[] filterPort
-			   .receive(mw_FilterResponseDoorStatus(p_door, p_status)) {
-				v_ret := pass;
-			}
-			[] filterPort.receive {
-				t_TC.stop;
-				v_ret := fail;
-			}
-			[] t_TC.timeout {
-				v_ret := inconc;
-			}
 		}
 		return v_ret;
 	}
