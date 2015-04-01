@@ -48,9 +48,7 @@ module Car2X_Functions {
 			mw_FilterResponseVehicleSpeed;
 	}
 
-	import from Car2X_Types {
-		type DoorStatus, FilterResponse, IgnitionStatus, GearLever;
-	}
+	import from Car2X_Types {type DoorStatus, FilterResponse, IgnitionStatus, GearLever;}
 
 	import from Car2X_ConfigSystem {type TesterComponentType;}
 
@@ -67,17 +65,41 @@ module Car2X_Functions {
 							 float p_variance, float p_timeOut)
 		runs on TesterComponentType return verdicttype  {
 		var verdicttype v_ret := inconc;
+		var boolean holding := false;
+		timer t_holding;
 		t_TC_Global.start(p_timeOut);
 		filterPort.send(m_FilterVehicleSpeedStart);
 
-		while (t_TC_Global.running) {
-			v_ret :=
-				f_VehicleSpeedSub(p_speed, p_holding_time, p_variance,
-								  c_timerOneSecond);
-			if (v_ret == pass) {
-				t_TC_Global.stop;
+		alt {
+			[not holding] filterPort.receive(mw_FilterResponseVehicleSpeed(p_speed, p_variance)) {
+				t_holding.start(p_holding_time);
+				holding := true;
+				repeat;				
+			}
+			[not holding] filterPort.receive {
+				v_ret := fail;
+				repeat;
+			}
+			[holding] filterPort.receive(mw_FilterResponseVehicleSpeed(p_speed,	p_variance)) {
+				v_ret := inconc;
+				repeat;
+			}
+			[holding] filterPort.receive {
+				v_ret := fail;
+				t_holding.stop;
+				holding := false;
+				repeat;
+			}
+			[holding]t_holding.timeout{
+				v_ret := pass
+			}
+			[] t_TC_Global.timeout {
+				if (v_ret != fail){ 
+					v_ret := inconc;
+				}
 			}
 		}
+
 		filterPort.send(m_FilterVehicleSpeedStop);
 
 		if (v_ret != pass) {
@@ -87,52 +109,6 @@ module Car2X_Functions {
 		return v_ret;
 	}
 
-	/**
-	 * @desc Testbody function for
-	 * @see f_VEHICLE_SPEED
-	 * @verdict pass The given speed is greater than 50.0
-	 * @verdict fail Due to invalid parameter
-	 * @verdict inconc Due to a timeout
-	 */
-	function f_VehicleSpeedSub(float p_speed, float p_holding_time,
-							   float p_variance, float p_globalTime)
-		runs on TesterComponentType return verdicttype  {
-		var verdicttype v_ret := none;
-		timer t_TC := c_timerFiveSeconds;
-		var template FilterResponse v_speed;
-		timer t_holding;
-
-		// start the timer
-		t_TC.start(p_globalTime);
-		alt {
-			[] filterPort
-			   .receive(mw_FilterResponseVehicleSpeed(p_speed, p_variance)) {
-				t_TC.stop;
-				v_ret := pass;
-				t_holding.start(p_holding_time);
-				while (t_holding.running and v_ret == pass) {
-					alt {
-						[] filterPort
-						   .receive(mw_FilterResponseVehicleSpeed(p_speed,
-																  p_variance)) {
-							v_ret := pass;
-						}
-						[] filterPort.receive {
-							v_ret := fail;
-						}
-					}
-				}
-			}
-			[] filterPort.receive {
-				t_TC.stop;
-				v_ret := fail;
-			}
-			[] t_TC.timeout {
-				v_ret := inconc;
-			}
-		}
-		return v_ret;
-	}
 
 	/**
 	 * @desc Function to get accelerator status from CAN filer.
@@ -148,37 +124,45 @@ module Car2X_Functions {
 								 float p_time_out)
 		runs on TesterComponentType return verdicttype  {
 		var verdicttype v_ret := inconc;
-		var boolean holding := false;
-		timer t_holding;
+		var boolean holding := false; //flag if target reached
+		timer t_holding; 
 		
 		filterPort.send(m_FilterAcceleratorPedalStart);
 		t_TC_Global.start(p_time_out);
 		
 		alt {
 			[not holding] filterPort.receive(mw_FilterResponseAcceleratorPedal(p_accelerator_pedal, p_variance)) {
+				//target value reached -> set holding true; start holding timer
 				t_holding.start(p_holding_time);
 				holding := true;
 				repeat;				
 			}
 			[not holding] filterPort.receive {
+				//received some other thing
 				v_ret := fail;
 				repeat;
 			}
 			[holding] filterPort.receive(mw_FilterResponseAcceleratorPedal(p_accelerator_pedal,	p_variance)) {
+				//still reached target value
 				v_ret := inconc;
 				repeat;
 			}
 			[holding] filterPort.receive {
+				//didn't reched target value-> stop holding timer; set holding false
 				v_ret := fail;
 				t_holding.stop;
 				holding := false;
 				repeat;
 			}
 			[holding]t_holding.timeout{
+				//reached target value for whole holding time -> pass
 				v_ret := pass
 			}
 			[] t_TC_Global.timeout {
-				v_ret := inconc;
+				//time out-> stage failed
+				if (v_ret != fail){ 
+					v_ret := inconc;
+				}
 			}
 		}
 			
@@ -202,67 +186,49 @@ module Car2X_Functions {
 						   float p_time_out)
 		runs on TesterComponentType return verdicttype  {
 		var verdicttype v_ret := inconc;
+		var boolean holding := false;
+		timer t_holding;
 		// start timer
 		t_TC_Global.start(p_time_out);
 		// start request
 		filterPort.send(m_FilterBrakePedalStart);
-		while (t_TC_Global.running) {
-			v_ret := f_BrakePedalSub(p_pedal_status, p_holding_time, 1.0);
-			if (v_ret == pass) {
-				t_TC_Global.stop;
+		
+		alt {
+			[not holding] filterPort.receive(mw_FilterResponseBrakePedalStatus(p_pedal_status)) {
+				t_holding.start(p_holding_time);
+				holding := true;
+				repeat;				
+			}
+			[not holding] filterPort.receive {
+				v_ret := fail;
+				repeat;
+			}
+			[holding] filterPort.receive(mw_FilterResponseBrakePedalStatus(p_pedal_status)) {
+				v_ret := inconc;
+				repeat;
+			}
+			[holding] filterPort.receive {
+				v_ret := fail;
+				t_holding.stop;
+				holding := false;
+				repeat;
+			}
+			[holding]t_holding.timeout{
+				v_ret := pass
+			}
+			[] t_TC_Global.timeout {
+				if (v_ret != fail){ 
+					v_ret := inconc;
+				}
 			}
 		}
+		
 		// stop request
 		filterPort.send(m_FilterBrakePedalStop);
 
 		if (v_ret != pass) {
 			setverdict(v_ret);
 			f_tearDown();
-		}
-		return v_ret;
-	}
-
-	/**
-	 * @desc  function to request brake pedal from CAN filter
-	 * @param p_pedal_status target pedal status; true = press, false = release
-	 * @param p_holding_time Time to hold this brake status (in sec)
-	 * @param p_globalTime interval time
-	 * @return verdicttype for this request
-	 * @verdict
-	 */
-	function f_BrakePedalSub(boolean p_pedalStatus, float p_holding_time,
-							 float p_globalTime)
-		runs on TesterComponentType return verdicttype  {
-		var verdicttype v_ret := pass;
-		var template FilterResponse v_brakePedal;
-		timer t_TC := c_timerFiveSeconds;
-		timer t_holding;
-		t_TC.start(p_globalTime);
-
-		alt {
-			[] filterPort
-			   .receive(mw_FilterResponseBrakePedalStatus(p_pedalStatus)) {
-				t_TC.stop;
-				while (t_holding.running and v_ret == pass) {
-					alt {
-						[] filterPort
-						   .receive(mw_FilterResponseBrakePedalStatus
-									(p_pedalStatus)) {
-							v_ret := pass;
-						}
-						[] filterPort.receive {
-							v_ret := fail;
-						}
-					}
-				}
-			}
-			[] filterPort.receive {
-				t_TC.stop;
-				v_ret := fail;
-			}
-			[] t_TC.timeout {
-				v_ret := inconc;
-			}
 		}
 		return v_ret;
 	}
@@ -278,18 +244,43 @@ module Car2X_Functions {
 							float p_variance, float p_time_out)
 		runs on TesterComponentType return verdicttype  {
 		var verdicttype v_ret := inconc;
+		var boolean holding := false;
+		timer t_holding;
 		// start timer
 		t_TC_Global.start(p_time_out);
 		// start request
 		filterPort.send(m_FilterEngineSpeedStart);
-		while (t_TC_Global.running) {
-			v_ret :=
-				f_EngineSpeedSub(p_engine_speed, p_variance, p_holding_time,
-								 c_timerTwoSeconds);
-			if (v_ret == pass) {
-				t_TC_Global.stop;
+		
+		alt {
+			[not holding] filterPort.receive(mw_FilterResponseEngineSpeed(p_engine_speed, p_variance)) {
+				t_holding.start(p_holding_time);
+				holding := true;
+				repeat;				
 			}
-		}
+			[not holding] filterPort.receive {
+				v_ret := fail;
+				repeat;
+			}
+			[holding] filterPort.receive(mw_FilterResponseEngineSpeed(p_engine_speed, p_variance)) {
+				v_ret := inconc;
+				repeat;
+			}
+			[holding] filterPort.receive {
+				v_ret := fail;
+				t_holding.stop;
+				holding := false;
+				repeat;
+			}
+			[holding]t_holding.timeout{
+				v_ret := pass
+			}
+			[] t_TC_Global.timeout {
+				if (v_ret != fail){ 
+					v_ret := inconc;
+				}
+			}
+		}		
+		
 		// stop request
 		filterPort.send(m_FilterEngineSpeedStop);
 
@@ -300,55 +291,7 @@ module Car2X_Functions {
 		return v_ret;
 	}
 
-	/**
-	 * @desc Requests engine speed from CAN filter. Test body for
-	 * @see f_ENGINE_SPEED
-	 * @param p_engine_speed Target engine speed to reach (in rpm)
-	 * @param p_variance Variance of target speed
-	 * @param p_holding_time Time with target speed (in sec)
-	 * @param p_globalTime Time until timeout (in sec)
-	 */
-	function f_EngineSpeedSub(float p_targetEngineSpeed, float p_variance,
-							  float p_holding_time, float p_globalTime)
-		runs on TesterComponentType return verdicttype  {
-		var verdicttype v_ret := pass;
-		var template FilterResponse v_speed;
-		timer t_TC := c_timerFiveSeconds;
-		timer t_holding;
-
-		// start the timer
-		t_TC.start(p_globalTime);
-		alt {
-			[] filterPort
-			   .receive(mw_FilterResponseEngineSpeed(p_targetEngineSpeed,
-													 p_variance)) {
-				t_TC.stop;
-				t_holding.start(p_holding_time);
-				while (t_holding.running and v_ret == pass) {
-					alt {
-						[] filterPort
-						   .receive(mw_FilterResponseEngineSpeed(p_targetEngineSpeed
-																 , p_variance))
-						{
-							v_ret := pass;
-						}
-						[] filterPort.receive {
-							v_ret := fail;
-						}
-					}
-				}
-			}
-			[] filterPort.receive {
-				t_TC.stop;
-				v_ret := fail;
-			}
-			[] t_TC.timeout {
-				v_ret := inconc;
-			}
-		}
-		return v_ret;
-	}
-
+	
 	/**
 	 * @desc Function to measure battery status for a defined period of time
 	 * @param p_batteryStatus target battery status
@@ -369,31 +312,22 @@ module Car2X_Functions {
 		// start global timer
 		t_TC_Global.start(p_timeOut);
 		
-		while (t_TC_Global.running) {
-			alt {
-				[] filterPort.receive(mw_FilterResponseBatteryStatus(p_batteryStatus, p_variance)) {
-				// timer to check whether the value can be hold for a given timespan
-				t_holding.start(p_holdingTime);
-				
-				while (t_holding.running and v_ret == pass) {
-					alt {
-						[] filterPort.receive(mw_FilterResponseBatteryStatus(p_batteryStatus, p_variance)){
-							v_ret := pass;
-						}
-						[] filterPort.receive {
-							v_ret := fail;
-						}
-					}
-				}
+		alt {
+			[] filterPort.receive(mw_FilterResponseBatteryStatus(p_batteryStatus, p_variance)) {
+				v_ret := pass;
+				t_TC_Global.stop;
 			}
 			[] filterPort.receive {
 				v_ret := fail;
+				repeat;
 			}
 			[] t_TC_Global.timeout {
-				v_ret := inconc;
+				if (v_ret != fail){ 
+					v_ret := inconc;
+				}
 			}
-		}
-		}
+		}		
+		
 		filterPort.send(m_FilterBatteryStatusStop);
 
 		if (v_ret != pass) {
@@ -419,19 +353,20 @@ module Car2X_Functions {
 		// start global timer
 		t_TC_Global.start(p_globalTime);
 
-		while (t_TC_Global.running) {
-    		alt {
-    			[] filterPort.receive(mw_FilterResponseSteeringWheel(p_targetAngle, p_variance)) {
-    				v_ret := pass;
-    				t_TC_Global.stop;
-    			}
-    			[] filterPort.receive {
-    				v_ret := fail;
-    			}
-    			[] t_TC_Global.timeout {
-    				v_ret := inconc;
-    			}
-    		}
+		alt {
+			[] filterPort.receive(mw_FilterResponseSteeringWheel(p_targetAngle, p_variance)) {
+				v_ret := pass;
+				t_TC_Global.stop;
+			}
+			[] filterPort.receive {
+				v_ret := fail;
+				repeat;
+			}
+			[] t_TC_Global.timeout {
+				if (v_ret != fail){ 
+					v_ret := inconc;
+				}
+			}
 		}
 		// stop steering wheel request
 		filterPort.send(m_FilterSteeringWheelStop);
@@ -465,7 +400,9 @@ module Car2X_Functions {
 				repeat;
 			}
 			[] t_TC_Global.timeout {
-				v_ret := inconc;
+				if (v_ret != fail){ 
+					v_ret := inconc;
+				}
 			}
 		}
 		filterPort.send(m_FilterHeadLampStatusStop);
@@ -492,16 +429,17 @@ module Car2X_Functions {
 		// start global timer
 		t_TC_Global.start(p_globalTime);
 
-		while (t_TC_Global.running) {
-			alt {
-				[] filterPort.receive(mw_FilterResponseIgnitionStatus(p_ignitionStatus)) {
-					t_TC_Global.stop;
-					v_ret := pass;
-				}
-				[] filterPort.receive {
-					v_ret := fail;
-				}
-				[] t_TC_Global.timeout {
+		alt {
+			[] filterPort.receive(mw_FilterResponseIgnitionStatus(p_ignitionStatus)) {
+				t_TC_Global.stop;
+				v_ret := pass;
+			}
+			[] filterPort.receive {
+				v_ret := fail;
+				repeat;
+			}
+			[] t_TC_Global.timeout {
+				if (v_ret != fail){ 
 					v_ret := inconc;
 				}
 			}
@@ -532,16 +470,17 @@ module Car2X_Functions {
 		// start global timer
 		t_TC_Global.start(p_globalTime);
 
-		while (t_TC_Global.running) {
-			alt {
-				[] filterPort.receive(mw_FilterResponseParkingBrakeStatus(p_status)) {
-					t_TC_Global.stop;
-					v_ret := pass;
-				}
-				[] filterPort.receive {
-					v_ret := fail;
-				}
-				[] t_TC_Global.timeout {
+		alt {
+			[] filterPort.receive(mw_FilterResponseParkingBrakeStatus(p_status)) {
+				t_TC_Global.stop;
+				v_ret := pass;
+			}
+			[] filterPort.receive {
+				v_ret := fail;
+				repeat;
+			}
+			[] t_TC_Global.timeout {
+				if (v_ret != fail){ 
 					v_ret := inconc;
 				}
 			}
@@ -572,16 +511,17 @@ module Car2X_Functions {
 		// start global timer
 		t_TC_Global.start(p_globalTime);
 
-		while (t_TC_Global.running) {
-			alt {
-				[] filterPort.receive(mw_FilterResponseGearLever(p_gear)) {
-					t_TC_Global.stop;
-					v_ret := pass;
-				}
-				[] filterPort.receive {
-					v_ret := fail;
-				}
-				[] t_TC_Global.timeout {
+		alt {
+			[] filterPort.receive(mw_FilterResponseGearLever(p_gear)) {
+				t_TC_Global.stop;
+				v_ret := pass;
+			}
+			[] filterPort.receive {
+				v_ret := fail;
+				repeat;
+			}
+			[] t_TC_Global.timeout {
+				if (v_ret != fail){ 
 					v_ret := inconc;
 				}
 			}
@@ -622,7 +562,9 @@ module Car2X_Functions {
 				repeat;
 			}
 			[] t_TC_Global.timeout {
-				v_ret := inconc;
+				if (v_ret != fail){ 
+					v_ret := inconc;
+				}
 			}
 		}
 		filterPort.send(m_FilterDoorStatusStop);
