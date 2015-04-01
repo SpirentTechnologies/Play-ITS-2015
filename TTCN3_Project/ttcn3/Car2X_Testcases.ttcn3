@@ -115,7 +115,7 @@ module Car2X_Testcases {
 	 * @desc speed up to 60 and full brake
 	 * @verdict
 	 */
-	testcase TC_FULL_BRAKE_OVER_60() runs on TesterComponentType system SystemComponentType {
+	testcase TC_FULL_BRAKE_SPEED_60() runs on TesterComponentType system SystemComponentType {
 		var verdicttype v_ret := inconc;
 		var float v_timerValue := c_timerFortySeconds;
 		// set up configuration
@@ -149,7 +149,7 @@ module Car2X_Testcases {
 	 * @desc For these Testcase, the tester should start the engine and turn up
 	 *   the engine rotation
 	 */
-	testcase TC_ENGINE_ROTATION_SPEED() runs on TesterComponentType system SystemComponentType {
+	testcase TC_ENGINE_SPEED() runs on TesterComponentType system SystemComponentType {
 		var verdicttype v_ret := inconc;
 		var float v_timerValue := c_timerFortySeconds;
 		// set up configuration
@@ -214,7 +214,7 @@ module Car2X_Testcases {
 	 *   open the driver door.
 	 * @verdict
 	 */
-	testcase TC_OPEN_DOOR_AT_SPEED_50() runs on TesterComponentType system SystemComponentType {
+	testcase TC_OPEN_DOOR_SPEED_50() runs on TesterComponentType system SystemComponentType {
 		var verdicttype v_ret := inconc;
 		var float v_timerValue := c_timerFortySeconds;
 		// set up configuration
@@ -251,7 +251,7 @@ module Car2X_Testcases {
 	 * @desc testcase for parking brake status
 	 * @verdict 
 	 */
-	testcase TC_PARKING_BRAKE_STATUS() runs on TesterComponentType system SystemComponentType {
+	testcase TC_HAND_BRAKE() runs on TesterComponentType system SystemComponentType {
 		var verdicttype v_ret := inconc;
 		var float v_timerValue := c_timerFortySeconds;
 		// set up configuration
@@ -374,7 +374,7 @@ module Car2X_Testcases {
 	 * @desc testcase for reverse gear
 	 * @verdict 
 	 */
-	testcase TC_DRIVE_IN_REVERSE() runs on TesterComponentType system SystemComponentType{
+	testcase TC_DRIVE_REVERSE() runs on TesterComponentType system SystemComponentType{
 		var verdicttype v_ret := inconc;
     	var float v_timerValue := c_timerFortySeconds;    
     	// set up configuration
@@ -419,7 +419,7 @@ module Car2X_Testcases {
 	 * @desc testcase - speed up to 50 km/h and then slow down to 30
 	 * @verdict 
 	 */
-	testcase TC_SPEED_UP_50_SLOW_DOWN_30() runs on TesterComponentType system SystemComponentType{
+	testcase TC_SPEED_50_TO_30() runs on TesterComponentType system SystemComponentType{
 		var verdicttype v_ret := inconc;
 		var float v_timerValue := c_timerFortySeconds;
 
@@ -456,7 +456,7 @@ module Car2X_Testcases {
 	 * @desc speed up to 30 and the stop the car
 	 * @verdict 
 	 */
-	testcase TC_SPEED_UP_30_AND_STOP() runs on TesterComponentType{
+	testcase TC_SPEED_30_AND_STOP() runs on TesterComponentType{
     	var verdicttype v_ret := inconc;
     	var float v_timerValue := c_timerFortySeconds;
     
