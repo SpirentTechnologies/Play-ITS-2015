@@ -14,7 +14,7 @@ public final class CANFilterLog {
 		case INCOMING_REQUEST:
 			infoMessage += "Incoming request: ";
 			break;
-		case STOPP:
+		case STOP:
 			infoMessage += "No more requests, stopping service.";
 			break;
 		case START:

@@ -46,14 +46,11 @@ public class SocketUtils {
     } catch (IOException e) {
       canFilterLog.logError(FilterLogMessages.SOCKET_ERROR);
     }
-    finally {
-		canFilterLog.logInfo(FilterLogMessages.STOPP);
-		close(serverSocket);
-	}
     return serverSocket;
   }
   
-  private void close(Closeable socket) {
+  public void close(Closeable socket) {
+	  canFilterLog.logInfo(FilterLogMessages.STOP);
 		try {
 			if (socket != null) {
 				socket.close();

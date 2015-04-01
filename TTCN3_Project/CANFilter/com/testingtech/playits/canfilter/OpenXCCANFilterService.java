@@ -17,6 +17,7 @@ public class OpenXCCANFilterService implements CANFilterService {
   private Hashtable<String, Car2XEntry> car2xEntries = new Hashtable<>();
   private RequestProcessor requestProcessor;
   private OpenXCResourceConnector resourceConnector;
+  private ServerSocket serverSocket;
 
   public OpenXCCANFilterService(String... args)
       throws AddressInstantiationException, IOException, JSONException {
@@ -31,7 +32,7 @@ public class OpenXCCANFilterService implements CANFilterService {
 
   private void createRequestProcessor(String... args)
       throws AddressInstantiationException, IOException, JSONException {
-    ServerSocket serverSocket = socketUtils.createServerSocket(args[0],
+    serverSocket = socketUtils.createServerSocket(args[0],
         args[1]);
     requestProcessor = new RequestProcessor(serverSocket, car2xEntries);
   }
@@ -57,6 +58,7 @@ public class OpenXCCANFilterService implements CANFilterService {
       canFilterLog.logError(FilterLogMessages.SOCKET_ERROR,
           e.getMessage());
     }
+    socketUtils.close(serverSocket);
     resourceConnector.disconnect();
   }
 }
