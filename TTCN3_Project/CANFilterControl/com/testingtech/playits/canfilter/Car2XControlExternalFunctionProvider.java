@@ -29,13 +29,13 @@ public class Car2XControlExternalFunctionProvider extends
   @ExternalFunction(name = "startFilter", module = "Car2X_Control")
   public CharstringValue startFilter(CharstringValue host,
       IntegerValue portNumber, CharstringValue simulatorHost,
-      IntegerValue simulatorPortNumber) {
+      IntegerValue simulatorPortNumber, BooleanValue isUsingSimulator) {
     return startFilter(
         "com.testingtech.playits.canfilter.CANFilterServiceMain",
         new String[] { host.getString(),
             String.valueOf(portNumber.getInt()),
             simulatorHost.getString(),
-            String.valueOf(simulatorPortNumber.getInt()) });
+            String.valueOf(simulatorPortNumber.getInt()), String.valueOf(isUsingSimulator.getBoolean())});
   }
 
   private CharstringValue startFilter(String mainClass, String[] parameters) {
