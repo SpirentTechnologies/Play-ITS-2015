@@ -6,11 +6,6 @@ import jssc.SerialPortException;
 import java.net.Socket;
 import java.util.Hashtable;
 
-/**
- * 
- * @author Benjamin Kodera, Christian Kühling
- *
- */
 public class ELMRS232 {
 	static Socket sock = null;
 	static Hashtable<String, String> commandHashTable = new Hashtable<String, String>();

@@ -1,4 +1,8 @@
 module Car2X_Control {
+<<<<<<< HEAD
   external function startFilter(in charstring host, in integer portNumber, in charstring simulatorHost, in integer simulatorPort, in boolean isUsingSimulator) return charstring;
+=======
+  external function startFilter(in charstring host, in integer portNumber, in charstring simulatorHost, in integer simulatorPort) return charstring;
+>>>>>>> branch 'OpenXcAndTTWorkbench' of https://github.com:443/TestingTechnologies/Play-ITS-2015.git
   external function stopFilter() return boolean;
 }

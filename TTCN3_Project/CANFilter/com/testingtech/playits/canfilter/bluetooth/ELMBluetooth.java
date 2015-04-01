@@ -19,11 +19,6 @@ import javax.bluetooth.UUID;
 import javax.microedition.io.Connector;
 import javax.microedition.io.StreamConnection;
 
-/**
- * 
- * @author Benjamin Kodera, Christian Kühling
- *
- */
 public class ELMBluetooth implements DiscoveryListener {
 
 	private static Object lock = new Object();
@@ -36,56 +31,56 @@ public class ELMBluetooth implements DiscoveryListener {
 	private static PrintWriter pwriter;
 	private static BufferedReader in;
 
-	 ELMBluetooth obj;
+	ELMBluetooth obj;
 
-	  /**
-	   * @param RemoteDevice
-	   * @param DeviceClass
-	   * using javax.bluetooth import
-	   */
-	  public void deviceDiscovered(RemoteDevice btDevice, DeviceClass cod) {
-	    if (!remdevices.contains(btDevice)) {
-	      remdevices.addElement(btDevice);
-	    }
-	  }
+	/**
+	 * @param RemoteDevice
+	 * @param DeviceClass
+	 *            using javax.bluetooth import
+	 */
+	public void deviceDiscovered(RemoteDevice btDevice, DeviceClass cod) {
+		if (!remdevices.contains(btDevice)) {
+			remdevices.addElement(btDevice);
+		}
+	}
 
-	  @Override
-	  public void servicesDiscovered(int transID, ServiceRecord[] servRecord) {
-	    if (!(servRecord == null) && servRecord.length > 0) {
-	      connectionURL = servRecord[0].getConnectionURL(0, false);
-	    }
+	@Override
+	public void servicesDiscovered(int transID, ServiceRecord[] servRecord) {
+		if (!(servRecord == null) && servRecord.length > 0) {
+			connectionURL = servRecord[0].getConnectionURL(0, false);
+		}
 
-	  }
+	}
 
-	  @Override
-	  public void serviceSearchCompleted(int transID, int respCode) {
-	    synchronized (lock) {
-	      lock.notify();
-	    }
-	  }
+	@Override
+	public void serviceSearchCompleted(int transID, int respCode) {
+		synchronized (lock) {
+			lock.notify();
+		}
+	}
 
-	  @Override
-	  public void inquiryCompleted(int discType) {
-	    synchronized (lock) {
-	      lock.notify();
-	    }
-	    switch (discType) {
-	      case DiscoveryListener.INQUIRY_COMPLETED:
-	        System.out.println("Inquiry Completed");
-	        break;
+	@Override
+	public void inquiryCompleted(int discType) {
+		synchronized (lock) {
+			lock.notify();
+		}
+		switch (discType) {
+		case DiscoveryListener.INQUIRY_COMPLETED:
+			System.out.println("Inquiry Completed");
+			break;
 
-	      case DiscoveryListener.INQUIRY_TERMINATED:
-	        System.out.println("Inquiry Terminated");
-	        break;
+		case DiscoveryListener.INQUIRY_TERMINATED:
+			System.out.println("Inquiry Terminated");
+			break;
 
-	      case DiscoveryListener.INQUIRY_ERROR:
-	        System.out.println("Inquiry Error");
-	        break;
+		case DiscoveryListener.INQUIRY_ERROR:
+			System.out.println("Inquiry Error");
+			break;
 
-	      default:
-	        System.out.println("Unknown Response Code");
-	    }
-	  }
+		default:
+			System.out.println("Unknown Response Code");
+		}
+	}
 
 	/**
 	 * Inits the Bluetooth Connection
@@ -93,23 +88,20 @@ public class ELMBluetooth implements DiscoveryListener {
 	 * @throws IOException
 	 */
 	public void init() throws IOException {
-		//TODO Fix(hangs @ Inquiry complete)
 		br = new BufferedReader(new InputStreamReader(System.in));
 		obj = new ELMBluetooth();
 		LocalDevice locdevice = LocalDevice.getLocalDevice();
-		    String add = locdevice.getBluetoothAddress();
-		    String friendlyName = locdevice.getFriendlyName();
-	
-		    System.out.println("Local Bluetooth Address : " + add);
-		    System.out.println("" + "" + "Local Friendly name : " + friendlyName);
-	    DiscoveryAgent disAgent = locdevice.getDiscoveryAgent();
-	    System.out.println("********Locating Devices******");
-	    disAgent.startInquiry(DiscoveryAgent.GIAC, obj);
+		String add = locdevice.getBluetoothAddress();
+		String friendlyName = locdevice.getFriendlyName();
+
+		System.out.println("Local Bluetooth Address : " + add);
+		System.out.println("" + "" + "Local Friendly name : " + friendlyName);
+		DiscoveryAgent disAgent = locdevice.getDiscoveryAgent();
+		System.out.println("********Locating Devices******");
+		disAgent.startInquiry(DiscoveryAgent.GIAC, obj);
 		try {
 			synchronized (lock) {
-				System.out.println("Lock Set");
 				lock.wait();
-				System.out.println("Lock Released");
 			}
 		} catch (InterruptedException e) {
 			e.printStackTrace();
@@ -125,15 +117,14 @@ public class ELMBluetooth implements DiscoveryListener {
 						.elementAt(value);
 				System.out.println(remoteDevice.getFriendlyName(false));
 				// TODO check if all elm327 are named this way
-				if ((remoteDevice.getFriendlyName(true) == "OBDII")
-						|| (remoteDevice.getFriendlyName(true) == "ELM327")) {
+				String name = remoteDevice.getFriendlyName(true);
+				if (name.equals("OBDII") || name.equals("ELM327")
+						|| name.equals("CBT")) {
 					index = value;
 				}
 			}
 
-			RemoteDevice desDevice = (RemoteDevice) remdevices.elementAt(index); // index
-																					// -
-																					// 1
+			RemoteDevice desDevice = (RemoteDevice) remdevices.elementAt(index);
 			UUID[] uuidset = new UUID[1];
 			uuidset[0] = new UUID("1101", true);
 

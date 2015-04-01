@@ -45,7 +45,7 @@ public final class CANFilterLog {
 			break;
 		}
 		for (String arg : args) {
-			infoMessage += arg + " : ";
+			infoMessage += arg + " ";
 		}
 		System.out.println(infoMessage);
 	}
@@ -81,7 +81,7 @@ public final class CANFilterLog {
 			break;
 		}
 		for (String arg : args) {
-			errorMessage += arg + " : ";
+			errorMessage += arg + " ";
 		}
 		System.err.println(errorMessage);
 	}
