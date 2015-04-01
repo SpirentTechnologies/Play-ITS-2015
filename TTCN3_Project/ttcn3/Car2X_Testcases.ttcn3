@@ -39,7 +39,7 @@ module Car2X_Testcases {
 	}
 	import from Car2X_Types {type DoorStatus, IgnitionStatus, GearLever;}
 
-	import from Car2X_ConfigSystem all;
+	import from Car2X_ConfigSystem {type SystemComponentType, TesterComponentType;}
 	import from Car2X_Functions {
 		function
 			f_ACCELERATOR_PEDAL,
@@ -66,9 +66,7 @@ module Car2X_Testcases {
 	 */
 	testcase TC_VEHICLE_SPEED_OVER_50_10_SEC() runs on TesterComponentType system SystemComponentType {
 		var verdicttype v_ret := inconc;
-
 		var float v_timerValue := c_timerSixtySeconds;
-
 		// set up configuration
 		f_setUp();
 
@@ -188,7 +186,6 @@ module Car2X_Testcases {
 	 */
 	testcase TC_VEHICLE_SPEED_SIMULATED() runs on TesterComponentType system SystemComponentType {
 		var verdicttype v_ret := pass;
-
 		var float v_timerValue := c_timerFiveSeconds;
 
 		// set up configuration
@@ -456,7 +453,7 @@ module Car2X_Testcases {
 	 * @desc speed up to 30 and the stop the car
 	 * @verdict 
 	 */
-	testcase TC_SPEED_UP_30_AND_STOP() runs on TesterComponentType{
+	testcase TC_SPEED_UP_30_AND_STOP() runs on TesterComponentType system SystemComponentType{
     	var verdicttype v_ret := inconc;
     	var float v_timerValue := c_timerFortySeconds;
     
