@@ -1,4 +1,4 @@
-package com.testingtech.car2x.hmi.testcase;
+package com.testingtech.car2x.hmi.testcases;
 
 public enum TestCaseVerdict {
 

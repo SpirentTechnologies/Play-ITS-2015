@@ -1,10 +1,14 @@
 package com.testingtech.car2x.hmi.ttmanclient;
 
+import android.os.AsyncTask;
+
+import com.testingtech.car2x.hmi.AsyncTimer;
+import com.testingtech.car2x.hmi.Globals;
 import com.testingtech.car2x.hmi.Logger;
 import com.testingtech.car2x.hmi.TestRunnerActivity;
-import com.testingtech.car2x.hmi.testcase.TestCaseProgress;
-import com.testingtech.car2x.hmi.testcase.TestCaseVerdict;
-import com.testingtech.car2x.hmi.testcase.Utils;
+import com.testingtech.car2x.hmi.testcases.TestCaseProgress;
+import com.testingtech.car2x.hmi.testcases.TestCaseVerdict;
+import com.testingtech.car2x.hmi.testcases.Utils;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.text.ParseException;
@@ -62,18 +66,25 @@ public class Publisher {
             TestRunnerActivity.guiUpdater.updateProgressBar(testCaseProgress.ordinal());
             TestRunnerActivity.guiUpdater.scrollToStage(testCaseProgress.ordinal() - 1);
             TestRunnerActivity.speakStageText(testCaseProgress.ordinal() - 1);
+            if (TestRunnerActivity.timer != null){
+                if(TestRunnerActivity.timer.getStatus().equals(AsyncTask.Status.RUNNING)) {
+                    TestRunnerActivity.timer.cancel(true);
+                }
+            }
+            TestRunnerActivity.timer = new AsyncTimer(Globals.runnerActivity.btnStop,
+                    Globals.runnerActivity.noticeText, timeWindow);
+            TestRunnerActivity.timer.execute();
             Logger.writeLog("testCaseProgress: " + testCaseProgress.ordinal());
         }
     } else {
         Logger.writeLog("Validation failed...");
     }
-
-
   }
 
   public void publishVerdict(String testCaseName, String verdictLabel) throws IOException {
       TestCaseVerdict testCaseVerdict = Utils.toTestCaseVerdict(verdictLabel);
 
+      String result;
       if (isCurrent(testCaseName) && testCaseName != null && testCaseVerdict != null) {
           Logger.writeLog(String.format(
                   verdictFormatString,
@@ -81,12 +92,21 @@ public class Publisher {
                   testCaseVerdict.name()
           ));
           // Update GUI
+          if(TestRunnerActivity.timer != null) {
+              if (TestRunnerActivity.timer.getStatus().equals(AsyncTask.Status.RUNNING)) {
+                  TestRunnerActivity.timer.cancel(true);
+              }
+          }
           Logger.writeLog("Publishing verdict");
-          TestRunnerActivity.guiUpdater.updateProgressBar(99);  // 99 for max value
           TestRunnerActivity.guiUpdater.resetTestRunnerGui();
+          TestRunnerActivity.guiUpdater.updateProgressBar(99);  // 99 for max value
+          result = "Test Verdict: " + testCaseVerdict.name();
       } else {
           Logger.writeLog("Validation failed...");
+          result = "Test case ended with errors.";
       }
+      TestRunnerActivity.finishTestCase();
+      TestRunnerActivity.guiUpdater.setNoticeText(result);
   }
 
 }

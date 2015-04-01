@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.EditText;
 
 import com.testingtech.car2x.hmi.testcases.XmlLoader;
+import com.testingtech.car2x.hmi.ttmanclient.Driver;
 
 public class MainActivity extends ActionBarActivity {
 
@@ -20,11 +21,15 @@ public class MainActivity extends ActionBarActivity {
         Globals.mainActivity = this;
         Logger.getInstance();
         XmlLoader.getInstance();
+        PropertyReader.loadPropertyFile();
+        Globals.serverPort = Integer.parseInt(PropertyReader.readProperty("ttman.server.port"));
+        Globals.clientPort = Integer.parseInt(PropertyReader.readProperty("ttman.client.port"));
     }
 
     public void startActivityTest(View view) {
         EditText ipText = (EditText) findViewById(R.id.ip);
         Globals.serverIp = ipText.getText().toString();
+
         Intent intent = new Intent(this, TestSelectorActivity.class);
         startActivity(intent);
     }

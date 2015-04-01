@@ -2,8 +2,9 @@ package com.testingtech.car2x.hmi.ttmanclient;
 
 import com.testingtech.car2x.hmi.Globals;
 import com.testingtech.car2x.hmi.Logger;
-import com.testingtech.car2x.hmi.testcase.TestCaseVerdict;
-import com.testingtech.car2x.hmi.testcase.Utils;
+import com.testingtech.car2x.hmi.PropertyReader;
+import com.testingtech.car2x.hmi.testcases.TestCaseVerdict;
+import com.testingtech.car2x.hmi.testcases.Utils;
 import com.testingtech.tworkbench.ttman.server.api.Credentials;
 import com.testingtech.tworkbench.ttman.server.api.ExecuteTestCaseJob;
 import com.testingtech.tworkbench.ttman.server.api.ExecutionServerFactory;
@@ -18,7 +19,7 @@ import java.net.InetAddress;
 
 public class TestCaseRunner implements Runnable {
 
-  private final NotificationHandler notificationHandler;
+  private NotificationHandler notificationHandler;
   private IExecutionServer client;
   private String currentTestCase;
   private TestCaseVerdict verdict;
@@ -37,8 +38,8 @@ public class TestCaseRunner implements Runnable {
       if(clientIp != null)
         Logger.writeLog("TESTCASERUNNER: Host address " + clientIp.getHostAddress());
 
-      final String user = "user";       // TODO load from external file
-      final String password = "password";
+      final String user = PropertyReader.readProperty("ttman.server.user.name");
+      final String password = PropertyReader.readProperty("ttman.server.user.password");
       final Credentials credentials = new Credentials(user, password);
 
       this.client = new ExecutionServerFactory().createClient(clientIp, Globals.clientPort);
@@ -69,8 +70,8 @@ public class TestCaseRunner implements Runnable {
     }
 
   private void initTestSuite() throws IOException {
-    final String testProject = "TTCN3_Project";
-    final String testFile = "clf/Car2X_Testcases.clf";
+    final String testProject = PropertyReader.readProperty("ttw.testcase.project");
+    final String testFile = PropertyReader.readProperty("ttw.testcase.file");
 
     this.client.loadTestSuiteFromFile(testProject, testFile);
   }
@@ -88,7 +89,7 @@ public class TestCaseRunner implements Runnable {
   public void run() {
     final ExecuteTestCaseJob execJob;
     try {
-      String testCaseModule = "Car2X_Testcases";
+      String testCaseModule = PropertyReader.readProperty("ttw.testcase.module");
       execJob = client.executeTestCase(testCaseModule, this.currentTestCase, null);
 
       Logger.writeLog("TESTCASERUNNER: Waiting for test case execution");
