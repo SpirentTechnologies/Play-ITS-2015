@@ -1,12 +1,17 @@
 package com.testingtech.playits.canfilter;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import org.etsi.ttcn.tci.BooleanValue;
 import org.etsi.ttcn.tci.CharstringValue;
-import org.etsi.ttcn.tci.IntegerValue;
+import org.etsi.ttcn.tci.RecordValue;
+import org.etsi.ttcn.tci.UnionValue;
 
 import com.testingtech.ttcn.annotation.ExternalFunction;
+import com.testingtech.ttcn.tci.util.ValueUtils;
 import com.testingtech.ttcn.tri.AnnotationsExternalFunctionPlugin;
 import com.testingtech.util.UUID;
 
@@ -20,23 +25,60 @@ public class Car2XControlExternalFunctionProvider extends
   /**
    * Starts a CAN filter service process with specified host and port
    * 
-   * @param host
-   *            host name
-   * @param portNumber
-   *            port
+   * @param RecordValue
    * @return process id
    */
   @ExternalFunction(name = "startFilter", module = "Car2X_Control")
-  public CharstringValue startFilter(CharstringValue host,
-      IntegerValue portNumber, CharstringValue simulatorHost,
-      IntegerValue simulatorPortNumber, BooleanValue isUsingSimulator) {
-    return startFilter(
-        "com.testingtech.playits.canfilter.CANFilterServiceMain",
-        new String[] { host.getString(),
-            String.valueOf(portNumber.getInt()),
-            simulatorHost.getString(),
-            String.valueOf(simulatorPortNumber.getInt()), String.valueOf(isUsingSimulator.getBoolean())});
+  public CharstringValue startFilter(RecordValue filterCfg) {
+	  String host = ValueUtils.getStringValue(filterCfg.getField("host"));
+	  String portNumber = ValueUtils.getStringValue(filterCfg
+			  .getField("portNumber"));
+	  List<String> args = new ArrayList<String>(Arrays.asList(host,
+			  String.valueOf(portNumber)));
+
+    UnionValue canConfig = (UnionValue) filterCfg.getField("canConfig");
+    String selectedVariant = canConfig.getPresentVariantName();
+    RecordValue selectedValue = (RecordValue) canConfig
+        .getVariant(selectedVariant);
+
+    String mainClass = "";
+    switch (selectedVariant) {
+    case "simulator":
+      mainClass = "com.testingtech.playits.canfilter.OpenXCCANFilterServiceMain";
+		createOpenXCArguments(selectedValue, args);
+      break;
+    case "elmBluetooth":
+      mainClass = "com.testingtech.playits.canfilter.BluetoothCANFilterServiceMain";
+      args.add(ValueUtils.getStringValue(selectedValue
+          .getField("deviceName")));
+      break;
+    case "elmRS232":
+      mainClass = "com.testingtech.playits.canfilter.RS232CANFilterServiceMain";
+		createRS232Arguments(selectedValue, args);
+      break;
+    default:
+      break;
+    }
+    return startFilter(mainClass, args.toArray(new String[0]));
   }
+
+private void createOpenXCArguments(RecordValue selectedValue, List<String> args) {
+	args.add(ValueUtils.getStringValue(selectedValue.getField("host")));
+      args.add(ValueUtils.getStringValue(selectedValue
+          .getField("portNumber")));
+}
+
+private void createRS232Arguments(RecordValue selectedValue, List<String> args) {
+	args.add(ValueUtils.getStringValue(selectedValue
+          .getField("comPort")));
+      args.add(ValueUtils.getStringValue(selectedValue
+          .getField("baudRate")));
+      args.add(ValueUtils.getStringValue(selectedValue.getField("parity")));
+      args.add(ValueUtils.getStringValue(selectedValue
+          .getField("dataBits")));
+      args.add(ValueUtils.getStringValue(selectedValue
+          .getField("stopBits")));
+}
 
   private CharstringValue startFilter(String mainClass, String[] parameters) {
     if (process != null && process.isAlive()) {
@@ -49,8 +91,8 @@ public class Car2XControlExternalFunctionProvider extends
 
     String pathSeparator = System.getProperty("path.separator");
     String execCommand = "java -classpath build/CANFilter" + pathSeparator
-            + "libs/java-json.jar " + mainClass + " "
-            + join(parameters, " "); 
+        + "libs/java-json.jar " + mainClass + " "
+        + join(parameters, " ");
     try {
 
       process = Runtime.getRuntime().exec(execCommand);

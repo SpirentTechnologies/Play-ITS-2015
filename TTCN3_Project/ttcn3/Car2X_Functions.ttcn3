@@ -6,11 +6,9 @@
  *   		 tear down configurations to reuse.
  */
 module Car2X_Functions {
-	import from Car2X_ModuleParameters {
-		const c_timerFiveSeconds, c_timerOneSecond, c_timerTwoSeconds;
-		modulepar SIMULATOR_HOST, SIMULATOR_PORT, TCP_REMOTE_HOST, TCP_REMOTE_PORT, SIMULATE;
-	}
 
+import from Car2X_ModuleParameters {modulepar FILTER;}
+	
 	import from Car2X_Templates {
 		template
 			m_FilterAcceleratorPedalStart,
@@ -48,7 +46,7 @@ module Car2X_Functions {
 			mw_FilterResponseVehicleSpeed;
 	}
 
-	import from Car2X_Types {type DoorStatus, FilterResponse, IgnitionStatus, GearLever;}
+	import from Car2X_Types {type DoorStatus, GearLever, IgnitionStatus;}
 
 	import from Car2X_ConfigSystem {type TesterComponentType;}
 
@@ -590,7 +588,7 @@ module Car2X_Functions {
 		// map the tester port to the system port
 		map(self:filterPort, system:filterPort);
 
-		var charstring filterServiceId := startFilter(TCP_REMOTE_HOST, TCP_REMOTE_PORT, SIMULATOR_HOST, SIMULATOR_PORT, SIMULATE);
+		var charstring filterServiceId := startFilter(FILTER);
 		if (lengthof(filterServiceId) == 0) {
 			setverdict(fail, "Could not start CAN filter service.");
 		} else {

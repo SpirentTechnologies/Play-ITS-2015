@@ -21,6 +21,8 @@ import javax.microedition.io.StreamConnection;
 
 public class ELMBluetooth implements DiscoveryListener {
 
+	private static final String DEFAULT_DEVICE_NAME = "OBDII"; // may also be named CBT
+
 	private static Object lock = new Object();
 
 	private static Vector<RemoteDevice> remdevices = new Vector<RemoteDevice>();
@@ -32,6 +34,12 @@ public class ELMBluetooth implements DiscoveryListener {
 	private static BufferedReader in;
 
 	ELMBluetooth obj;
+
+	private String deviceName;
+	
+	public ELMBluetooth(String deviceName) {
+		this.deviceName = deviceName;
+	}
 
 	/**
 	 * @param RemoteDevice
@@ -89,7 +97,7 @@ public class ELMBluetooth implements DiscoveryListener {
 	 */
 	public void init() throws IOException {
 		br = new BufferedReader(new InputStreamReader(System.in));
-		obj = new ELMBluetooth();
+		obj = new ELMBluetooth(deviceName);
 		LocalDevice locdevice = LocalDevice.getLocalDevice();
 		String add = locdevice.getBluetoothAddress();
 		String friendlyName = locdevice.getFriendlyName();
@@ -118,8 +126,7 @@ public class ELMBluetooth implements DiscoveryListener {
 				System.out.println(remoteDevice.getFriendlyName(false));
 				// TODO check if all elm327 are named this way
 				String name = remoteDevice.getFriendlyName(true);
-				if (name.equals("OBDII") || name.equals("ELM327")
-						|| name.equals("CBT")) {
+				if (name.equals(deviceName) || name.equals(DEFAULT_DEVICE_NAME)) {
 					index = value;
 				}
 			}

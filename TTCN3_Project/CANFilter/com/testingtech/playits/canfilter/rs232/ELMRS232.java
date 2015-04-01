@@ -1,19 +1,33 @@
 package com.testingtech.playits.canfilter.rs232;
 
-import jssc.SerialPort;
-import jssc.SerialPortException;
-
 import java.net.Socket;
 import java.util.Hashtable;
+import java.util.List;
+
+import jssc.SerialPort;
+import jssc.SerialPortException;
 
 public class ELMRS232 {
 	static Socket sock = null;
 	static Hashtable<String, String> commandHashTable = new Hashtable<String, String>();
 
-	private String portName = "COM4";
-
+	private String portName;
+	int baudRate;
+	int parity;
+	int dataBits;
+	int stopBits;
+	
 	private SerialPort serialPort = new SerialPort(portName);
 
+	
+	public ELMRS232(List<String> argsList) {
+		portName = argsList.get(0);
+		baudRate = Integer.parseInt(argsList.get(1));
+		parity = Integer.parseInt(argsList.get(2));
+		dataBits = Integer.parseInt(argsList.get(3));
+		stopBits = Integer.parseInt(argsList.get(4));
+	}
+	
 	/**
 	 * Runs the given command, waits 200ms and returns the raw Reply without
 	 * "WAITING" etc.
@@ -65,17 +79,12 @@ public class ELMRS232 {
 	/**
 	 * Inits the serialPort Connection
 	 */
-	public void init(String portname) {
+	public void init() {
 		try {
-			if (!(portname == "")) {
-				serialPort = new SerialPort(portname);
-			}
 			// Page 7 Manual elm327.pdf
 			serialPort.openPort();
-			serialPort.setParams(
-					SerialPort.BAUDRATE_9600, // 38400 OR 9600
-					SerialPort.DATABITS_8, SerialPort.STOPBITS_1,
-					SerialPort.PARITY_NONE);
+			serialPort.setParams(baudRate, // 38400 OR 9600
+					dataBits, stopBits, parity);
 		} catch (SerialPortException e) {
 			e.printStackTrace();
 		}

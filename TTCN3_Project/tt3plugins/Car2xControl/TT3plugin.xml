@@ -13,5 +13,6 @@
     <parameter id="name" value="CAN Filter Service External Functions Provider"/>
     <parameter id="class" value="com.testingtech.playits.canfilter.Car2XControlExternalFunctionProvider"/>
     <parameter id="description" value="External function implementation to control the CAN filter service used by the Car2X project."/>
+    <parameter id="taParams"/>
   </extension>
 </plugin>

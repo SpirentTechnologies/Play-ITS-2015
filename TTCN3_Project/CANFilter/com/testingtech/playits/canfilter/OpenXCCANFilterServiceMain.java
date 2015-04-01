@@ -32,10 +32,10 @@ import java.io.IOException;
 
 import org.json.JSONException;
 
-public class CANFilterServiceMain {
+public class OpenXCCANFilterServiceMain {
 
 	static CANFilterLog canFilterLog = new CANFilterLog(
-			CANFilterServiceMain.class.getSimpleName());
+			OpenXCCANFilterServiceMain.class.getSimpleName());
 	
 	/**
 	 * Provides TCP server functionality to handle JSON requests. Upon receiving
@@ -48,7 +48,7 @@ public class CANFilterServiceMain {
 	 */
 	public static void main(String[] args) {
 		try {
-			new CANFilterService(args).startFilter();
+			new OpenXCCANFilterService(args).startFilter();
 		} catch (JSONException e) {
 			canFilterLog.logError(FilterLogMessages.JSON_ERROR);
 		} catch (IOException e) {

@@ -1,16 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE campaignloader PUBLIC "-//TESTING TECH//DTD MLF//2.0" "mlf.dtd">
 <campaignloader>
-  <campaign Name="Car2X_Testcases" Control="false">
+  <campaign Name="Car2X_Testcases_OpenXCSimulator" Control="false">
     <testadapter Name="com.testingtech.ttcn.tri.PluginTestAdapter" File="">
       <description></description>
     </testadapter>
-    <module Name="Car2X_ModuleParameters" File="ttcn3build/Car2X_ModuleParameters.jar" Package="generated_ttcn"/>
     <module Name="Car2X_Testcases" File="ttcn3build/Car2X_Testcases.jar" Package="generated_ttcn"/>
     <parameter Name="FILTER" Module="Car2X_ModuleParameters" ModuleOfTypeDecl="Car2X_Control">
-      <description></description>
+      <description>	 </description>
       <type>FilterCfg</type>
-      <value><![CDATA[<Values:record type="FilterCfg" module="Car2X_Control" xmlns:Values="Values.xsd"><Values:charstring type="charstring" name="host"><Values:value>localhost</Values:value></Values:charstring><Values:integer type="integer" name="portNumber"><Values:value>7000</Values:value></Values:integer><Values:union type="CANCfg" module="Car2X_Control" name="canConfig"><Values:record type="SimulatoCfg" module="Car2X_Control" name="simulator"><Values:charstring type="charstring" name="host"><Values:value>localhost</Values:value></Values:charstring><Values:integer type="integer" name="portNumber"><Values:value>7000</Values:value></Values:integer></Values:record></Values:union></Values:record>]]></value>
+      <value><![CDATA[<Values:record type="FilterCfg" module="Car2X_Control" xmlns:Values="Values.xsd"><Values:charstring type="charstring" name="host"><Values:value>localhost</Values:value></Values:charstring><Values:integer type="integer" name="portNumber"><Values:value>7000</Values:value></Values:integer><Values:union type="CANCfg" module="Car2X_Control" name="canConfig"><Values:record type="SimulatoCfg" module="Car2X_Control" name="simulator"><Values:charstring type="charstring" name="host"><Values:value>localhost</Values:value></Values:charstring><Values:integer type="integer" name="portNumber"><Values:value>50001</Values:value></Values:integer></Values:record></Values:union></Values:record>]]></value>
       <default><![CDATA[<Values:record type="FilterCfg" module="Car2X_Control" xmlns:Values="Values.xsd"><Values:charstring type="charstring" name="host"><Values:value>localhost</Values:value></Values:charstring><Values:integer type="integer" name="portNumber"><Values:value>7000</Values:value></Values:integer><Values:union type="CANCfg" module="Car2X_Control" name="canConfig"><Values:record type="ELMRS232Cfg" module="Car2X_Control" name="elmRS232"><Values:charstring type="charstring" name="comPort"><Values:value>COM4</Values:value></Values:charstring><Values:integer type="integer" name="baudRate"><Values:value>9600</Values:value></Values:integer><Values:boolean type="boolean" name="parity"><Values:value>false</Values:value></Values:boolean><Values:integer type="integer" name="dataBits"><Values:value>8</Values:value></Values:integer><Values:integer type="integer" name="stopBits"><Values:value>1</Values:value></Values:integer></Values:record></Values:union></Values:record>]]></default>
       <presentation>
         <plain/>
