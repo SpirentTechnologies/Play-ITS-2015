@@ -39,7 +39,12 @@ public class CANFilterService {
     ResourceConnector resourceConnector = getResourceConnector();
     Thread resourceConnectorThread = new Thread(resourceConnector);
     while (requestProcessor.hasMoreRequests()) {
-      requestProcessor.processNextRequest();
+      try {
+        requestProcessor.processNextRequest();
+      }
+      catch(JSONException e) {
+    	canFilterLog.logError(FilterLogMessages.JSON_ERROR, e.getMessage());	
+      }
       if (!resourceConnectorThread.isAlive())
         resourceConnectorThread.start();
     }
