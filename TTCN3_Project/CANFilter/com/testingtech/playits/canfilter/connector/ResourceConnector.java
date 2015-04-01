@@ -1,5 +1,9 @@
 package com.testingtech.playits.canfilter.connector;
 
-public interface ResourceConnector extends Runnable {
+import java.io.IOException;
+
+public interface ResourceConnector {
+
 	void disconnect();
+	void connect() throws IOException;
 }

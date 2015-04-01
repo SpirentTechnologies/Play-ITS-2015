@@ -30,18 +30,22 @@ package com.testingtech.playits.canfilter.valueupdater;
 
 import java.util.Date;
 import java.util.Hashtable;
+import java.util.Scanner;
 
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import com.testingtech.playits.canfilter.CANFilterLog;
 import com.testingtech.playits.canfilter.Car2XEntry;
 import com.testingtech.playits.canfilter.FilterLogMessages;
+import com.testingtech.playits.canfilter.connector.OpenXCResourceConnector;
 
-public class OpenXCValueUpdater implements ValueUpdater {
+public class OpenXCValueUpdater implements Runnable {
 
 	private Hashtable<String, Car2XEntry> car2xEntries;
-	private CANFilterLog canFilterLog = new CANFilterLog(
-			OpenXCValueUpdater.class.getSimpleName());
+	private CANFilterLog canFilterLog = CANFilterLog
+			.getLog(OpenXCValueUpdater.class.getSimpleName());
+	private OpenXCResourceConnector connector;
 
 	/**
 	 * Connects to the openXC simulator and updates openXC respectively obd2
@@ -49,36 +53,37 @@ public class OpenXCValueUpdater implements ValueUpdater {
 	 * 
 	 * @param car2xEntries
 	 */
-	public OpenXCValueUpdater(Hashtable<String, Car2XEntry> car2xEntries) {
+	public OpenXCValueUpdater(OpenXCResourceConnector connector,
+			Hashtable<String, Car2XEntry> car2xEntries) {
+		this.connector = connector;
 		this.car2xEntries = car2xEntries;
 	}
-	
-	@Override
-	public void updateEntry(String key, Object value) {
-		// TODO enable to debug
-//		 System.out.println("[EntryUpdater] Incoming object: " + response);
-		try {
-			Car2XEntry car2xEntry = car2xEntries.get(key);
-			if (car2xEntry != null) {
-				updateEntry(car2xEntry, value);
-			}
-		} catch (JSONException jsone) {
-			canFilterLog.logError(FilterLogMessages.JSON_ERROR);
-		}
-	}
 
-	// TODO add obd2 key
-	private void updateEntry(Car2XEntry car2xEntry, Object value)
-			throws JSONException {
-		car2xEntry.setTimestamp(new Date().getTime());
-		car2xEntry.setValue(value);
-		
-		// TODO no more event value
-//		try {
-//			car2xEntry.setEvent(jsonObject.getBoolean("event"));
-//		} catch (JSONException jsonException) {
-//			// ignore missing event, because not every incoming
-//			// JSON object has an event
-//		}
+	@Override
+	public void run() {
+		Scanner scanner = connector.getScanner();
+		while (scanner.hasNext()) {
+			try {
+				String jsonString = scanner.next();
+				System.out.println("[EntryUpdater] Incoming object: "
+						+ jsonString);
+				JSONObject jsonObject = new JSONObject(jsonString);
+				Car2XEntry car2xEntry = car2xEntries.get(jsonObject
+						.getString("name"));
+				if (car2xEntry != null) {
+					car2xEntry.setTimestamp(new Date().getTime());
+					car2xEntry.setValue(jsonObject.get("value"));
+
+					try {
+						car2xEntry.setEvent(jsonObject.getBoolean("value"));
+					} catch (JSONException jsone) {
+						// ignore missing event because not every jsonObject
+						// has an event field
+					}
+				}
+			} catch (JSONException jsone) {
+				canFilterLog.logError(FilterLogMessages.JSON_ERROR);
+			}
+		}
 	}
 }

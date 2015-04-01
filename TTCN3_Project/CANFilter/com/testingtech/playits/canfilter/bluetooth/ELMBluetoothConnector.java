@@ -19,26 +19,33 @@ import javax.bluetooth.UUID;
 import javax.microedition.io.Connector;
 import javax.microedition.io.StreamConnection;
 
-public class ELMBluetooth implements DiscoveryListener {
+import com.testingtech.playits.canfilter.connector.Elm327Connector;
 
-	private static final String DEFAULT_DEVICE_NAME = "OBDII"; // may also be named CBT
+public class ELMBluetoothConnector extends Elm327Connector implements
+		DiscoveryListener {
 
+	private static final String DEFAULT_DEVICE_NAME = "OBDII"; // may also be
+																// named CBT
 	private static Object lock = new Object();
-
 	private static Vector<RemoteDevice> remdevices = new Vector<RemoteDevice>();
-
 	private static String connectionURL = null;
 
 	public BufferedReader br;
 	private static PrintWriter pwriter;
 	private static BufferedReader in;
 
-	ELMBluetooth obj;
+	ELMBluetoothConnector obj;
 
 	private String deviceName;
-	
-	public ELMBluetooth(String deviceName) {
+
+	public ELMBluetoothConnector(String deviceName) {
 		this.deviceName = deviceName;
+	}
+
+	@Override
+	public void connect() throws IOException {
+		initBluetooth();
+		super.connect();
 	}
 
 	/**
@@ -91,13 +98,13 @@ public class ELMBluetooth implements DiscoveryListener {
 	}
 
 	/**
-	 * Inits the Bluetooth Connection
+	 * Initializes the Bluetooth connection with a specified ELM327 device.
 	 * 
 	 * @throws IOException
 	 */
-	public void init() throws IOException {
+	private void initBluetooth() throws IOException {
 		br = new BufferedReader(new InputStreamReader(System.in));
-		obj = new ELMBluetooth(deviceName);
+		obj = new ELMBluetoothConnector(deviceName);
 		LocalDevice locdevice = LocalDevice.getLocalDevice();
 		String add = locdevice.getBluetoothAddress();
 		String friendlyName = locdevice.getFriendlyName();
@@ -160,6 +167,8 @@ public class ELMBluetooth implements DiscoveryListener {
 	}
 
 	/**
+	 * Runs an AT / OBD2 command. The response consists of a hexadecimal string
+	 * representation of the value corresponding to the command sent.
 	 * 
 	 * @param command
 	 *            the command to run
@@ -169,6 +178,7 @@ public class ELMBluetooth implements DiscoveryListener {
 	 *            Outputstream
 	 * @return raw reply
 	 */
+	@Override
 	public String run(String command) {
 		pwriter.write(command + "\r");
 		pwriter.flush();
@@ -179,7 +189,6 @@ public class ELMBluetooth implements DiscoveryListener {
 		}
 		byte bytes = 0;
 		StringBuilder res = new StringBuilder();
-		String rawReply = null;
 
 		// read until '>' arrives
 		try {
@@ -190,10 +199,14 @@ public class ELMBluetooth implements DiscoveryListener {
 			e.printStackTrace();
 		}
 		// ELM sends like this: 41 0F 05 with whitespaces
-		rawReply = res.toString().trim();
+		String rawResponse = res.toString().trim();
 		// no "WAITING" or "INIT BUS", just the data itself
-		rawReply = rawReply.substring(rawReply.lastIndexOf(13) + 1);
-		return rawReply;
+		rawResponse = rawResponse.substring(rawResponse.lastIndexOf(13) + 1);
+		return rawResponse;
 	}
 
+	@Override
+	public void disconnect() {
+		super.disconnect();
+	}
 }

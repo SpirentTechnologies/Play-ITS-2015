@@ -1,31 +1,28 @@
 package com.testingtech.playits.canfilter.rs232;
 
-import java.net.Socket;
-import java.util.Hashtable;
+import java.io.IOException;
 import java.util.List;
 
 import jssc.SerialPort;
 import jssc.SerialPortException;
 
-public class ELMRS232 {
-	static Socket sock = null;
-	static Hashtable<String, String> commandHashTable = new Hashtable<String, String>();
+import com.testingtech.playits.canfilter.connector.Elm327Connector;
 
-	private String portName;
+public class ELMRS232Connector extends Elm327Connector {
+
 	int baudRate;
 	int parity;
 	int dataBits;
 	int stopBits;
 	
-	private SerialPort serialPort = new SerialPort(portName);
+	private SerialPort serialPort;
 
-	
-	public ELMRS232(List<String> argsList) {
-		portName = argsList.get(0);
-		baudRate = Integer.parseInt(argsList.get(1));
-		parity = Integer.parseInt(argsList.get(2));
-		dataBits = Integer.parseInt(argsList.get(3));
-		stopBits = Integer.parseInt(argsList.get(4));
+	public ELMRS232Connector(List<String> rs232Params) {
+		serialPort = new SerialPort(rs232Params.get(0));
+		baudRate = Integer.parseInt(rs232Params.get(1));
+		parity = Integer.parseInt(rs232Params.get(2));
+		dataBits = Integer.parseInt(rs232Params.get(3));
+		stopBits = Integer.parseInt(rs232Params.get(4));
 	}
 	
 	/**
@@ -35,6 +32,7 @@ public class ELMRS232 {
 	 * @param command
 	 * @return raw Reply
 	 */
+	@Override
 	public String run(String command) {
 		try {
 			serialPort.writeString(command + "\r");
@@ -54,7 +52,7 @@ public class ELMRS232 {
 	 * 
 	 * @return raw data without INIT, WAITING etc
 	 */
-	public String getResponse() {
+	private String getResponse() {
 		StringBuilder res = new StringBuilder();
 		String rawResponse = null;
 		byte[] input = null;
@@ -65,7 +63,7 @@ public class ELMRS232 {
 			e.printStackTrace();
 		}
 		for (int i = 0; i < input.length; i++) {
-			if (((char) input[i]) != '>') {
+			if ((char) input[i] != '>') {
 				res.append((char) input[i]);
 			}
 		}
@@ -77,29 +75,34 @@ public class ELMRS232 {
 	}
 
 	/**
-	 * Inits the serialPort Connection
+	 * Opens the serialPort Connection
+	 * @throws IOException 
 	 */
-	public void init() {
+	@Override
+	public void connect() throws IOException {
+		initSerialPort();
+		super.connect();
+	}
+
+	private void initSerialPort() {
 		try {
-			// Page 7 Manual elm327.pdf
 			serialPort.openPort();
-			serialPort.setParams(baudRate, // 38400 OR 9600
+			serialPort.setParams(baudRate,
 					dataBits, stopBits, parity);
 		} catch (SerialPortException e) {
 			e.printStackTrace();
 		}
 	}
 
-	/**
-	 * Closes the port.
-	 */
-	// @Override
-	public void close() {
+
+	@Override
+	public void disconnect() {
 		try {
 			serialPort.closePort();
 		} catch (SerialPortException e) {
 			throw new IllegalStateException("Cannot close the port.", e);
 		}
+		super.disconnect();
 	}
 
 }

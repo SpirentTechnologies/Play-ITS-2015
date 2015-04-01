@@ -2,10 +2,12 @@ package com.testingtech.playits.canfilter;
 
 public final class CANFilterLog {
 
-	private String componentName;
+	private static String componentName;
+	private static CANFilterLog INSTANCE;
 
-	public CANFilterLog(String componentName) {
-		this.componentName = componentName;
+	public static CANFilterLog getLog(String name) {
+		componentName = name;
+		return INSTANCE == null ? new CANFilterLog() : INSTANCE;
 	}
 	
 	public void logInfo(FilterLogMessages FilterLogMessages, String... args) {
@@ -14,8 +16,10 @@ public final class CANFilterLog {
 		case INCOMING_REQUEST:
 			infoMessage += "Incoming request: ";
 			break;
+		case SOCKET_CLOSE:
+			infoMessage += "Closing socket ";
 		case STOP:
-			infoMessage += "No more requests, stopping service.";
+			infoMessage += "No more requests, stopping";
 			break;
 		case START:
 			infoMessage += "Listening for requests on ";
@@ -84,6 +88,10 @@ public final class CANFilterLog {
 			errorMessage += arg + " ";
 		}
 		System.err.println(errorMessage);
+	}
+
+	public void logError(String message) {
+		System.err.println("["+ componentName + "] " + message);
 	}
 
 }

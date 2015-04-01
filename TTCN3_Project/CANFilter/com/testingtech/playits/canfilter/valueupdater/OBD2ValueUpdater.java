@@ -1,30 +1,56 @@
 package com.testingtech.playits.canfilter.valueupdater;
 
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.Hashtable;
 
 import com.testingtech.playits.canfilter.Car2XEntry;
+import com.testingtech.playits.canfilter.connector.Elm327Connector;
 
-public class OBD2ValueUpdater implements ValueUpdater {
+public class OBD2ValueUpdater implements Runnable {
 
 	private Hashtable<String, Car2XEntry> car2xEntries;
 	private static final String TWO_HEX_BYTES = "([0-9A-F]{2})+";
+	private Elm327Connector elm327Connector;
 
-	public OBD2ValueUpdater(Hashtable<String, Car2XEntry> car2xEntries) {
+	public OBD2ValueUpdater(Elm327Connector elm327Connector,
+			Hashtable<String, Car2XEntry> car2xEntries) {
+		this.elm327Connector = elm327Connector;
 		this.car2xEntries = car2xEntries;
 	}
 
 	@Override
-	public void updateEntry(String key, Object value) {
-		Car2XEntry car2xEntry = car2xEntries.get(key);
-		String stringValue = calculateInput(value.toString());
+	public void run() {
+		while (elm327Connector.isConnected()) {
+			updateEntries();
+		}
+	}
+
+	private void updateEntries() {
+		Enumeration<String> openXCkeys = car2xEntries.keys();
+		while (openXCkeys.hasMoreElements()) {
+			String openXCkey = openXCkeys.nextElement();
+			if (openXCkey != null) {
+				updateEntry(openXCkey);
+			}
+		}
+	}
+
+	private void updateEntry(String openXCkey) {
+		Car2XEntry car2xEntry = car2xEntries.get(openXCkey);
+		String obd2Cmd = car2xEntry.getOBD2key();
+		String rawResponse = elm327Connector.run("01 " + obd2Cmd);
+		updateValue(car2xEntry, rawResponse);
+	}
+
+	private void updateValue(Car2XEntry car2xEntry, String value) {
+		String stringValue = calculateInput(value);
 		Object returnValue;
-		try{
+		try {
 			returnValue = Float.parseFloat(stringValue);
-		} catch (NumberFormatException e){
+		} catch (NumberFormatException e) {
 			returnValue = stringValue;
 		}
-			
 		car2xEntry.setValue(returnValue);
 		car2xEntry.setTimestamp(new Date().getTime());
 	}
@@ -37,10 +63,10 @@ public class OBD2ValueUpdater implements ValueUpdater {
 	 *         Hex-Bytes means 00 - FF = 0 - 255. To get the percentage:
 	 *         Data/255*100
 	 */
-	public String calculateInput(String response) {
+	private String calculateInput(String response) {
 		Float result;
 		int value2 = 0;
-		if (!((response.replaceAll("\\s+", "")).matches(TWO_HEX_BYTES))
+		if (!(response.replaceAll("\\s+", "").matches(TWO_HEX_BYTES))
 				|| response.length() < 6) {
 			return response; // TODO choose other default value
 		} else {

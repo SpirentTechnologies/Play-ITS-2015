@@ -23,18 +23,19 @@ public class Car2XControlExternalFunctionProvider extends
   private static String processId;
 
   /**
-   * Starts a CAN filter service process with specified host and port
+   * Starts a CAN filter service process with a specified filter configuration.
    * 
-   * @param RecordValue
-   * @return process id
+   * @param RecordValue server host (Charstring), 
+   * server port (IntegerValue) and a connection configuration (UnionValue)
+   * @return process identifier
    */
   @ExternalFunction(name = "startFilter", module = "Car2X_Control")
   public CharstringValue startFilter(RecordValue filterCfg) {
-	  String host = ValueUtils.getStringValue(filterCfg.getField("host"));
-	  String portNumber = ValueUtils.getStringValue(filterCfg
-			  .getField("portNumber"));
-	  List<String> args = new ArrayList<String>(Arrays.asList(host,
-			  String.valueOf(portNumber)));
+    String host = ValueUtils.getStringValue(filterCfg.getField("host"));
+    String portNumber = ValueUtils.getStringValue(filterCfg
+        .getField("portNumber"));
+    List<String> args = new ArrayList<String>(Arrays.asList(host,
+        String.valueOf(portNumber)));
 
     UnionValue canConfig = (UnionValue) filterCfg.getField("canConfig");
     String selectedVariant = canConfig.getPresentVariantName();
@@ -44,17 +45,17 @@ public class Car2XControlExternalFunctionProvider extends
     String mainClass = "";
     switch (selectedVariant) {
     case "simulator":
-      mainClass = "com.testingtech.playits.canfilter.OpenXCCANFilterServiceMain";
-		createOpenXCArguments(selectedValue, args);
+      mainClass = "com.testingtech.playits.canfilter.OpenXCCANFilterService";
+      createOpenXCArguments(selectedValue, args);
       break;
     case "elmBluetooth":
-      mainClass = "com.testingtech.playits.canfilter.BluetoothCANFilterServiceMain";
+      mainClass = "com.testingtech.playits.canfilter.BluetoothCANFilterService";
       args.add(ValueUtils.getStringValue(selectedValue
           .getField("deviceName")));
       break;
     case "elmRS232":
-      mainClass = "com.testingtech.playits.canfilter.RS232CANFilterServiceMain";
-		createRS232Arguments(selectedValue, args);
+      mainClass = "com.testingtech.playits.canfilter.RS232CANFilterService";
+      createRS232Arguments(selectedValue, args);
       break;
     default:
       break;
@@ -62,23 +63,20 @@ public class Car2XControlExternalFunctionProvider extends
     return startFilter(mainClass, args.toArray(new String[0]));
   }
 
-private void createOpenXCArguments(RecordValue selectedValue, List<String> args) {
-	args.add(ValueUtils.getStringValue(selectedValue.getField("host")));
-      args.add(ValueUtils.getStringValue(selectedValue
-          .getField("portNumber")));
-}
+  private void createOpenXCArguments(RecordValue selectedValue,
+      List<String> args) {
+    args.add(ValueUtils.getStringValue(selectedValue.getField("host")));
+    args.add(ValueUtils.getStringValue(selectedValue.getField("portNumber")));
+  }
 
-private void createRS232Arguments(RecordValue selectedValue, List<String> args) {
-	args.add(ValueUtils.getStringValue(selectedValue
-          .getField("comPort")));
-      args.add(ValueUtils.getStringValue(selectedValue
-          .getField("baudRate")));
-      args.add(ValueUtils.getStringValue(selectedValue.getField("parity")));
-      args.add(ValueUtils.getStringValue(selectedValue
-          .getField("dataBits")));
-      args.add(ValueUtils.getStringValue(selectedValue
-          .getField("stopBits")));
-}
+  private void createRS232Arguments(RecordValue selectedValue,
+      List<String> args) {
+    args.add(ValueUtils.getStringValue(selectedValue.getField("comPort")));
+    args.add(ValueUtils.getStringValue(selectedValue.getField("baudRate")));
+    args.add(ValueUtils.getStringValue(selectedValue.getField("parity")));
+    args.add(ValueUtils.getStringValue(selectedValue.getField("dataBits")));
+    args.add(ValueUtils.getStringValue(selectedValue.getField("stopBits")));
+  }
 
   private CharstringValue startFilter(String mainClass, String[] parameters) {
     if (process != null && process.isAlive()) {

@@ -3,36 +3,34 @@ package com.testingtech.playits.canfilter.tests;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.List;
+import java.util.ArrayList;
 
-import com.testingtech.playits.canfilter.connector.Elm327Connector;
+import com.testingtech.playits.canfilter.bluetooth.ELMBluetoothConnector;
+import com.testingtech.playits.canfilter.rs232.ELMRS232Connector;
 import com.testingtech.playits.canfilter.valueupdater.OBD2ValueUpdater;
 
 public class ELMStandaloneTest {
 	public static void main(String[] args) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		Elm327Connector elm327 = new Elm327Connector(null);
-		OBD2ValueUpdater obd2ValueUpdater = new OBD2ValueUpdater(null);
+		ELMRS232Connector rs232Connector = new ELMRS232Connector(new ArrayList<String>());
+		ELMBluetoothConnector bluetoothConnector = new ELMBluetoothConnector("COM4");
+		OBD2ValueUpdater obd2ValueUpdater;
 		System.out.println("Please choose:");
 		System.out.println("[1] = Bluetooth  [2] = RS232  [3] = Exit");
 		String command = br.readLine();
 		switch (command) {
 		case "1":
-			elm327.usedConnection = elm327.BLUETOOTH;
 			System.out.println("You choose Bluetooth");
 			System.out.println("Bluetooth Init takes about 20s..");
-			elm327.init();
+			bluetoothConnector.connect();
 			break;
 		case "2":
-			elm327.usedConnection = elm327.RS232;
 			System.out
 					.println("You choose RS232, please enter the used COM-Port(like COM3) or press Enter");
 			String portname = br.readLine();
 			if (portname.startsWith("COM")) {
-				elm327.init(portname);
-			} else {
-				elm327.init("");
-			}
+				rs232Connector.connect();
+			}		
 			break;
 
 		case "3":
@@ -41,12 +39,12 @@ public class ELMStandaloneTest {
 			return;
 		}
 		System.out.println("now displaying all converted supported PIDs:");
-		elm327.initOpenXCToOBD2Map();
-		List<String> supportedPids = elm327.getSupportedPIDs();
-		for (String hexPids : supportedPids) {
-			System.out.println(elm327.getKeyByValue(elm327.openXCToOBD2Map,
-					hexPids) + " = " + hexPids);
-		}
+//		elm327.initOpenXCToOBD2Map();
+//		List<String> supportedPids = elm327.getSupportedPIDs();
+//		for (String hexPids : supportedPids) {
+//			System.out.println(elm327.getKeyByValue(elm327.openXCToOBD2Map,
+//					hexPids) + " = " + hexPids);
+//		}
 
 		System.out.println("Please enter one of the Strings above");
 		System.out.println("To Exit simply enter 'EXIT");
@@ -58,19 +56,19 @@ public class ELMStandaloneTest {
 				return;
 			} else {
 				if (command.startsWith("01")) {
-					System.out.println("Entered Command: "
-							+ command
-							+ " = as OpenXCKey: "
-							+ elm327.getKeyByValue(elm327.openXCToOBD2Map,
-									command));
+//					System.out.println("Entered Command: "
+//							+ command
+//							+ " = as OpenXCKey: "
+//							+ elm327.getKeyByValue(elm327.openXCToOBD2Map,
+//									command));
 				} else {
-					System.out.println("Entered Command: " + command
-							+ " = as PID: "
-							+ elm327.openXCToOBD2Map.get(command));
+//					System.out.println("Entered Command: " + command
+//							+ " = as PID: "
+//							+ elm327.openXCToOBD2Map.get(command));
 				}
-				String response = elm327.run(command);
-				System.out.println("Response: " + response + " = Converted : "
-						+ obd2ValueUpdater.calculateInput(response));
+//				String response = elm327.run(command);
+//				System.out.println("Response: " + response + " = Converted : "
+//						+ obd2ValueUpdater.calculateInput(response));
 			}
 		}
 

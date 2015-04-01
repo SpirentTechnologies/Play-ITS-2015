@@ -2,12 +2,16 @@ package com.testingtech.playits.canfilter;
 
 public class Car2XEntry {
   // Attributes
-  private String obd2key = "0D"; // default value
+  private String obd2key;
   private Object value;
   private boolean event;
   private long timestamp;
 
-  /**
+  public Car2XEntry(String obd2Key) {
+	this.obd2key = obd2Key;
+  }
+
+/**
    * Backup key for communicating with ELM327
    * @return hexadecimal OBD2 key
    */
