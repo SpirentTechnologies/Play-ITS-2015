@@ -16,7 +16,7 @@ import com.testingtech.tworkbench.ttman.server.impl.TEMessageRequest;
 
 public final class NotificationHandler implements IExecutionHandler {
 
-  private final Publisher publisher;
+  private Publisher publisher;
   private String testCaseName;
 
   public NotificationHandler(Publisher publisher) {
@@ -29,7 +29,7 @@ public final class NotificationHandler implements IExecutionHandler {
       throws IOException {
 
     final String currentTestCaseName = testCase.getName();
-    final String verdict = testCaseStatus.getVerdictKind().toString();
+    final String verdict = testCaseStatus.getVerdictKind().getString();
     this.publisher.publishVerdict(currentTestCaseName, verdict);
   }
 

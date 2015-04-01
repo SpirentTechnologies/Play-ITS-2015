@@ -2,7 +2,6 @@ package com.testingtech.car2x.hmi;
 
 import android.content.Intent;
 import android.graphics.drawable.AnimationDrawable;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
@@ -19,6 +18,8 @@ import android.widget.TableLayout;
 import android.widget.TextView;
 
 import com.testingtech.car2x.hmi.ttmanclient.Driver;
+import com.testingtech.car2x.hmi.ttmanclient.TestCaseRunner;
+
 import java.util.Locale;
 
 public class TestRunnerActivity extends ActionBarActivity {
@@ -27,15 +28,14 @@ public class TestRunnerActivity extends ActionBarActivity {
     private static TableLayout table;
     private static TextToSpeech speech;
     public static GuiUpdater guiUpdater;
-    private Driver driver;
-    private AsyncTimer timer;
+    public static AsyncTimer timer;
+    public Button btnStop;
+    public TextView noticeText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_test_runner);
-
-
 
         // get data from the parent activity
         Intent intent = getIntent();
@@ -45,7 +45,7 @@ public class TestRunnerActivity extends ActionBarActivity {
         int stageCount = testStages.length;
 
         createGuiUpdater(stageCount);
-        Globals.view = this;
+        Globals.runnerActivity = this;
         // set and create GUI elements
         setTitle(testTitle);
         table = (TableLayout) findViewById(R.id.tableStages);
@@ -70,14 +70,15 @@ public class TestRunnerActivity extends ActionBarActivity {
     private void createGuiUpdater(int stageCount){
         // get components from current activity
         TextView statusRunningText = (TextView) findViewById(R.id.status_text);
-        TextView noticeText = (TextView) findViewById(R.id.notification);
         ScrollView stages = (ScrollView) findViewById(R.id.progress);
         ProgressBar progressBar = (ProgressBar) findViewById(R.id.progressbar);
         Button btnStart = (Button) findViewById(R.id.button_start);
-        Button btnStop = (Button) findViewById(R.id.button_stop);
         ImageView logoImage = (ImageView) findViewById(R.id.status_animation);
         logoImage.setBackgroundResource(R.drawable.animation_logo);
         AnimationDrawable logoAnimation = (AnimationDrawable) logoImage.getBackground();
+        noticeText = (TextView) findViewById(R.id.notification);
+        btnStop = (Button) findViewById(R.id.button_stop);
+        table = (TableLayout) findViewById(R.id.tableStages);
         // start the gui updater
         guiUpdater = new GuiUpdater(progressBar, logoAnimation, btnStart, btnStop,
                 noticeText, statusRunningText, stages, table, stageCount);
@@ -85,33 +86,33 @@ public class TestRunnerActivity extends ActionBarActivity {
 
     /**
      * Start the test. Create a new AsyncThread and run it.
-     * @param view The parent view.
+     * @param view The parent runnerActivity.
      */
     public void startTest(View view) {
-        driver = new Driver(testId);  // TODO
-        //driver.start(testId);
+        //driver = new Driver(testId);  // TODO can only start once
+        Globals.currentTestCase = testId;
+        Globals.driver = new Driver();
+        new Thread(Globals.driver).start();
+        //Globals.driver.startTestCase();
         guiUpdater.enableStartButton(false);
         guiUpdater.animateLogo(true);
         guiUpdater.setStatusText(getString(R.string.textview_running));
-        TextView noticeText = (TextView) findViewById(R.id.notification);
-        Button btnStop = (Button) findViewById(R.id.button_stop);
-        timer = new AsyncTimer(btnStop, noticeText, 6);
-        timer.execute();
     }
 
     /**
      * Stop the running test. Cancel the AsyncThread and close the Socket.
-     * @param view The parent view.
+     * @param view The parent runnerActivity.
      */
     public void stopTest(View view) {
-        // TODO interrupt threads, send stop message
-        driver.interrupt();
+        finishTestCase();
+    }
+
+    public static void finishTestCase(){
+        //driver.interrupt();     // TODO not working
         guiUpdater.enableStartButton(true);
         guiUpdater.animateLogo(false);
-        guiUpdater.setStatusText(getString(R.string.textview_not_running));
-        if (timer.getStatus().equals(AsyncTask.Status.RUNNING)){
-            timer.cancel(true);
-        }
+        guiUpdater.setStatusText("Test is not running.");
+
     }
 
     @SuppressWarnings("deprecation")

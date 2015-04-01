@@ -1,4 +1,4 @@
-package com.testingtech.car2x.hmi.testcase;
+package com.testingtech.car2x.hmi.testcases;
 
 import com.testingtech.car2x.hmi.Logger;
 
@@ -17,13 +17,17 @@ public class Utils {
   public static TestCaseVerdict toTestCaseVerdict(String verdictLabel) {
     switch(verdictLabel) {
       case "pass":
-      case "pass (1)":
         return TestCaseVerdict.PASS;
+      case "inconc":
+        return TestCaseVerdict.INCONCLUSIVE;
+      case "fail":
+        return TestCaseVerdict.FAIL;
       case "error":
-      case "error (4)":
+        case "none":
+        case "userError":
         return TestCaseVerdict.ERROR;
       default:
-          Logger.writeLog("UTILS: Verdict label [" + verdictLabel + "] unsupported.");
+        Logger.writeLog("UTILS: Verdict label [" + verdictLabel + "] unsupported.");
         return null;
     }
   }
