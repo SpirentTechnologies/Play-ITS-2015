@@ -5,12 +5,14 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
 
-import com.testingtech.playits.canfilter.Elm327Connector;
+import com.testingtech.playits.canfilter.connector.Elm327Connector;
+import com.testingtech.playits.canfilter.valueupdater.OBD2ValueUpdater;
 
 public class ELMStandaloneTest {
 	public static void main(String[] args) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		Elm327Connector elm327 = new Elm327Connector(null);
+		OBD2ValueUpdater obd2ValueUpdater = new OBD2ValueUpdater(null);
 		System.out.println("Please choose:");
 		System.out.println("[1] = Bluetooth  [2] = RS232  [3] = Exit");
 		String command = br.readLine();
@@ -68,7 +70,7 @@ public class ELMStandaloneTest {
 				}
 				String response = elm327.run(command);
 				System.out.println("Response: " + response + " = Converted : "
-						+ elm327.convertOBD2Response(response));
+						+ obd2ValueUpdater.calculateInput(response));
 			}
 		}
 

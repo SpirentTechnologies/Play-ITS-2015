@@ -17,8 +17,15 @@ public class OBD2ValueUpdater implements ValueUpdater {
 	@Override
 	public void updateEntry(String key, Object value) {
 		Car2XEntry car2xEntry = car2xEntries.get(key);
-		Float floatValue = convertToFloat(value.toString());
-		car2xEntry.setValue(floatValue);
+		String stringValue = calculateInput(value.toString());
+		Object returnValue;
+		try{
+			returnValue = Float.parseFloat(stringValue);
+		} catch (NumberFormatException e){
+			returnValue = stringValue;
+		}
+			
+		car2xEntry.setValue(returnValue);
 		car2xEntry.setTimestamp(new Date().getTime());
 	}
 
@@ -30,12 +37,12 @@ public class OBD2ValueUpdater implements ValueUpdater {
 	 *         Hex-Bytes means 00 - FF = 0 - 255. To get the percentage:
 	 *         Data/255*100
 	 */
-	public Float convertToFloat(String response) {
+	public String calculateInput(String response) {
 		Float result;
 		int value2 = 0;
 		if (!((response.replaceAll("\\s+", "")).matches(TWO_HEX_BYTES))
 				|| response.length() < 6) {
-			return 0f; // TODO choose other default value
+			return response; // TODO choose other default value
 		} else {
 			String[] data = response.split("\\s"); // (response =
 			// "41 0C 0C FC") 41,0C,0C,FC, data[0] = Bus, data[1] = Command
@@ -123,9 +130,9 @@ public class OBD2ValueUpdater implements ValueUpdater {
 				result = value1 - 125f;
 				break;
 			default:
-				return 0f;
+				return response;
 			}
 		}
-		return result;
+		return Float.toString(result);
 	}
 }

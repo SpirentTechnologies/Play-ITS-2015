@@ -66,7 +66,7 @@ public class Elm327Connector implements ResourceConnector {
 	 * @return see http://en.wikipedia.org/wiki/OBD-II_PIDs adds possible
 	 *         available PID Codes
 	 */
-	private void initOpenXCToOBD2Map() {
+	public void initOpenXCToOBD2Map() {
 		File file = new File("resources\\openXCToOBD2Map.txt");
 		try {
 			Scanner scanner = new Scanner(file);
