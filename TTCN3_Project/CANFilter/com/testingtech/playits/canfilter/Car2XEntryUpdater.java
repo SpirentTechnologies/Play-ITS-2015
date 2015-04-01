@@ -27,8 +27,7 @@ public class Car2XEntryUpdater {
 	private void addEntry(String key, int interval) {
 		canFilterLog.logInfo(FilterLogMessages.ENTRY_ADDED, key);
 		car2xEntries.put(key, new Car2XEntry());
-
-		// timeoutResponder.addTimer(key, interval);
+//		 timeoutResponder.addTimer(key, interval);
 	}
 
 	public void removeEntries(JSONArray jsonArray) throws JSONException {

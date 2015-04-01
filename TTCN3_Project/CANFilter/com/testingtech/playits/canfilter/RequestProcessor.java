@@ -16,15 +16,17 @@ public class RequestProcessor {
   private CANFilterLog canFilterLog = new CANFilterLog(
       RequestProcessor.class.getSimpleName());
   private JSONTokener jsonTokener;
-  private Car2XEntryUpdater car2xEntryUpdater;
+  // private Car2XEntryUpdater car2xEntryUpdater;
   private TimeoutResponder timeoutResponder;
+  private Hashtable<String, Car2XEntry> car2xEntries;
 
   public RequestProcessor(ServerSocket serverSocket,
       Hashtable<String, Car2XEntry> car2xEntries) throws IOException,
       JSONException {
-	  acceptRequests(serverSocket);
-	  car2xEntryUpdater = new Car2XEntryUpdater(car2xEntries);
-	  timeoutResponder = new TimeoutResponder(socket, car2xEntries);
+    this.car2xEntries = car2xEntries;
+    acceptRequests(serverSocket);
+    // car2xEntryUpdater = new Car2XEntryUpdater(car2xEntries);
+    timeoutResponder = new TimeoutResponder(socket, car2xEntries);
   }
 
   private void acceptRequests(ServerSocket serverSocket) throws IOException,
@@ -55,15 +57,41 @@ public class RequestProcessor {
     JSONArray data = request.getJSONArray("reqData");
     switch (request.getString("reqType")) {
     case "start":
-    	// TODO add loop
-      car2xEntryUpdater.addEntries(data);
+      // TODO add loop
+      addEntries(data);
       break;
     case "stop":
-      car2xEntryUpdater.removeEntries(data);
+      removeEntries(data);
       break;
     default:
       canFilterLog.logError(FilterLogMessages.UNSUPPORTED_REQUEST);
       break;
     }
+  }
+
+  public void addEntries(JSONArray jsonArray) throws JSONException {
+    for (int index = 0; index < jsonArray.length(); index++) {
+      JSONObject jsonObject = jsonArray.getJSONObject(index);
+      addEntry(jsonObject.getString("key"), jsonObject.getInt("interval"));
+    }
+  }
+
+  private void addEntry(String key, int interval) {
+    canFilterLog.logInfo(FilterLogMessages.ENTRY_ADDED, key);
+    car2xEntries.put(key, new Car2XEntry());
+    timeoutResponder.addTimer(key, interval);
+  }
+
+  public void removeEntries(JSONArray jsonArray) throws JSONException {
+    for (int index = 0; index < jsonArray.length(); index++) {
+      JSONObject jsonObject = jsonArray.getJSONObject(index);
+      removeEntry(jsonObject.getString("key"));
+    }
+  }
+
+  private void removeEntry(String key) {
+    canFilterLog.logInfo(FilterLogMessages.ENTRY_REMOVED, key);
+    car2xEntries.remove(key);
+    timeoutResponder.removeTimer(key);
   }
 }

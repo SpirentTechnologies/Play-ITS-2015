@@ -1,4 +1,5 @@
 module Car2X_Control {
+	
 	type record FilterCfg {
 		charstring host optional,
 		integer portNumber optional,

@@ -11,7 +11,43 @@
       <description>	 </description>
       <type>FilterCfg</type>
       <value><![CDATA[<Values:record type="FilterCfg" module="Car2X_Control" xmlns:Values="Values.xsd"><Values:charstring type="charstring" name="host"><Values:value>localhost</Values:value></Values:charstring><Values:integer type="integer" name="portNumber"><Values:value>7000</Values:value></Values:integer><Values:union type="CANCfg" module="Car2X_Control" name="canConfig"><Values:record type="SimulatoCfg" module="Car2X_Control" name="simulator"><Values:charstring type="charstring" name="host"><Values:value>localhost</Values:value></Values:charstring><Values:integer type="integer" name="portNumber"><Values:value>50001</Values:value></Values:integer></Values:record></Values:union></Values:record>]]></value>
-      <default><![CDATA[<Values:record type="FilterCfg" module="Car2X_Control" xmlns:Values="Values.xsd"><Values:charstring type="charstring" name="host"><Values:value>localhost</Values:value></Values:charstring><Values:integer type="integer" name="portNumber"><Values:value>7000</Values:value></Values:integer><Values:union type="CANCfg" module="Car2X_Control" name="canConfig"><Values:record type="ELMRS232Cfg" module="Car2X_Control" name="elmRS232"><Values:charstring type="charstring" name="comPort"><Values:value>COM4</Values:value></Values:charstring><Values:integer type="integer" name="baudRate"><Values:value>9600</Values:value></Values:integer><Values:boolean type="integer" name="parity"><Values:value>false</Values:value></Values:boolean><Values:integer type="integer" name="dataBits"><Values:value>8</Values:value></Values:integer><Values:integer type="integer" name="stopBits"><Values:value>1</Values:value></Values:integer></Values:record></Values:union></Values:record>]]></default>
+      <default><![CDATA[<Values:record type="FilterCfg" module="Car2X_Control" xmlns:Values="Values.xsd"><Values:charstring type="charstring" name="host"><Values:value>localhost</Values:value></Values:charstring><Values:integer type="integer" name="portNumber"><Values:value>7000</Values:value></Values:integer><Values:union type="CANCfg" module="Car2X_Control" name="canConfig"><Values:record type="ELMRS232Cfg" module="Car2X_Control" name="elmRS232"><Values:charstring type="charstring" name="comPort"><Values:value>COM4</Values:value></Values:charstring><Values:integer type="integer" name="baudRate"><Values:value>9600</Values:value></Values:integer><Values:integer type="integer" name="parity"><Values:value>0</Values:value></Values:integer><Values:integer type="integer" name="dataBits"><Values:value>8</Values:value></Values:integer><Values:integer type="integer" name="stopBits"><Values:value>1</Values:value></Values:integer></Values:record></Values:union></Values:record>]]></default>
+      <presentation>
+        <plain/>
+      </presentation>
+    </parameter>
+    <parameter Name="TCP_LOCAL_HOST" Module="Car2X_ModuleParameters" ModuleOfTypeDecl="">
+      <description></description>
+      <type>charstring</type>
+      <value><![CDATA[<Values:charstring type="charstring" xmlns:Values="Values.xsd"><Values:value>localhost</Values:value></Values:charstring>]]></value>
+      <default><![CDATA[<Values:charstring type="charstring" xmlns:Values="Values.xsd"><Values:value>localhost</Values:value></Values:charstring>]]></default>
+      <presentation>
+        <plain/>
+      </presentation>
+    </parameter>
+    <parameter Name="TCP_LOCAL_PORT" Module="Car2X_ModuleParameters" ModuleOfTypeDecl="">
+      <description></description>
+      <type>integer</type>
+      <value><![CDATA[<Values:integer type="integer" xmlns:Values="Values.xsd"><Values:value>7070</Values:value></Values:integer>]]></value>
+      <default><![CDATA[<Values:integer type="integer" xmlns:Values="Values.xsd"><Values:value>7070</Values:value></Values:integer>]]></default>
+      <presentation>
+        <plain/>
+      </presentation>
+    </parameter>
+    <parameter Name="TCP_REMOTE_HOST" Module="Car2X_ModuleParameters" ModuleOfTypeDecl="">
+      <description></description>
+      <type>charstring</type>
+      <value><![CDATA[<Values:charstring type="charstring" xmlns:Values="Values.xsd"><Values:value>localhost</Values:value></Values:charstring>]]></value>
+      <default><![CDATA[<Values:charstring type="charstring" xmlns:Values="Values.xsd"><Values:value>localhost</Values:value></Values:charstring>]]></default>
+      <presentation>
+        <plain/>
+      </presentation>
+    </parameter>
+    <parameter Name="TCP_REMOTE_PORT" Module="Car2X_ModuleParameters" ModuleOfTypeDecl="">
+      <description></description>
+      <type>integer</type>
+      <value><![CDATA[<Values:integer type="integer" xmlns:Values="Values.xsd"><Values:value>7000</Values:value></Values:integer>]]></value>
+      <default><![CDATA[<Values:integer type="integer" xmlns:Values="Values.xsd"><Values:value>7000</Values:value></Values:integer>]]></default>
       <presentation>
         <plain/>
       </presentation>

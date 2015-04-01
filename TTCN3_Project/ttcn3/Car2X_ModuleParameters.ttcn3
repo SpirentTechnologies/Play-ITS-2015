@@ -159,16 +159,13 @@ module Car2X_ModuleParameters {
 			};
 
 	//
-	// 	modulepar charstring TCP_LOCAL_HOST := "localhost";
-	// 	modulepar integer TCP_LOCAL_PORT := 7070;
-	// 	modulepar charstring TCP_REMOTE_HOST := "localhost";
-	// 	modulepar integer TCP_REMOTE_PORT := 7000;
-	//
-	// 	modulepar charstring SIMULATOR_HOST := "localhost";
-	// 	modulepar integer SIMULATOR_PORT := 50001;
-	//
-	// 	modulepar boolean SIMULATE := true;
+	 	modulepar charstring TCP_LOCAL_HOST := "localhost";
+	 	modulepar integer TCP_LOCAL_PORT := 7070;
+	 	modulepar charstring TCP_REMOTE_HOST := "localhost";
+	 	modulepar integer TCP_REMOTE_PORT := 7000;
+	
 	// timer values in sec
+	
 	const float c_timerSixtySeconds := 60.0;
 	const float c_timerFiftySeconds := 50.0;
 	const float c_timerFortySeconds := 40.0;
