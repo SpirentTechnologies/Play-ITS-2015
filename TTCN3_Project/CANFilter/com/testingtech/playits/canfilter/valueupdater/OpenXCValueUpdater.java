@@ -65,8 +65,8 @@ public class OpenXCValueUpdater implements Runnable {
 		while (scanner.hasNext()) {
 			try {
 				String jsonString = scanner.next();
-				System.out.println("[EntryUpdater] Incoming object: "
-						+ jsonString);
+//				System.out.println("[EntryUpdater] Incoming object: "
+//						+ jsonString);
 				JSONObject jsonObject = new JSONObject(jsonString);
 				Car2XEntry car2xEntry = car2xEntries.get(jsonObject
 						.getString("name"));
