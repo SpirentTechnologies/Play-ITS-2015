@@ -38,7 +38,6 @@ public class GuiUpdater extends Activity{
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                //noticeText.setText("");
                 noticeText.setBackgroundColor(Color.TRANSPARENT);
                 statusRunningText.setText(R.string.textview_not_running);
                 for (int i = 0; i < table.getChildCount(); i++){
