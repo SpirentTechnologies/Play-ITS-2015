@@ -1,0 +1,227 @@
+/**
+* @desc Automatically generated behavior for type module Car2X_Types 
+* Warning: File was generated automatically and will be overwritten by the next generation process. 
+* Date: Sun Mar 22 20:03:25 CET 2015 
+ * @see Car2X_Types
+ */
+module Car2X_Types_Teststeps {
+  import from Car2X_Types all;
+  import from Car2X_Types_Config all;
+  
+  function send_ElmRequest(Car2X_Types.ElmRequest msg) runs on Car2X_Types_Config.Component {
+    PORT_Car2X_Types.send(msg);
+  }
+  
+  altstep alt_ElmRequest(template Car2X_Types.ElmRequest msg, out Car2X_Types.ElmRequest receivedVal) runs on Car2X_Types_Config.Component {
+    [] PORT_Car2X_Types.receive(msg) -> value receivedVal {
+      setverdict(pass);
+    }
+  }
+  
+  function receive_ElmRequest(template Car2X_Types.ElmRequest msg, float guardTimeout := DEFAULT_TIMEOUT) runs on Car2X_Types_Config.Component {
+    var Car2X_Types.ElmRequest receivedVal;
+    timer guard := guardTimeout;
+    var default behavior := activate(defaultBehavior(guard));
+    guard.start;
+    alt {
+      [] alt_ElmRequest(msg, receivedVal) {
+        setverdict(pass);
+      }
+    }
+    guard.stop;
+    deactivate(behavior);
+  }
+  
+  function send_ElmResponse(Car2X_Types.ElmResponse msg) runs on Car2X_Types_Config.Component {
+    PORT_Car2X_Types.send(msg);
+  }
+  
+  altstep alt_ElmResponse(template Car2X_Types.ElmResponse msg, out Car2X_Types.ElmResponse receivedVal) runs on Car2X_Types_Config.Component {
+    [] PORT_Car2X_Types.receive(msg) -> value receivedVal {
+      setverdict(pass);
+    }
+  }
+  
+  function receive_ElmResponse(template Car2X_Types.ElmResponse msg, float guardTimeout := DEFAULT_TIMEOUT) runs on Car2X_Types_Config.Component {
+    var Car2X_Types.ElmResponse receivedVal;
+    timer guard := guardTimeout;
+    var default behavior := activate(defaultBehavior(guard));
+    guard.start;
+    alt {
+      [] alt_ElmResponse(msg, receivedVal) {
+        setverdict(pass);
+      }
+    }
+    guard.stop;
+    deactivate(behavior);
+  }
+  
+  function send_FilterRequest(Car2X_Types.FilterRequest msg) runs on Car2X_Types_Config.Component {
+    PORT_Car2X_Types.send(msg);
+  }
+  
+  altstep alt_FilterRequest(template Car2X_Types.FilterRequest msg, out Car2X_Types.FilterRequest receivedVal) runs on Car2X_Types_Config.Component {
+    [] PORT_Car2X_Types.receive(msg) -> value receivedVal {
+      setverdict(pass);
+    }
+  }
+  
+  function receive_FilterRequest(template Car2X_Types.FilterRequest msg, float guardTimeout := DEFAULT_TIMEOUT) runs on Car2X_Types_Config.Component {
+    var Car2X_Types.FilterRequest receivedVal;
+    timer guard := guardTimeout;
+    var default behavior := activate(defaultBehavior(guard));
+    guard.start;
+    alt {
+      [] alt_FilterRequest(msg, receivedVal) {
+        setverdict(pass);
+      }
+    }
+    guard.stop;
+    deactivate(behavior);
+  }
+  
+  function send_FilterRequest_reqData(Car2X_Types.FilterRequest.reqData msg) runs on Car2X_Types_Config.Component {
+    PORT_Car2X_Types.send(msg);
+  }
+  
+  altstep alt_FilterRequest_reqData(template Car2X_Types.FilterRequest.reqData msg, out Car2X_Types.FilterRequest.reqData receivedVal) runs on Car2X_Types_Config.Component {
+    [] PORT_Car2X_Types.receive(msg) -> value receivedVal {
+      setverdict(pass);
+    }
+  }
+  
+  function receive_FilterRequest_reqData(template Car2X_Types.FilterRequest.reqData msg, float guardTimeout := DEFAULT_TIMEOUT) runs on Car2X_Types_Config.Component {
+    var Car2X_Types.FilterRequest.reqData receivedVal;
+    timer guard := guardTimeout;
+    var default behavior := activate(defaultBehavior(guard));
+    guard.start;
+    alt {
+      [] alt_FilterRequest_reqData(msg, receivedVal) {
+        setverdict(pass);
+      }
+    }
+    guard.stop;
+    deactivate(behavior);
+  }
+  
+  function send_ReqData(Car2X_Types.ReqData msg) runs on Car2X_Types_Config.Component {
+    PORT_Car2X_Types.send(msg);
+  }
+  
+  altstep alt_ReqData(template Car2X_Types.ReqData msg, out Car2X_Types.ReqData receivedVal) runs on Car2X_Types_Config.Component {
+    [] PORT_Car2X_Types.receive(msg) -> value receivedVal {
+      setverdict(pass);
+    }
+  }
+  
+  function receive_ReqData(template Car2X_Types.ReqData msg, float guardTimeout := DEFAULT_TIMEOUT) runs on Car2X_Types_Config.Component {
+    var Car2X_Types.ReqData receivedVal;
+    timer guard := guardTimeout;
+    var default behavior := activate(defaultBehavior(guard));
+    guard.start;
+    alt {
+      [] alt_ReqData(msg, receivedVal) {
+        setverdict(pass);
+      }
+    }
+    guard.stop;
+    deactivate(behavior);
+  }
+  
+  function send_FilterResponse(Car2X_Types.FilterResponse msg) runs on Car2X_Types_Config.Component {
+    PORT_Car2X_Types.send(msg);
+  }
+  
+  altstep alt_FilterResponse(template Car2X_Types.FilterResponse msg, out Car2X_Types.FilterResponse receivedVal) runs on Car2X_Types_Config.Component {
+    [] PORT_Car2X_Types.receive(msg) -> value receivedVal {
+      setverdict(pass);
+    }
+  }
+  
+  function receive_FilterResponse(template Car2X_Types.FilterResponse msg, float guardTimeout := DEFAULT_TIMEOUT) runs on Car2X_Types_Config.Component {
+    var Car2X_Types.FilterResponse receivedVal;
+    timer guard := guardTimeout;
+    var default behavior := activate(defaultBehavior(guard));
+    guard.start;
+    alt {
+      [] alt_FilterResponse(msg, receivedVal) {
+        setverdict(pass);
+      }
+    }
+    guard.stop;
+    deactivate(behavior);
+  }
+  
+  function send_IgnitionStatus(Car2X_Types.IgnitionStatus msg) runs on Car2X_Types_Config.Component {
+    PORT_Car2X_Types.send(msg);
+  }
+  
+  altstep alt_IgnitionStatus(template Car2X_Types.IgnitionStatus msg, out Car2X_Types.IgnitionStatus receivedVal) runs on Car2X_Types_Config.Component {
+    [] PORT_Car2X_Types.receive(msg) -> value receivedVal {
+      setverdict(pass);
+    }
+  }
+  
+  function receive_IgnitionStatus(template Car2X_Types.IgnitionStatus msg, float guardTimeout := DEFAULT_TIMEOUT) runs on Car2X_Types_Config.Component {
+    var Car2X_Types.IgnitionStatus receivedVal;
+    timer guard := guardTimeout;
+    var default behavior := activate(defaultBehavior(guard));
+    guard.start;
+    alt {
+      [] alt_IgnitionStatus(msg, receivedVal) {
+        setverdict(pass);
+      }
+    }
+    guard.stop;
+    deactivate(behavior);
+  }
+  
+  function send_DoorStatus(Car2X_Types.DoorStatus msg) runs on Car2X_Types_Config.Component {
+    PORT_Car2X_Types.send(msg);
+  }
+  
+  altstep alt_DoorStatus(template Car2X_Types.DoorStatus msg, out Car2X_Types.DoorStatus receivedVal) runs on Car2X_Types_Config.Component {
+    [] PORT_Car2X_Types.receive(msg) -> value receivedVal {
+      setverdict(pass);
+    }
+  }
+  
+  function receive_DoorStatus(template Car2X_Types.DoorStatus msg, float guardTimeout := DEFAULT_TIMEOUT) runs on Car2X_Types_Config.Component {
+    var Car2X_Types.DoorStatus receivedVal;
+    timer guard := guardTimeout;
+    var default behavior := activate(defaultBehavior(guard));
+    guard.start;
+    alt {
+      [] alt_DoorStatus(msg, receivedVal) {
+        setverdict(pass);
+      }
+    }
+    guard.stop;
+    deactivate(behavior);
+  }
+  
+  function send_TransmissionGear(Car2X_Types.TransmissionGear msg) runs on Car2X_Types_Config.Component {
+    PORT_Car2X_Types.send(msg);
+  }
+  
+  altstep alt_TransmissionGear(template Car2X_Types.TransmissionGear msg, out Car2X_Types.TransmissionGear receivedVal) runs on Car2X_Types_Config.Component {
+    [] PORT_Car2X_Types.receive(msg) -> value receivedVal {
+      setverdict(pass);
+    }
+  }
+  
+  function receive_TransmissionGear(template Car2X_Types.TransmissionGear msg, float guardTimeout := DEFAULT_TIMEOUT) runs on Car2X_Types_Config.Component {
+    var Car2X_Types.TransmissionGear receivedVal;
+    timer guard := guardTimeout;
+    var default behavior := activate(defaultBehavior(guard));
+    guard.start;
+    alt {
+      [] alt_TransmissionGear(msg, receivedVal) {
+        setverdict(pass);
+      }
+    }
+    guard.stop;
+    deactivate(behavior);
+  }
+  
+}
