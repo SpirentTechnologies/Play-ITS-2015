@@ -14,7 +14,7 @@ public class AsyncTimer extends AsyncTask<Void, Integer, Void> {
     public AsyncTimer(Button btnStop, TextView text, int t){
         this.btnStop = btnStop;
         this.noticeText = text;
-        this.time = t;
+        this.time = t - 1;      // - 1 for delay
     }
 
     @Override
@@ -43,7 +43,6 @@ public class AsyncTimer extends AsyncTask<Void, Integer, Void> {
     protected void onCancelled(){
         // test succeeded in time
         noticeText.setBackgroundColor(Color.TRANSPARENT);
-        noticeText.setText("");
     }
 
     @Override
