@@ -63,7 +63,7 @@ public class OBD2ValueUpdater implements Runnable {
 	 *         Hex-Bytes means 00 - FF = 0 - 255. To get the percentage:
 	 *         Data/255*100
 	 */
-	private String calculateInput(String response) {
+	public String calculateInput(String response) {
 		Float result;
 		int value2 = 0;
 		if (!(response.replaceAll("\\s+", "").matches(TWO_HEX_BYTES))
