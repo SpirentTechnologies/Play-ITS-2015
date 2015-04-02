@@ -1,0 +1,753 @@
+/**
+ * TODO: may store redundant alt statements into variable
+ * @author Christian Damm, Sascha Kretzschmann
+ * @desc This module provides function for each test case.
+ *   		 Additionally this module provide set up and
+ *   		 tear down configurations to reuse.
+ */
+module Car2X_Functions {
+
+import from Car2X_ModuleParameters {modulepar FILTER;}
+	
+	import from Car2X_Templates {
+		template
+			m_FilterAcceleratorPedalStart,
+			m_FilterAcceleratorPedalStop,
+			m_FilterBatteryStatusStart,
+			m_FilterBatteryStatusStop,
+			m_FilterBrakePedalStart,
+			m_FilterBrakePedalStop,
+			m_FilterDoorStatusStart,
+			m_FilterDoorStatusStop,
+			m_FilterEngineSpeedStart,
+			m_FilterEngineSpeedStop,
+			m_FilterGearLeverStart,
+			m_FilterGearLeverStop,
+			m_FilterHeadLampStatusStart,
+			m_FilterHeadLampStatusStop,
+			m_FilterIgnitionStateStart,
+			m_FilterIgnitionStateStop,
+			m_FilterParkingBrakeStatusStart,
+			m_FilterParkingBrakeStatusStop,
+			m_FilterSteeringWheelStart,
+			m_FilterSteeringWheelStop,
+			m_FilterVehicleSpeedStart,
+			m_FilterVehicleSpeedStop,
+			mw_FilterResponseAcceleratorPedal,
+			mw_FilterResponseBatteryStatus,
+			mw_FilterResponseBrakePedalStatus,
+			mw_FilterResponseDoorStatus,
+			mw_FilterResponseEngineSpeed,
+			mw_FilterResponseGearLever,
+			mw_FilterResponseHeadLampStatus,
+			mw_FilterResponseIgnitionStatus,
+			mw_FilterResponseParkingBrakeStatus,
+			mw_FilterResponseSteeringWheel,
+			mw_FilterResponseVehicleSpeed;
+	}
+
+	import from Car2X_Types {type DoorStatus, GearLever, IgnitionStatus;}
+
+	import from Car2X_ConfigSystem {type TesterComponentType;}
+
+	import from Car2X_Control {function startFilter, stopFilter;}
+
+	/**
+	 * @desc Function to measure vehicle speed for a defined period of time.
+	 * @param p_speed Target speed (in km/h) as float
+	 * @param p_holding_time Time with target speed (in sec)
+	 * @param p_variance Variance range around the targetAngle (in km/h)
+	 * @param p_globalTime Time until timeout (in sec)
+	 */
+	function f_VEHICLE_SPEED(float p_speed, float p_holding_time,
+							 float p_variance, float p_timeOut)
+		runs on TesterComponentType return verdicttype  {
+		var verdicttype v_ret := inconc;
+		var boolean holding := false;
+		timer t_holding;
+		t_TC_Global.start(p_timeOut);
+		filterPort.send(m_FilterVehicleSpeedStart);
+
+		alt {
+			[not holding] filterPort.receive(mw_FilterResponseVehicleSpeed(p_speed, p_variance)) {
+				t_holding.start(p_holding_time);
+				holding := true;
+				repeat;				
+			}
+			[not holding] filterPort.receive {
+				v_ret := fail;
+				repeat;
+			}
+			[holding] filterPort.receive(mw_FilterResponseVehicleSpeed(p_speed,	p_variance)) {
+				v_ret := inconc;
+				repeat;
+			}
+			[holding] filterPort.receive {
+				v_ret := fail;
+				t_holding.stop;
+				holding := false;
+				repeat;
+			}
+			[holding]t_holding.timeout{
+				v_ret := pass
+			}
+			[] t_TC_Global.timeout {
+				if (v_ret != fail){ 
+					v_ret := inconc;
+				}
+			}
+		}
+
+		filterPort.send(m_FilterVehicleSpeedStop);
+
+		if (v_ret != pass) {
+			setverdict(v_ret);
+			f_tearDown();
+		}
+		return v_ret;
+	}
+
+
+	/**
+	 * @desc Function to get accelerator status from CAN filer.
+	 * @param p_accelerator_pedal target accelerator pedal status (in percent)
+	 *   (0.0..1.0)
+	 * @param p_holding_time Time to hold this accelerator status (in sec)
+	 * @param p_variance Variance for target accelerator status (in rpm)
+	 * @param p_time_out Time until timeout (in sec)
+	 * @return verdicttype for this stage
+	 */
+	function f_ACCELERATOR_PEDAL(float p_accelerator_pedal,
+								 float p_holding_time, float p_variance,
+								 float p_time_out)
+		runs on TesterComponentType return verdicttype  {
+		var verdicttype v_ret := inconc;
+		var boolean holding := false; //flag if target reached
+		timer t_holding; 
+		
+		filterPort.send(m_FilterAcceleratorPedalStart);
+		t_TC_Global.start(p_time_out);
+		
+		alt {
+			[not holding] filterPort.receive(mw_FilterResponseAcceleratorPedal(p_accelerator_pedal, p_variance)) {
+				//target value reached -> set holding true; start holding timer
+				t_holding.start(p_holding_time);
+				holding := true;
+				repeat;				
+			}
+			[not holding] filterPort.receive {
+				//received some other thing
+				v_ret := fail;
+				repeat;
+			}
+			[holding] filterPort.receive(mw_FilterResponseAcceleratorPedal(p_accelerator_pedal,	p_variance)) {
+				//still reached target value
+				v_ret := inconc;
+				repeat;
+			}
+			[holding] filterPort.receive {
+				//didn't reched target value-> stop holding timer; set holding false
+				v_ret := fail;
+				t_holding.stop;
+				holding := false;
+				repeat;
+			}
+			[holding]t_holding.timeout{
+				//reached target value for whole holding time -> pass
+				v_ret := pass
+			}
+			[] t_TC_Global.timeout {
+				//time out-> stage failed
+				if (v_ret != fail){ 
+					v_ret := inconc;
+				}
+			}
+		}
+			
+		filterPort.send(m_FilterAcceleratorPedalStop);
+		if (v_ret != pass) {
+			setverdict(v_ret);
+			f_tearDown();
+		}
+		return v_ret;
+	}
+
+	
+	/**
+	 * @desc function to get brake pedal status
+	 * @param p_pedal_status target pedal status; true = press, false = release
+	 * @param p_holding_time Time to hold the brake pedal (or release)(in sec)
+	 * @param p_time_out Time until timeout (in sec)
+	 * @return verdicttype for this stage
+	 */
+	function f_BRAKE_PEDAL(boolean p_pedal_status, float p_holding_time,
+						   float p_time_out)
+		runs on TesterComponentType return verdicttype  {
+		var verdicttype v_ret := inconc;
+		var boolean holding := false;
+		timer t_holding;
+		// start timer
+		t_TC_Global.start(p_time_out);
+		// start request
+		filterPort.send(m_FilterBrakePedalStart);
+		
+		alt {
+			[not holding] filterPort.receive(mw_FilterResponseBrakePedalStatus(p_pedal_status)) {
+				t_holding.start(p_holding_time);
+				holding := true;
+				repeat;				
+			}
+			[not holding] filterPort.receive {
+				v_ret := fail;
+				repeat;
+			}
+			[holding] filterPort.receive(mw_FilterResponseBrakePedalStatus(p_pedal_status)) {
+				v_ret := inconc;
+				repeat;
+			}
+			[holding] filterPort.receive {
+				v_ret := fail;
+				t_holding.stop;
+				holding := false;
+				repeat;
+			}
+			[holding]t_holding.timeout{
+				v_ret := pass
+			}
+			[] t_TC_Global.timeout {
+				if (v_ret != fail){ 
+					v_ret := inconc;
+				}
+			}
+		}
+		
+		// stop request
+		filterPort.send(m_FilterBrakePedalStop);
+
+		if (v_ret != pass) {
+			setverdict(v_ret);
+			f_tearDown();
+		}
+		return v_ret;
+	}
+
+	/**
+	 * @desc Function to measure engine speed for a defined period of time
+	 * @param p_engine_speed Target engine speed (in rpm) as integer
+	 * @param p_holding_time Time to hold this engine speed (in sec)
+	 * @param p_variance Variance for target engine speed (in rpm)
+	 * @param p_time_out Time until timeout (in sec)
+	 */
+	function f_ENGINE_SPEED(float p_engine_speed, float p_holding_time,
+							float p_variance, float p_time_out)
+		runs on TesterComponentType return verdicttype  {
+		var verdicttype v_ret := inconc;
+		var boolean holding := false;
+		timer t_holding;
+		// start timer
+		t_TC_Global.start(p_time_out);
+		// start request
+		filterPort.send(m_FilterEngineSpeedStart);
+		
+		alt {
+			[not holding] filterPort.receive(mw_FilterResponseEngineSpeed(p_engine_speed, p_variance)) {
+				t_holding.start(p_holding_time);
+				holding := true;
+				repeat;				
+			}
+			[not holding] filterPort.receive {
+				v_ret := fail;
+				repeat;
+			}
+			[holding] filterPort.receive(mw_FilterResponseEngineSpeed(p_engine_speed, p_variance)) {
+				v_ret := inconc;
+				repeat;
+			}
+			[holding] filterPort.receive {
+				v_ret := fail;
+				t_holding.stop;
+				holding := false;
+				repeat;
+			}
+			[holding]t_holding.timeout{
+				v_ret := pass
+			}
+			[] t_TC_Global.timeout {
+				if (v_ret != fail){ 
+					v_ret := inconc;
+				}
+			}
+		}		
+		
+		// stop request
+		filterPort.send(m_FilterEngineSpeedStop);
+
+		if (v_ret != pass) {
+			setverdict(v_ret);
+			f_tearDown();
+		}
+		return v_ret;
+	}
+
+	
+	/**
+	 * @desc Function to measure battery status for a defined period of time
+	 * @param p_batteryStatus target battery status
+	 * @param p_variance variance around the target status
+	 * @param p_holdingTime time with in the variance range (in s)
+	 * @param p_timeOut time until time out
+	 * @return
+	 * @verdict
+	 */
+	function f_BATTERY_STATUS(float p_batteryStatus, float p_variance,
+							  float p_holdingTime, float p_timeOut)
+		runs on TesterComponentType return verdicttype  {
+		var verdicttype v_ret := none;
+		timer t_holding;
+		
+		// start battery status request
+		filterPort.send(m_FilterBatteryStatusStart);
+		// start global timer
+		t_TC_Global.start(p_timeOut);
+		
+		alt {
+			[] filterPort.receive(mw_FilterResponseBatteryStatus(p_batteryStatus, p_variance)) {
+				v_ret := pass;
+				t_TC_Global.stop;
+			}
+			[] filterPort.receive {
+				v_ret := fail;
+				repeat;
+			}
+			[] t_TC_Global.timeout {
+				if (v_ret != fail){ 
+					v_ret := inconc;
+				}
+			}
+		}		
+		
+		filterPort.send(m_FilterBatteryStatusStop);
+
+		if (v_ret != pass) {
+			setverdict(v_ret);
+			f_tearDown();
+		}
+		return v_ret;
+	}
+
+	/**
+	 * @desc Function to measure steering wheel angle
+	 * @param p_targetAngle Angle which should be reached (in degree) as float
+	 * @param p_variance Variance of the target angle (in degree) as float
+	 * @param p_globalTime Time until timeout (in sec)
+	 */
+	function f_STEERING_WHEEL_ANGLE(float p_targetAngle, float p_variance,
+									float p_globalTime)
+		runs on TesterComponentType return verdicttype  {
+		var verdicttype v_ret := none;
+		
+		// start steering wheel request
+		filterPort.send(m_FilterSteeringWheelStart);
+		// start global timer
+		t_TC_Global.start(p_globalTime);
+
+		alt {
+			[] filterPort.receive(mw_FilterResponseSteeringWheel(p_targetAngle, p_variance)) {
+				v_ret := pass;
+				t_TC_Global.stop;
+			}
+			[] filterPort.receive {
+				v_ret := fail;
+				repeat;
+			}
+			[] t_TC_Global.timeout {
+				if (v_ret != fail){ 
+					v_ret := inconc;
+				}
+			}
+		}
+		// stop steering wheel request
+		filterPort.send(m_FilterSteeringWheelStop);
+
+		if (v_ret != pass) {
+			setverdict(v_ret);
+			f_tearDown();
+		}
+		return v_ret;
+	}
+
+	/**
+	 * @desc Function to measure headlamp status.
+	 * @param p_Status <b>true</b> headlamp on; <b>false</b> headlamp off
+	 * @param p_timeout intervall until timeout (in sec)
+	 */
+	function f_HEADLAMP_STATUS(boolean p_Status, float p_timeout)
+		runs on TesterComponentType return verdicttype  {
+		var verdicttype v_ret := none;
+		// start ignition status request
+		filterPort.send(m_FilterHeadLampStatusStart);
+		// start global timer
+		t_TC_Global.start(p_timeout);
+		alt {
+			[] filterPort.receive(mw_FilterResponseHeadLampStatus(p_Status)) {
+				t_TC_Global.stop;
+				v_ret := pass;
+			}
+			[] filterPort.receive {
+				v_ret := fail;
+				repeat;
+			}
+			[] t_TC_Global.timeout {
+				if (v_ret != fail){ 
+					v_ret := inconc;
+				}
+			}
+		}
+		filterPort.send(m_FilterHeadLampStatusStop);
+		// stage failed -> end whole TC
+		if (v_ret != pass) {
+			setverdict(v_ret);
+			f_tearDown();
+		}
+		return v_ret;
+	}
+
+	/**
+	 * @desc Measures the ignition status.
+	 * @param ignitionStatus Enum value of type IgnitionStatus
+	 * @param p_timeOut time until time out (in sec)
+	 */
+	function f_IGNITION_STATUS(IgnitionStatus p_ignitionStatus,
+							   float p_globalTime)
+		runs on TesterComponentType return verdicttype  {
+		var verdicttype v_ret := none;
+
+		// start ignition status request
+		filterPort.send(m_FilterIgnitionStateStart);
+		// start global timer
+		t_TC_Global.start(p_globalTime);
+
+		alt {
+			[] filterPort.receive(mw_FilterResponseIgnitionStatus(p_ignitionStatus)) {
+				t_TC_Global.stop;
+				v_ret := pass;
+			}
+			[] filterPort.receive {
+				v_ret := fail;
+				repeat;
+			}
+			[] t_TC_Global.timeout {
+				if (v_ret != fail){ 
+					v_ret := inconc;
+				}
+			}
+		}
+		// stop ignition status request
+		filterPort.send(m_FilterIgnitionStateStop);
+
+		// stage failed -> end whole TC
+		if (v_ret != pass) {
+			setverdict(v_ret);
+			f_tearDown();
+		}
+		return v_ret;
+	}
+
+	/**
+	 * @desc Checks the parking brake status.
+	 * @param p_status <b>true</b> parking brake engaged; <b>false</b> headlamp
+	 *   disengaged
+	 * @param p_globalTime interval until timeout
+	 */
+	function f_PARKING_BRAKE_STATUS(boolean p_status, float p_globalTime)
+		runs on TesterComponentType return verdicttype  {
+		var verdicttype v_ret := none;
+
+		// start parking brake status request
+		filterPort.send(m_FilterParkingBrakeStatusStart);
+		// start global timer
+		t_TC_Global.start(p_globalTime);
+
+		alt {
+			[] filterPort.receive(mw_FilterResponseParkingBrakeStatus(p_status)) {
+				t_TC_Global.stop;
+				v_ret := pass;
+			}
+			[] filterPort.receive {
+				v_ret := fail;
+				repeat;
+			}
+			[] t_TC_Global.timeout {
+				if (v_ret != fail){ 
+					v_ret := inconc;
+				}
+			}
+		}
+		// stop parking brake status request
+		filterPort.send(m_FilterParkingBrakeStatusStop);
+
+		// stage failed -> end whole TC
+		if (v_ret != pass) {
+			setverdict(v_ret);
+			f_tearDown();
+		}
+		return v_ret;
+	}
+
+	/**
+	 * @desc Measures transmission gear and compare with target state
+	 * @param gear Target state; enum value of type TransmissionGear
+	 * @param p_globalTime time until timeout
+	 * @verdict
+	 */
+	function f_GEAR_LEVER_STATUS(GearLever p_gear, float p_globalTime)
+		runs on TesterComponentType return verdicttype  {
+		var verdicttype v_ret := none;
+
+		// start gear lever status request
+		filterPort.send(m_FilterGearLeverStart);
+		// start global timer
+		t_TC_Global.start(p_globalTime);
+
+		alt {
+			[] filterPort.receive(mw_FilterResponseGearLever(p_gear)) {
+				t_TC_Global.stop;
+				v_ret := pass;
+			}
+			[] filterPort.receive {
+				v_ret := fail;
+				repeat;
+			}
+			[] t_TC_Global.timeout {
+				if (v_ret != fail){ 
+					v_ret := inconc;
+				}
+			}
+		}
+		filterPort.send(m_FilterGearLeverStop);
+
+		if (v_ret != pass) {
+			setverdict(v_ret);
+			// send verdict
+			f_tearDown();
+		}
+		return v_ret;
+	}
+
+	/**
+	 * @desc  Function to get door status from CAN filer.
+	 * @param p_door Enumeration value to define which door
+	 * @param p_status Status of the door; <b>true</b> for open
+	 *   door; <b>false</b> for close door
+	 * @param p_globalTime Defines time until timeout (in sec)
+	 * @verdict
+	 */
+	function f_DOOR_STATUS(DoorStatus p_door, boolean p_status,
+						   float p_timeOut)
+		runs on TesterComponentType return verdicttype  {
+		var verdicttype v_ret := none;
+		// start gear lever status request
+		filterPort.send(m_FilterDoorStatusStart);
+		// start global timer
+		t_TC_Global.start(p_timeOut);
+		alt {
+			[] filterPort.receive(mw_FilterResponseDoorStatus(p_door, p_status)) {
+				t_TC_Global.stop;
+				v_ret := pass;
+			}
+			[] filterPort.receive {
+				v_ret := fail;
+				repeat;
+			}
+			[] t_TC_Global.timeout {
+				if (v_ret != fail){ 
+					v_ret := inconc;
+				}
+			}
+		}
+		filterPort.send(m_FilterDoorStatusStop);
+
+		if (v_ret != pass) {
+			setverdict(v_ret);
+			// send verdict
+			f_tearDown();
+		}
+		return v_ret;
+	}
+
+	/**
+	 * @desc Set up the configuration for test cases running on
+	 * @see Car2X_ConfigSystem.TesterComponentType.
+	 *   		 Maps the port of the tester to the system port.
+	 */
+	function f_setUp() runs on TesterComponentType  {
+		// create an instance of the tester
+		var TesterComponentType Tester;
+		Tester := TesterComponentType.create;
+		v_stage := 1;
+		// map the tester port to the system port
+		map(self:filterPort, system:filterPort);
+
+		var charstring filterServiceId := startFilter(FILTER);
+		if (lengthof(filterServiceId) == 0) {
+			setverdict(fail, "Could not start CAN filter service.");
+		} else {
+			log("CAN filter service started.");
+		}
+	}
+
+	/**
+	 * @desc Auxiliary function to find max value of two float values
+	 * @param valueA
+	 * @param valueB
+	 * @return The maximum value.
+	 */
+	function f_max(float p_valueA, float p_valueB) return float  {
+		if (p_valueA > p_valueB) {
+			return p_valueA;
+		} else {
+			return p_valueB;
+		}
+	}
+
+	/**
+	 * @desc Auxiliary function to find min value of two float values
+	 * @param valueA
+	 * @param valueB
+	 * @return The minimum value
+	 */
+	function f_min(float p_valueA, float p_valueB) return float  {
+		if (p_valueA < p_valueB) {
+			return p_valueA;
+		} else {
+			return p_valueB;
+		}
+	}
+
+	/**
+	 * @desc Auxiliary function to cast the ignitionStatus to charstring.
+	 *   		 We cannot compare an enum type with a charstring that is
+	 *   		 needed for the function
+	 * @see f_ignitionStatus_SUB
+	 * @param ignitionStatus Ignition status to cast.
+	 * @return charstring Ignition status as charstring
+	 */
+	function f_ignitionStatus2str(IgnitionStatus p_ignitionStatus)
+		return charstring  {
+		select (p_ignitionStatus) {
+			case (e_off) {
+				return "off";
+			}
+			case (e_accessory) {
+				return "accessory";
+			}
+			case (e_run) {
+				return "run";
+			}
+			case (e_start) {
+				return "start";
+			}
+		}
+	}
+
+	/**
+	 * @desc Auxiliary function to cast enum value of DoorStatus to charstring
+	 * @param doorStatus The door status to cast
+	 * @return The door status as charstring
+	 */
+	function f_doorStatus2Str(DoorStatus p_doorStatus) return charstring  {
+		select (p_doorStatus) {
+			case (e_driver) {
+				return "driver";
+			}
+			case (e_passenger) {
+				return "passener";
+			}
+			case (e_rearLeft) {
+				return "rear_left";
+			}
+			case (e_rearRight) {
+				return "rear_right";
+			}
+		}
+	}
+
+	/**
+	 * @desc Auxiliary function to cast enum value of TransmissionGear to
+	 *   charstring
+	 * @param gear The gear status to cast
+	 * @return The gear status as charstring
+	 */
+	function f_gearStatus2Str(GearLever p_gear) return charstring  {
+		select (p_gear) {
+			case (e_first) {
+				return "first";
+			}
+			case (e_second) {
+				return "second";
+			}
+			case (e_third) {
+				return "third";
+			}
+			case (e_fourth) {
+				return "fourth";
+			}
+			case (e_fifth) {
+				return "fifth";
+			}
+			case (e_sixth) {
+				return "sixth";
+			}
+			case (e_seventh) {
+				return "seventh";
+			}
+			case (e_eighth) {
+				return "eighth";
+			}
+			case (e_nineth) {
+				return "nineth";
+			}
+			case (e_tenth) {
+				return "tenth";
+			}
+			case (e_reverse) {
+				return "reverse";
+			}
+			case (e_neutral) {
+				return "neutral";
+			}
+		}
+	}
+
+	/**
+	 * @desc Tear down the configuration for test cases running on
+	 * @see Car2X_ConfigSystem.TesterComponentType.
+	 *   		 UnMaps the ports.
+	 */
+	function f_tearDown() runs on TesterComponentType  {
+		unmap(self:filterPort, system:filterPort);
+		if (not stopFilter()) {
+			log("Could not stop CAN filter service.");
+		}
+		stop;
+	}
+
+	/**
+	 * @desc Function to set the verdict and communicate via the action statment
+	 *   with TTman.
+	 *   		 Furthermore, increment the stage for the test case.
+	 * @param verdict Verdicttype for the given stage.
+	 * @param stage Stage Current stage.
+	 * @return integer The new stage.
+	 *   TODO: new stage as return
+	 */
+	function f_setVerdictAndStage(verdicttype p_verdict, integer p_stage, float p_globalTimer)
+		runs on TesterComponentType return integer  {
+		setverdict(p_verdict);
+		p_stage := p_stage + 1;
+		// send stage information
+		action("stage:" & int2str(p_stage) & ",timeWindow:" &
+			   int2str(float2int(p_globalTimer)));
+		return p_stage;
+	}
+}

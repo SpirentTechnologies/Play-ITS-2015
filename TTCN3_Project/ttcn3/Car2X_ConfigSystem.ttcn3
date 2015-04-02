@@ -1,2 +1,59 @@
+/**
+ * @author Christian Damm, Sascha Kretzschmann
+ * @desc Module to define all needed ports and components within the project.
+ */ 
+
 module Car2X_ConfigSystem {
+	
+	import from Car2X_Types all;	
+
+	/**
+	 * @desc A port for the ELM327
+	 * @member ElmResponse @see Car2X_Types.ElmResponse
+	 * @member ElmRequest @see Car2X_Types.ElmRequest
+	 */
+	type port ElmPortType message {
+		in ElmResponse;
+		out ElmRequest;
+	}
+	
+	/**
+	 * @desc A port for the Filterer that reads data stream.
+	 * @member FiltererResponse @see Car2X_Types.FiltererResponse
+	 * @member FiltererRequest @see Car2X_Types.FiltererRequest
+	 */
+	type port FilterPortType message {		
+		in FilterResponse;
+		out FilterRequest;
+	}
+	
+	/**
+	 * @desc This component represents the Tester that contains the test logic
+	 * 		 to simulate the SUT
+	 * @member t_TC Timer
+	 * @member elmPort @see Car2X_ConfigSystem.ElmPortType
+	 * @member filtererPort @see Car2X_ConfigSystem.FiltererPortType
+	 */
+	type component TesterComponentType {
+		timer t_TC_Global := 5.0;
+		var integer v_stage := 1;
+		port ElmPortType elmPort;
+		port FilterPortType filterPort;
+	}
+	
+	/**
+	 * @desc This system component represents how the test system appears to its
+	 * 		 environment.
+	 * @member elmPort @see Car2X_ConfigSystem.ElmPortType
+	 * @member filtererPort @see Car2X_ConfigSystem.FiltererPortType
+	 */
+	type component SystemComponentType {
+		port ElmPortType elmPort;
+		port FilterPortType filterPort;
+	}
+	
+	/**
+	 * @desc Pseudo-component type
+	 */
+	type component EmptyComponentType {}
 }

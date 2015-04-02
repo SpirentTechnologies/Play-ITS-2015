@@ -1,4 +1,212 @@
+/**
+ * @author Christian Damm, Sascha Kretzschmann
+ * @desc Define parameters we use within our project.
+ *   TODO: Add modul parmeter to determin what we want to test (ELM or OpenXC)
+ */
 module Car2X_ModuleParameters {
+	import from Car2X_Control {type ELMRS232Cfg, FilterCfg;}
+
+	import from Car2X_Types {type ValueDescription;}
+
+	// CAN MODE 01
+	const charstring c_modePrefix01 := "01";
+	const charstring c_ElmVehicleSpeed := "0D";
+
+	// keys for data table
+	const charstring c_steeringWheelAngle := "steering_wheel_angle";
+	const charstring c_torqueAtTransmission := "torque_at_transmission";
+	const charstring c_engineSpeed := "engine_speed";
+	const charstring c_vehicleSpeed := "vehicle_speed";
+	const charstring c_acceleratorPedalPosition := "accelerator_pedal_position";
+	const charstring c_parkingBrakeStatus := "parking_brake_status";
+	const charstring c_brakePedalStatus := "brake_pedal_status";
+	const charstring c_transmissionGearPosition := "transmission_gear_position";
+	const charstring c_gearLeverPosition := "gear_lever_position";
+	const charstring c_odometer := "odometer";
+	const charstring c_ignitionStatus := "ignition_status";
+	const charstring c_fuelLevel := "fuel_level";
+	const charstring c_fuelConsumedSinceRestart := "fuel_consumed_since_restart";
+	const charstring c_doorStatus := "door_status";
+	const charstring c_headlampStatus := "headlamp_status";
+	const charstring c_highBeamStatus := "high_beam_status";
+	const charstring c_windshieldWiperStatus := "windshield_wiper_status";
+	const charstring c_latitude := "latitude";
+	const charstring c_longitude := "longitude";
+	const charstring c_batteryStatus := "battery_status";
+
+	// key for start and stop request
+	const charstring c_startRequest := "start";
+	const charstring c_stopRequest := "stop";
+
+	// key for intervall times in ms
+	const integer c_FilterInterval2000 := 2000;
+	const integer c_FilterInterval1500 := 1500;
+	const integer c_FilterInterval1000 := 1000;
+	const integer c_FilterInterval500 := 500;
+
+	// key for testcases
+	// batteryStatus
+	const float c_batteryStatusMax := 20.0;
+	const float c_batteryStatus15 := 15.0;
+	const float c_batteryStatus12 := 12.0;
+	const float c_batteryStatus10 := 10.0;
+	const float c_batteryStatus8 := 8.0;
+	const float c_batteryStatus5 := 5.0;
+	const float c_batteryStatus3 := 3.0;
+	const float c_batteryStatusMin := 0.0;
+
+	// battery status variance
+	const float c_batteryStatusVarriance5 := 5.0;
+	const float c_batteryStatusVarriance2 := 2.0;
+	const float c_batteryStatusVarriance1 := 1.0;
+	const float c_batteryStatusVarrianceHalf := 0.5;
+	const float c_batteryStatusVarriance0 := 0.0;
+
+	// accelerator pedal position
+	const float c_acceleratorPedalMax := 1.0;
+	const float c_acceleratorPedal80Percent := 0.8;
+	const float c_acceleratorPedal50Percent := 0.5;
+	const float c_acceleratorPedal30Percent := 0.3;
+	const float c_acceleratorPedalMin := 0.0;
+
+	// door status
+	const boolean c_doorStatusOpen := true;
+	const boolean c_doorStatusClose := false;
+
+	// head lamp status
+	const boolean c_headLampOn := true;
+	const boolean c_headLampOff := false;
+
+	// accelerator pedal variance
+	const float c_acceleratorVariance20Percent := 0.2;
+	const float c_acceleratorVariance10Percent := 0.1;
+	const float c_acceleratorVariance05Percent := 0.05;
+	const float c_acceleratorVariance00Percent := 0.0;
+
+	// steering wheel angle
+	const float c_steeringWheelMax := 600.0;
+	const float c_steeringWheel400 := 400.0;
+	const float c_steeringWheel200 := 200.0;
+	const float c_steeringWheel0 := 0.0;
+	const float c_steeringWheelMinus200 := - 200.0;
+	const float c_steeringWheelMinus400 := - 400.0;
+	const float c_steeringWheelMin := - 600.0;
+
+	// steering wheel variance
+	const float c_steeringWheelVariance200 := 200.0;
+	const float c_steeringWheelVariance100 := 100.0;
+	const float c_steeringWheelVariance50 := 50.0;
+	const float c_steeringWheelVariance0 := 0.0;
+
+	// brake pedal status
+	const boolean c_brakePedalStatusPressed := true;
+	const boolean c_brakePedalStatusReleased := false;
+
+
+	// parking brake status
+	const boolean c_parkingBrakeStatusPressed := true;
+	const boolean c_parkingBrakeStatusReleased := false;
+
+	// vehicle Speed
+	const float c_vehicleSpeedMax := 655.0;
+	const float c_vehicleSpeed50 := 50.0;
+	const float c_vehicleSpeed30 := 30.0;
+	const float c_vehicleSpeed10 := 10.0;
+	const float c_vehicleSpeedMin := 0.0;
+
+	// vehicle Speed variance
+	const float c_vehicleSpeedVar15 := 15.0;
+	const float c_vehicleSpeedVar10 := 10.0;
+	const float c_vehicleSpeedVar5 := 5.0;
+	const float c_vehicleSpeedVar1 := 1.0;
+	const float c_vehicleSpeedVar0 := 0.0;
+
+	// engine speed
+	const float c_engineSpeedMax := 16382.0;
+	const float c_engineSpeed5000 := 5000.0;
+	const float c_engineSpeed4000 := 4000.0;
+	const float c_engineSpeed3000 := 3000.0;
+	const float c_engineSpeed2500 := 2500.0;
+	const float c_engineSpeed2000 := 2000.0;
+	const float c_engineSpeed1000 := 1000.0;
+	const float c_engineSpeed500 := 500.0;
+	const float c_engineSpeedMin := 0.0;
+
+	// engine speed variance
+	const float c_engineSpeedVar500 := 500.0;
+	const float c_engineSpeedVar250 := 250.0;
+	const float c_engineSpeedVar100 := 100.0;
+	const float c_engineSpeedVar50 := 50.0;
+	const float c_engineSpeedVar0 := 0.0;
+
+	/**
+	 * @desc
+	 */
+//	modulepar FilterCfg FILTER := {"localhost", 7000, {elmBluetooth := {deviceName := "OBDII"}}};
+	modulepar FilterCfg FILTER := {"localhost", 7000, {simulator := {host := "localhost", portNumber := 50001}}};
+//	modulepar FilterCfg FILTER := {"localhost", 7000, {elmRS232 := {comPort := "COM4", baudRate := 9600, parity := 0, dataBits := 8, stopBits := 1}}};
 	
-	const charstring c_modePrefix_01 := "01";
+	modulepar charstring TCP_LOCAL_HOST := "localhost";
+	modulepar integer TCP_LOCAL_PORT := 7070;
+	modulepar charstring TCP_REMOTE_HOST := "localhost";
+	modulepar integer TCP_REMOTE_PORT := 7000;
+	
+	// timer values in sec
+	
+	const float c_timerSixtySeconds := 60.0;
+	const float c_timerFiftySeconds := 50.0;
+	const float c_timerFortySeconds := 40.0;
+	const float c_timerThirtySeconds := 30.0;
+	const float c_timerTwentySeconds := 20.0;
+	const float c_timerTenSeconds := 10.0;
+	const float c_timerFiveSeconds := 5.0;
+	const float c_timerTwoSeconds := 2.0;
+	const float c_timerOneSecond := 1.0;
+	const float c_timerHalfSecond := 0.5;
+
+	// Value Description
+	/**
+	 * @desc value description for steering wheel; used in template
+	 */
+	const ValueDescription cvd_steeringWheel := {
+		openXCKey := c_steeringWheelAngle,
+		min := c_steeringWheelMin,
+		max := c_steeringWheelMax
+	};
+
+	/**
+	 * @desc value description for acceleratoe pedal ; used in template
+	 */
+	const ValueDescription cvd_AcceleratorPedal := {
+		openXCKey := c_acceleratorPedalPosition,
+		min := c_acceleratorPedalMin,
+		max := c_acceleratorPedalMax
+	};
+
+	/**
+	 * @desc value description for vehicle speed; used in template
+	 */
+	const ValueDescription cvd_vehicleSpeed := {
+		openXCKey := c_vehicleSpeed,
+		min := c_vehicleSpeedMin,
+		max := c_vehicleSpeedMax
+	};
+
+	/**
+	 * @desc value description for engine speed; used in template
+	 */
+	const ValueDescription cvd_engineSpeed := {
+		openXCKey := c_engineSpeed,
+		min := c_engineSpeedMin,
+		max := c_engineSpeedMax
+	};
+
+	/**
+	 * @desc value description for battery status ; used in template
+	 */
+	const ValueDescription cvd_batteryStatus := {
+		openXCKey := c_batteryStatus,
+		min := c_batteryStatusMin,
+		max := c_batteryStatusMax
+	};
 }

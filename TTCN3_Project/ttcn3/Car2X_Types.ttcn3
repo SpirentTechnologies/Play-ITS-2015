@@ -1,13 +1,160 @@
+/**
+ * @author Christian Damm, Sascha Kretzschmann
+ * @desc Self defined type we use within our project.
+ */
 module Car2X_Types {
-	// add types here
 	
+	/**
+	 * 
+	 * @desc currently not used 
+	 * @member modePrefix
+	 * @member parameterID
+	 */
 	type record ElmRequest {
 		charstring modePrefix length(2),
 		charstring parameterID length(2)
 	}
 	
+	/**
+	 * 
+	 * @desc currently not used
+	 */
 	type record ElmResponse {
 		charstring response
 	}
 	
-}
+	/**
+	 * 
+	 * @desc Type for filter requests.
+	 * @member reqType Determine the type of the request.
+	 * 				   'start' to start receiving requested data.
+	 * 				   'stop' to stop receiving requested data.
+	 * @member reqData @see ReqData
+	 */
+	type record FilterRequest {
+		charstring reqType,
+		record of ReqData reqData
+	}
+	
+	/**
+	 * 
+	 * @desc The data structure that is requested from the server.
+	 * 		 It is used for 'start' and 'stop' requests.
+	 * @member key Determines the key. All key are listed here  @url https://github.com/TestingTechnologies/Play-ITS-2015/wiki/Filter#data-table
+	 * @member interval Determines the interval in which the given data is received.
+	 */
+	type record ReqData {
+		charstring key,
+		integer interval optional
+	}
+	
+	/**
+	 *
+	 * @desc The response can have different types. To avoid conversion a union is defined to
+	 * take the suitable type.
+	 * @member stringValue The response value given as string.
+	 * @member floatValue The response value given as float.
+	 * @member booleanValue The response value given as boolean.
+	 */
+	type union UnionValue {
+    	charstring stringValue,
+    	float floatValue,
+    	boolean booleanValue
+	}
+	
+	/**
+     * 
+     * @desc Type for the filter response.
+     * 		 For more information @url https://github.com/TestingTechnologies/Play-ITS-2015/wiki/TTWorkbench#response
+     * @member OpenXCKey Key for given OpenXC value.
+     * @member OBD2Key Key for given OBD2 value.
+     * @member valueA First value of the requested data (@see UnionValue)
+     * @member valueB An optional value for some OpenXC statements.
+     * @member myTimestamp Timestamp of the response.
+     */
+	type record FilterResponse {
+		charstring OpenXCKey,
+		charstring OBD2Key,
+		UnionValue car2XValue,
+		boolean eventValue optional,
+		integer respTimestamp
+	}
+	
+	/**
+	 * 
+	 * @desc Enum type to represent the ignition status
+	 * @member e_off Ignition status is off
+	 * @member e_accessory Ignition status is accessory
+	 * @member e_run Ignition status is run
+	 * @member e_start Ignition status is start
+	 */
+	type enumerated IgnitionStatus {
+		e_off,
+		e_accessory,
+		e_run,
+		e_start
+	};
+	
+	/**
+	 * 
+	 * @desc Enum type to represent the door status
+	 * @member e_driver Driver door
+	 * @member e_passenger Passenger door
+	 * @member e_rearLeft Left rear door
+	 * @member e_rearRight Right rear door
+	 */
+	type enumerated DoorStatus {
+		e_driver,
+		e_passenger,
+		e_rearLeft,
+		e_rearRight
+	};
+	
+	/**
+	 * 
+	 * @desc Enum to represent the transmission gear status
+	 * @member e_first
+	 * @member e_second
+	 * @member e_third
+	 * @member e_fourth
+	 * @member e_fifth
+	 * @member e_sixth
+	 * @member e_seventh
+	 * @member e_eighth
+	 * @member e_nineth
+	 * @member e_tenth
+	 * @member e_reverse
+	 * @member e_neutral
+	 */
+	type enumerated GearLever {
+		e_first,
+		e_second,
+		e_third,
+		e_fourth,
+		e_fifth,
+		e_sixth,
+		e_seventh,
+		e_eighth,
+		e_nineth,
+		e_tenth,
+		e_reverse,
+		e_neutral,
+		e_park,
+		e_drive,
+		e_sport,
+		e_low
+	}
+	
+	/**
+	 * 
+	 * @desc type description for float value with min and max value range
+	 */
+	type record ValueDescription {
+			charstring openXCKey,
+			float min,
+			float max
+		}
+} 
+with {
+  encode "json";
+};
