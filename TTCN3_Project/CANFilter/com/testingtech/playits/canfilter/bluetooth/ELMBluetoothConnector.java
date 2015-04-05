@@ -27,11 +27,11 @@ public class ELMBluetoothConnector extends Elm327Connector implements
 	private static final String DEFAULT_DEVICE_NAME = "OBDII"; // may also be
 																// named CBT
 	private static Object lock = new Object();
-	private static Vector<RemoteDevice> remdevices = new Vector<RemoteDevice>();
+	private static Vector<RemoteDevice> remoteDevices = new Vector<RemoteDevice>();
 	private static String connectionURL = null;
 
-	public BufferedReader br;
-	private static PrintWriter pwriter;
+	public BufferedReader bufferedReader;
+	private static PrintWriter printWriter;
 	private static BufferedReader in;
 
 	ELMBluetoothConnector obj;
@@ -54,8 +54,8 @@ public class ELMBluetoothConnector extends Elm327Connector implements
 	 *            using javax.bluetooth import
 	 */
 	public void deviceDiscovered(RemoteDevice btDevice, DeviceClass cod) {
-		if (!remdevices.contains(btDevice)) {
-			remdevices.addElement(btDevice);
+		if (!remoteDevices.contains(btDevice)) {
+			remoteDevices.addElement(btDevice);
 		}
 	}
 
@@ -103,7 +103,7 @@ public class ELMBluetoothConnector extends Elm327Connector implements
 	 * @throws IOException
 	 */
 	private void initBluetooth() throws IOException {
-		br = new BufferedReader(new InputStreamReader(System.in));
+		bufferedReader = new BufferedReader(new InputStreamReader(System.in));
 		obj = new ELMBluetoothConnector(deviceName);
 		LocalDevice locdevice = LocalDevice.getLocalDevice();
 		String add = locdevice.getBluetoothAddress();
@@ -121,14 +121,14 @@ public class ELMBluetoothConnector extends Elm327Connector implements
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		if (remdevices.size() <= 0) {
+		if (remoteDevices.size() <= 0) {
 			System.out.println("No devices found");
 
 		} else {
 			int index = 0;
 			System.out.println(("available Bluetooth Device:"));
-			for (int value = 0; value < remdevices.size(); value++) {
-				RemoteDevice remoteDevice = (RemoteDevice) remdevices
+			for (int value = 0; value < remoteDevices.size(); value++) {
+				RemoteDevice remoteDevice = (RemoteDevice) remoteDevices
 						.elementAt(value);
 				System.out.println(remoteDevice.getFriendlyName(false));
 				// TODO check if all elm327 are named this way
@@ -138,7 +138,7 @@ public class ELMBluetoothConnector extends Elm327Connector implements
 				}
 			}
 
-			RemoteDevice desDevice = (RemoteDevice) remdevices.elementAt(index);
+			RemoteDevice desDevice = (RemoteDevice) remoteDevices.elementAt(index);
 			UUID[] uuidset = new UUID[1];
 			uuidset[0] = new UUID("1101", true);
 
@@ -159,7 +159,7 @@ public class ELMBluetoothConnector extends Elm327Connector implements
 						.open(connectionURL);
 				OutputStream outStream = stConnect.openOutputStream();
 
-				pwriter = new PrintWriter(new OutputStreamWriter(outStream));
+				printWriter = new PrintWriter(new OutputStreamWriter(outStream));
 				InputStream inStream = stConnect.openInputStream();
 				in = new BufferedReader(new InputStreamReader(inStream));
 			}
@@ -180,8 +180,12 @@ public class ELMBluetoothConnector extends Elm327Connector implements
 	 */
 	@Override
 	public String run(String command) {
-		pwriter.write(command + "\r");
-		pwriter.flush();
+		try {
+			printWriter.write(command + "\r");
+			printWriter.flush();
+		} catch (Exception e) {
+			System.err.println("Could not execute command " + command + ": " + e.getMessage());
+		}
 		try {
 			Thread.sleep(200);
 		} catch (InterruptedException e) {
@@ -195,8 +199,8 @@ public class ELMBluetoothConnector extends Elm327Connector implements
 			while ((char) (bytes = (byte) in.read()) != '>') {
 				res.append((char) bytes);
 			}
-		} catch (IOException e) {
-			e.printStackTrace();
+		} catch (Exception e) {
+			System.err.println("Could not read ELM response: " + e.getMessage());
 		}
 		// ELM sends like this: 41 0F 05 with whitespaces
 		String rawResponse = res.toString().trim();

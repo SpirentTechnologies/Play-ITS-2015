@@ -56,7 +56,7 @@ public class ELMStandaloneTest {
 		
 		List<String> supportedPids = connector.getSupportedPIDs();
 		for (String hexPid : supportedPids) {
-			System.out.println(openXCToOBD2Map.get(hexPid)  + " = " + hexPid);
+			System.out.println(openXCToOBD2Map.get(hexPid.substring(3))  + " = " + hexPid);
 		}
 
 		System.out.println("Please enter one of the Strings above");

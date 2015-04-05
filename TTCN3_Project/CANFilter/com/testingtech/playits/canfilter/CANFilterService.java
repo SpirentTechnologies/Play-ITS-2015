@@ -22,9 +22,10 @@ public class CANFilterService {
 			ResourceConnector resourceConnector,
 			Hashtable<String, Car2XEntry> car2xEntries, Runnable valueUpdater)
 			throws AddressInstantiationException, IOException, JSONException {
-		requestProcessor = createRequestProcessor(serverAddress, car2xEntries);
 		this.resourceConnector = resourceConnector;
+		resourceConnector.connect();
 		this.valueUpdater = valueUpdater;
+		requestProcessor = createRequestProcessor(serverAddress, car2xEntries);
 	}
 
 	private RequestProcessor createRequestProcessor(
@@ -41,7 +42,6 @@ public class CANFilterService {
 	public void startFilter() {
 		try {
 			Thread valueUpdaterThread = null;
-			resourceConnector.connect();
 
 			while (requestProcessor.hasMoreRequests()) {
 				requestProcessor.processNextRequest();
@@ -52,10 +52,11 @@ public class CANFilterService {
 			}
 		} catch (JSONException e) {
 			canFilterLog.logError(FilterLogMessages.JSON_ERROR, e.getMessage());
-		} catch (IOException e) {
-			canFilterLog.logError(FilterLogMessages.SOCKET_ERROR,
-					e.getMessage());
 		}
+//		} catch (IOException e) {
+//			canFilterLog.logError(FilterLogMessages.SOCKET_ERROR,
+//					e.getMessage());
+//		}
 		requestProcessor.shutdown();
 		resourceConnector.disconnect();
 	}

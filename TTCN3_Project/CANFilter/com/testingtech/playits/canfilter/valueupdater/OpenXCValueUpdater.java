@@ -28,7 +28,6 @@
  */
 package com.testingtech.playits.canfilter.valueupdater;
 
-import java.util.Date;
 import java.util.Hashtable;
 import java.util.Scanner;
 
@@ -71,7 +70,6 @@ public class OpenXCValueUpdater implements Runnable {
 				Car2XEntry car2xEntry = car2xEntries.get(jsonObject
 						.getString("name"));
 				if (car2xEntry != null) {
-					car2xEntry.setTimestamp(new Date().getTime());
 					car2xEntry.setValue(jsonObject.get("value"));
 
 					try {

@@ -3,10 +3,10 @@
 <plugin id="canfilter.control.car2xcontrol" name="CAN Filter Service" provider-name="Testing Technologies IST GmbH" version="1.0.0">
   <runtime>
     <library name="../../build/CANFilterControl"/>
+    <library name="../../build/CANFilter"/>
     <library name="../../libs/java-json.jar"/>
-    <library name="../../libs/bluecove-2.1.0.jar"/>
     <library name="../../libs/jssc.jar"/>
-    <library name="../../CANFilter"/>
+    <library name="../../libs/bluecove-2.1.1-SNAPSHOT.jar"/>
   </runtime>
   <dependency/>
   <extension point="com.testingtech.ttcn.extension.ExternalFunctionsProvider">

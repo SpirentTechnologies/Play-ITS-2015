@@ -1,5 +1,7 @@
 package com.testingtech.playits.canfilter;
 
+import java.util.Date;
+
 public class Car2XEntry {
   // Attributes
   private String obd2key;
@@ -62,18 +64,11 @@ public class Car2XEntry {
   }
 
   /**
-   * Date of last update of car2XValue and event
-   * @param timestamp milliseconds.
-   */
-  public void setTimestamp(long timestamp) {
-    this.timestamp = timestamp;
-  }
-
-  /**
    * Actual value of car2x entry.
    * @param value String or String representation of a number
    */
   public void setValue(Object value) {
+	timestamp = new Date().getTime();
     this.value = value;
   }
 

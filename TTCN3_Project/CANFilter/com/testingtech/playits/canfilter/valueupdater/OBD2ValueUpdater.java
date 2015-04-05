@@ -1,6 +1,5 @@
 package com.testingtech.playits.canfilter.valueupdater;
 
-import java.util.Date;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
@@ -52,7 +51,6 @@ public class OBD2ValueUpdater implements Runnable {
 			returnValue = stringValue;
 		}
 		car2xEntry.setValue(returnValue);
-		car2xEntry.setTimestamp(new Date().getTime());
 	}
 
 	/**

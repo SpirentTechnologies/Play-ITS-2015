@@ -124,10 +124,12 @@ public abstract class Elm327Connector implements ResourceConnector {
 	 */
 	private String getHexadecimalPIDs(String range) {
 		String rawResponse = run("01 " + range);
-		// delete whitespaces
+		// delete white spaces
 		rawResponse = rawResponse.replaceAll("\\s+", "");
 		// cut the first 4 Bytes
-		rawResponse = rawResponse.substring(4);
+		if (rawResponse.length() > 4) {
+			rawResponse = rawResponse.substring(4);
+		}
 		return rawResponse;
 	}
 
