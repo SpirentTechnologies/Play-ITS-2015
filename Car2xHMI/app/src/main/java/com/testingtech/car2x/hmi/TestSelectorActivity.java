@@ -2,9 +2,7 @@ package com.testingtech.car2x.hmi;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ExpandableListView;
 
@@ -16,7 +14,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public class TestSelectorActivity extends ActionBarActivity {
+public class TestSelectorActivity extends AppCompatActivity {
 
     public final static String TEST_ID = "id";
     public final static String TEST_TITLE = "title";

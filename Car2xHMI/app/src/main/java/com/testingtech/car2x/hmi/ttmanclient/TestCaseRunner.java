@@ -11,11 +11,12 @@ import com.testingtech.tworkbench.ttman.server.api.ExecutionServerFactory;
 import com.testingtech.tworkbench.ttman.server.api.IExecutionServer;
 import com.testingtech.tworkbench.ttman.server.api.JobStatus;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.Enumeration;
-import java.io.IOException;
-import java.net.InetAddress;
 
 public class TestCaseRunner implements Runnable {
 
@@ -42,7 +43,7 @@ public class TestCaseRunner implements Runnable {
       final String password = PropertyReader.readProperty("ttman.server.user.password");
       final Credentials credentials = new Credentials(user, password);
 
-      this.client = new ExecutionServerFactory().createClient(clientIp, Globals.clientPort);
+      this.client = new ExecutionServerFactory().createClient();
       this.client.connect(Globals.serverIp, Globals.serverPort, credentials, this.notificationHandler);
   }
 
@@ -87,7 +88,7 @@ public class TestCaseRunner implements Runnable {
    */
   @Override
   public void run() {
-    final ExecuteTestCaseJob execJob;
+     final ExecuteTestCaseJob execJob;
     try {
       String testCaseModule = PropertyReader.readProperty("ttw.testcase.module");
       execJob = client.executeTestCase(testCaseModule, this.currentTestCase, null);
@@ -106,12 +107,20 @@ public class TestCaseRunner implements Runnable {
         executionDone = (jobStatus == JobStatus.CANCELLED) || (jobStatus == JobStatus.FINISHED);
       }
         Logger.writeLog("TESTCASERUNNER: End of test case execution");
-
-      String verdictLabel = execJob.getTestCaseStatus().getVerdictKind().getString();
+        String verdictLabel = execJob.getTestCaseStatus().getVerdictKind().getString();
       this.verdict = Utils.toTestCaseVerdict(verdictLabel);
 
     } catch (IOException ioex) {
         Logger.writeLog("TESTCASERUNNER: " + ioex.getMessage());
+    }
+      finally {
+        try {
+            //File tlzPath = Globals.mainActivity.getFilesDir();
+            File tlzPath = Globals.mainActivity.getExternalFilesDir(null);
+            client.saveLog(new File(tlzPath, this.currentTestCase + ".tlz"));
+        } catch (IOException ioex) {
+            Logger.writeLog("TESTCASERUNNER: " + ioex.getMessage());
+        }
     }
   }
 

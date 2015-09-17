@@ -5,10 +5,8 @@ import android.graphics.drawable.AnimationDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Gravity;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -18,11 +16,10 @@ import android.widget.TableLayout;
 import android.widget.TextView;
 
 import com.testingtech.car2x.hmi.ttmanclient.Driver;
-import com.testingtech.car2x.hmi.ttmanclient.TestCaseRunner;
 
 import java.util.Locale;
 
-public class TestRunnerActivity extends ActionBarActivity {
+public class TestRunnerActivity extends AppCompatActivity {
 
     private String testId;
     private static TableLayout table;

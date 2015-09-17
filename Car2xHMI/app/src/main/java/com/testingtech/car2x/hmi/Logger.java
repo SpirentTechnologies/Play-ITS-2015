@@ -21,6 +21,7 @@ public class Logger{
 
     public void initLogFile(){
         File path = Globals.mainActivity.getExternalFilesDir(null);
+        //File path = Globals.mainActivity.getFilesDir();
         File file = new File(path, "Log.txt");
         try {
             Logger.writer = new PrintWriter(file);

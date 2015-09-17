@@ -18,12 +18,12 @@ public final class PropertyReader {
      * @return Property value, if property key is in property list
      */
     public static String readProperty(String property) {
-        String propertyValue = properties.getProperty(property);
-        return propertyValue;
+        return properties.getProperty(property);
     }
 
     public static void loadPropertyFile() {
         try {
+            //File path = Globals.mainActivity.getFilesDir();
             File path = Globals.mainActivity.getExternalFilesDir(null);
             File file = new File(path, "config.properties");
             properties = new Properties();
@@ -37,8 +37,7 @@ public final class PropertyReader {
     public static void loadPropertyFile(String path){
         try {
             properties = new Properties();
-            final InputStream inputStream = new FileInputStream(path);
-            properties.load(inputStream);
+            properties.load(new FileInputStream(path));
         }catch(IOException ioe){
             ioe.printStackTrace(Logger.writer);
         }

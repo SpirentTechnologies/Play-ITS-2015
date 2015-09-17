@@ -11,16 +11,12 @@ package com.testingtech.car2x.hmi.ttmanclient;
 
 import com.testingtech.car2x.hmi.Globals;
 import com.testingtech.car2x.hmi.Logger;
-import com.testingtech.car2x.hmi.ttmanclient.Publisher;
-import com.testingtech.car2x.hmi.ttmanclient.NotificationHandler;
-import com.testingtech.car2x.hmi.ttmanclient.TestCaseRunner;
 
 import java.io.IOException;
 
 public class Driver implements Runnable {
 
     private Publisher publisher;
-    private NotificationHandler notificationHandler;
     private TestCaseRunner testCaseRunner;
     private Thread thread;
 
@@ -29,7 +25,7 @@ public class Driver implements Runnable {
         Logger.writeLog("DRIVER: Starting");
         try {
             publisher = new Publisher();
-            notificationHandler = new NotificationHandler(publisher);
+            NotificationHandler notificationHandler = new NotificationHandler(publisher);
             testCaseRunner = new TestCaseRunner(notificationHandler);
             startTestCase();
         }catch(IOException ioe){

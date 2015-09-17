@@ -9,6 +9,7 @@ import com.testingtech.car2x.hmi.TestRunnerActivity;
 import com.testingtech.car2x.hmi.testcases.TestCaseProgress;
 import com.testingtech.car2x.hmi.testcases.TestCaseVerdict;
 import com.testingtech.car2x.hmi.testcases.Utils;
+
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.text.ParseException;

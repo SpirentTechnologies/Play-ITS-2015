@@ -1,8 +1,5 @@
 package com.testingtech.car2x.hmi;
 
-import java.util.List;
-import java.util.Map;
-
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Typeface;
@@ -11,6 +8,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.TextView;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * Class for handling the ExpandableListView functionality in the TestSelector Activity.
