@@ -1,16 +1,22 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 21
-    buildToolsVersion "21.1.2"
+    compileSdkVersion 23
+    buildToolsVersion "23.0.1"
 
     defaultConfig {
         applicationId "com.testingtech.car2x.hmi"
         minSdkVersion 15
-        targetSdkVersion 21
+        targetSdkVersion 23
         versionCode 1
         versionName "1.0"
     }
+
+//    compileOptions {
+//        sourceCompatibility JavaVersion.VERSION_1_8
+//        targetCompatibility JavaVersion.VERSION_1_8
+//    }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -20,11 +26,12 @@ android {
 }
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile 'com.android.support:appcompat-v7:21.0.3'
-    compile files('C:/Users/Paul/Documents/GitHub/Play-ITS-2015/Car2xHMI/libs/protobuf-java-2.4.1.jar')
-    compile files('C:/Users/Paul/Documents/GitHub/Play-ITS-2015/Car2xHMI/libs/protobuf-socket-rpc-2.0.jar')
-    compile files('C:/Users/Paul/Documents/GitHub/Play-ITS-2015/Car2xHMI/libs/slf4j-api-1.7.7.jar')
-    compile files('C:/Users/Paul/Documents/GitHub/Play-ITS-2015/Car2xHMI/libs/TTlogging.jar')
-    compile files('C:/Users/Paul/Documents/GitHub/Play-ITS-2015/Car2xHMI/libs/TTmanServerAPI.jar')
+    provided fileTree(dir: 'libs', include: ['*.jar'])
+    compile 'com.android.support:appcompat-v7:23.0.1'
+    compile files('libs/TTmanServerAPI.jar')
+    compile files('libs/TTlogging.jar')
+    compile files('libs/TTtools.jar')
+    compile files('libs/slf4j-api-1.7.7.jar')
+    compile files('libs/protobuf-socket-rpc-2.0.jar')
+    compile files('libs/protobuf-java-2.4.1.jar')
 }
