@@ -16,8 +16,8 @@
     <parameter id="default" value="true"/>
   </codec>
   <extfunc>
-    <plugin id="canfilter.control.car2xcontrol">
-      <parameter id="class" value="com.testingtech.playits.canfilter.Car2XControlExternalFunctionProvider"/>
+    <plugin id="com.testingtech.playits.canfilter.control">
+      <parameter id="class" value="com.testingtech.playits.canfilter.control.Car2XControlExternalFunctionProvider"/>
     </plugin>
   </extfunc>
   <port>

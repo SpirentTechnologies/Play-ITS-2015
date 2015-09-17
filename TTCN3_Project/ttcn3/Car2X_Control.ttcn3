@@ -1,9 +1,9 @@
 module Car2X_Control {
 	
-	type record FilterCfg {
-		charstring host optional,
-		integer portNumber optional,
-		CANCfg canConfig optional
+	type union FilterCfg {
+		SimulatoCfg simulator,
+		ELMBluetoothCfg elmBluetooth,
+		ELMRS232Cfg elmRS232
 	}
 	
 	type record SimulatoCfg {
@@ -23,12 +23,6 @@ module Car2X_Control {
 	 	charstring deviceName
 	}
 	
-	type union CANCfg {
-		SimulatoCfg simulator,
-		ELMBluetoothCfg elmBluetooth,
-		ELMRS232Cfg elmRS232
-	}
-	
-	external function startFilter(in FilterCfg p_Filter) return charstring;
+	external function startFilter(in charstring host, in integer portNumber, in FilterCfg p_Filter) return charstring;
 	external function stopFilter() return boolean;
 }

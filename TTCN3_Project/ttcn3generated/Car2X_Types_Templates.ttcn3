@@ -70,28 +70,28 @@ module Car2X_Types_Templates {
   template Car2X_Types.FilterResponse FilterResponse_ValueTemplate (
     Car2X_Types.FilterResponse.OpenXCKey p_OpenXCKey, 
     Car2X_Types.FilterResponse.OBD2Key p_OBD2Key, 
-    Car2X_Types.FilterResponse.valueA p_valueA, 
-    template(omit) Car2X_Types.FilterResponse.valueB p_valueB := omit, 
+    Car2X_Types.FilterResponse.car2XValue p_car2XValue, 
+    template(omit) Car2X_Types.FilterResponse.eventValue p_eventValue := omit, 
     Car2X_Types.FilterResponse.respTimestamp p_respTimestamp
   ) := {
     OpenXCKey := p_OpenXCKey,
     OBD2Key := p_OBD2Key,
-    valueA := p_valueA,
-    valueB := p_valueB,
+    car2XValue := p_car2XValue,
+    eventValue := p_eventValue,
     respTimestamp := p_respTimestamp
   }
   
   template Car2X_Types.FilterResponse FilterResponse_MatchTemplate (
     template(present) Car2X_Types.FilterResponse.OpenXCKey p_OpenXCKey := ?, 
     template(present) Car2X_Types.FilterResponse.OBD2Key p_OBD2Key := ?, 
-    template(present) Car2X_Types.FilterResponse.valueA p_valueA := ?, 
-    template Car2X_Types.FilterResponse.valueB p_valueB := *, 
+    template(present) Car2X_Types.FilterResponse.car2XValue p_car2XValue := ?, 
+    template Car2X_Types.FilterResponse.eventValue p_eventValue := *, 
     template(present) Car2X_Types.FilterResponse.respTimestamp p_respTimestamp := ?
   ) := {
     OpenXCKey := p_OpenXCKey,
     OBD2Key := p_OBD2Key,
-    valueA := p_valueA,
-    valueB := p_valueB,
+	car2XValue := p_car2XValue,
+	eventValue := p_eventValue,
     respTimestamp := p_respTimestamp
   }
   

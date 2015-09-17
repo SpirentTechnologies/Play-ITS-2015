@@ -142,9 +142,9 @@ module Car2X_ModuleParameters {
 	/**
 	 * @desc
 	 */
-	modulepar FilterCfg FILTER := {"localhost", 7000, {elmBluetooth := {deviceName := "OBDII"}}};
-//	modulepar FilterCfg FILTER := {"localhost", 7000, {simulator := {host := "localhost", portNumber := 50001}}};
-//	modulepar FilterCfg FILTER := {"localhost", 7000, {elmRS232 := {comPort := "COM4", baudRate := 9600, parity := 0, dataBits := 8, stopBits := 1}}};
+	modulepar FilterCfg FILTER := {elmBluetooth := {deviceName := "OBDII"}};
+//	modulepar FilterCfg FILTER := {elmRS232 := {comPort := "COM4", baudRate := 9600, parity := 0, dataBits := 8, stopBits := 1}};
+//	modulepar FilterCfg FILTER := {simulator := {host := "localhost", portNumber := 50001}};
 	
 	modulepar charstring TCP_LOCAL_HOST := "localhost";
 	modulepar integer TCP_LOCAL_PORT := 7070;
