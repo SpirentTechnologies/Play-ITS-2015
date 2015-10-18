@@ -1,1 +1,1 @@
-include ':app', ':TTmanServerAPI'
+include ':app'
