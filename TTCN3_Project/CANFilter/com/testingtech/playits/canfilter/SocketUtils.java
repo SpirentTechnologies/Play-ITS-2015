@@ -7,10 +7,10 @@ import java.net.ServerSocket;
 
 public class SocketUtils {
 
-  private static CANFilterLog canFilterLog = CANFilterLog.getLog(SocketUtils.class.getSimpleName());
+  private static CANFilterLog canFilterLog = new CANFilterLog(SocketUtils.class.getSimpleName());
 
-  final static String HOST_PATTERN = "(localhost|(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[0-9]{1,2})(\\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[0-9]{1,2})){3})";
-  final static String PORT_NUMBER_PATTERN = "(6553[0-5]|655[0-2]\\d|65[0-4]\\d\\d|6[0-4]\\d{3}|[1-5]\\d{4}|[1-9]\\d{0,3}|0)";
+  private final static String HOST_PATTERN = "(localhost|(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[0-9]{1,2})(\\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[0-9]{1,2})){3})";
+  private final static String PORT_NUMBER_PATTERN = "(6553[0-5]|655[0-2]\\d|65[0-4]\\d\\d|6[0-4]\\d{3}|[1-5]\\d{4}|[1-9]\\d{0,3}|0)";
 
   public static InetSocketAddress createAddress(String... args)
       throws AddressInstantiationException {
@@ -37,13 +37,11 @@ public class SocketUtils {
       throws AddressInstantiationException {
     ServerSocket serverSocket = null;
     try {
-      serverSocket = new ServerSocket();
-      serverSocket.setReuseAddress(true);
-      serverSocket.bind(address);
+      serverSocket = new ServerSocket(address.getPort(), 0, address.getAddress());
       canFilterLog.logInfo(FilterLogMessages.START,
-          address.getHostName(), String.valueOf(address.getPort()));
+          address.getAddress().toString());
     } catch (IOException e) {
-      canFilterLog.logError(FilterLogMessages.SOCKET_ERROR);
+      canFilterLog.logError(FilterLogMessages.SOCKET_BIND, address.getAddress().toString(), ":", e.getMessage());
     }
     return serverSocket;
   }
