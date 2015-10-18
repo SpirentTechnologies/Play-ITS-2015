@@ -14,6 +14,7 @@ import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TableLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.testingtech.car2x.hmi.ttmanclient.Driver;
 
@@ -28,12 +29,12 @@ public class TestRunnerActivity extends AppCompatActivity {
     public static AsyncTimer timer;
     public Button btnStop;
     public TextView noticeText;
+    private static Driver driver = Driver.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_test_runner);
-
         // get data from the parent activity
         Intent intent = getIntent();
         testId = intent.getStringExtra(TestSelectorActivity.TEST_ID);
@@ -46,7 +47,7 @@ public class TestRunnerActivity extends AppCompatActivity {
         // set and create GUI elements
         setTitle(testTitle);
         table = (TableLayout) findViewById(R.id.tableStages);
-        for(String stage : testStages){
+        for (String stage : testStages) {
             TextView stageText = new TextView(this);
             stageText.setGravity(Gravity.CENTER);
             stageText.setTextSize(28);
@@ -64,7 +65,7 @@ public class TestRunnerActivity extends AppCompatActivity {
         });
     }
 
-    private void createGuiUpdater(int stageCount){
+    private void createGuiUpdater(int stageCount) {
         // get components from current activity
         TextView statusRunningText = (TextView) findViewById(R.id.status_text);
         ScrollView stages = (ScrollView) findViewById(R.id.progress);
@@ -83,29 +84,39 @@ public class TestRunnerActivity extends AppCompatActivity {
 
     /**
      * Start the test. Create a new AsyncThread and run it.
+     *
      * @param view The parent runnerActivity.
      */
     public void startTest(View view) {
-        //driver = new Driver(testId);  // TODO can only start once
-        Globals.currentTestCase = testId;
-        Globals.driver = new Driver();
-        new Thread(Globals.driver).start();
-        //Globals.driver.startTestCase();
-        guiUpdater.enableStartButton(false);
-        guiUpdater.animateLogo(true);
-        guiUpdater.setStatusText(getString(R.string.textview_running));
+        if (driver.isConnected()) {
+            Globals.currentTestCase = testId;
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    driver.startTestCase();
+                }
+            }).start();
+            guiUpdater.enableStartButton(false);
+            guiUpdater.animateLogo(true);
+            guiUpdater.setStatusText(getString(R.string.textview_running));
+        }
+        else {
+            Toast.makeText(this, "Lost connection to TTman Server", Toast.LENGTH_SHORT).show();
+            finish();
+        }
     }
 
     /**
      * Stop the running test. Cancel the AsyncThread and close the Socket.
+     *
      * @param view The parent runnerActivity.
      */
     public void stopTest(View view) {
         finishTestCase();
     }
 
-    public static void finishTestCase(){
-        //driver.interrupt();     // TODO not working
+    public static void finishTestCase() {
+        driver.stopExecution();
         guiUpdater.enableStartButton(true);
         guiUpdater.animateLogo(false);
         guiUpdater.setStatusText("Test is not running.");
@@ -113,20 +124,20 @@ public class TestRunnerActivity extends AppCompatActivity {
     }
 
     @SuppressWarnings("deprecation")
-    public static void speakStageText(int stageNum){
+    public static void speakStageText(int stageNum) {
         TextView text = (TextView) table.getChildAt(stageNum);
         String toSpeak = text.getText().toString();
-        if(Build.VERSION.SDK_INT < 21){
+        if (Build.VERSION.SDK_INT < 21) {
             speech.speak(toSpeak, TextToSpeech.QUEUE_FLUSH, null);
-        } else{
+        } else {
             speech.speak(toSpeak, TextToSpeech.QUEUE_FLUSH, null, "speak");
         }
     }
 
     @Override
-    protected void onDestroy(){
+    protected void onDestroy() {
         super.onDestroy();
-        if(speech != null)
+        if (speech != null)
             speech.shutdown();
     }
 

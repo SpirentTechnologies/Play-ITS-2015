@@ -9,7 +9,7 @@ import android.widget.ScrollView;
 import android.widget.TableLayout;
 import android.widget.TextView;
 
-public class GuiUpdater extends Activity{
+public class GuiUpdater extends Activity {
 
     private ProgressBar pBar;
     private AnimationDrawable logoAnimation;
@@ -22,7 +22,7 @@ public class GuiUpdater extends Activity{
     public GuiUpdater(ProgressBar pBar, AnimationDrawable logoAnimation,
                       Button btnStart, Button btnStop, TextView noticeText,
                       TextView statusRunningText, ScrollView stages,
-                      TableLayout table, int stageCount){
+                      TableLayout table, int stageCount) {
         this.pBar = pBar;
         this.logoAnimation = logoAnimation;
         this.btnStart = btnStart;
@@ -34,13 +34,13 @@ public class GuiUpdater extends Activity{
         this.table = table;
     }
 
-    public void resetTestRunnerGui(){
+    public void resetTestRunnerGui() {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 noticeText.setBackgroundColor(Color.TRANSPARENT);
                 statusRunningText.setText(R.string.textview_not_running);
-                for (int i = 0; i < table.getChildCount(); i++){
+                for (int i = 0; i < table.getChildCount(); i++) {
                     table.getChildAt(i).setBackgroundColor(Color.TRANSPARENT);
                 }
                 enableStartButton(true);
@@ -49,35 +49,35 @@ public class GuiUpdater extends Activity{
         });
     }
 
-    public void updateProgressBar(final int stage){
+    public void updateProgressBar(final int stage) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if(stage < 0){
+                if (stage < 0) {
                     pBar.setProgress(0);
-                }else if(stage > stageCount){
+                } else if (stage > stageCount) {
                     pBar.setProgress(100);
-                }else {
+                } else {
                     pBar.setProgress(stage * 100 / stageCount);
                 }
             }
         });
     }
 
-    public void animateLogo(final boolean animate){
+    public void animateLogo(final boolean animate) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if(animate){
+                if (animate) {
                     logoAnimation.start();
-                }else{
+                } else {
                     logoAnimation.stop();
                 }
             }
         });
     }
 
-    public void setStatusText(final String text){
+    public void setStatusText(final String text) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -86,7 +86,7 @@ public class GuiUpdater extends Activity{
         });
     }
 
-    public void setNoticeText(final String text){
+    public void setNoticeText(final String text) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -95,15 +95,15 @@ public class GuiUpdater extends Activity{
         });
     }
 
-    public void scrollToStage(final int stage){
+    public void scrollToStage(final int stage) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 Logger.writeLog("GUIUPDATER: scroll to stage " + stage);
-                if(stage < 0 || stage > stageCount)
+                if (stage < 0 || stage > stageCount)
                     return;
                 stages.smoothScrollTo(0, stage);
-                if(stage > 0){
+                if (stage > 0) {
                     table.getChildAt(stage - 1).setBackgroundColor(Color.TRANSPARENT);
                 }
                 table.getChildAt(stage).setBackgroundResource(R.drawable.rectangle_border_red);
@@ -111,14 +111,14 @@ public class GuiUpdater extends Activity{
         });
     }
 
-    public void enableStartButton(final boolean enable){
+    public void enableStartButton(final boolean enable) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if(enable){
+                if (enable) {
                     btnStart.setEnabled(true);
                     btnStop.setEnabled(false);
-                }else {
+                } else {
                     btnStart.setEnabled(false);
                     btnStop.setEnabled(true);
                 }

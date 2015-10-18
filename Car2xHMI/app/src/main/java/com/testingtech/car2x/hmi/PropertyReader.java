@@ -23,22 +23,22 @@ public final class PropertyReader {
 
     public static void loadPropertyFile() {
         try {
-            //File path = Globals.mainActivity.getFilesDir();
+//            File path = Globals.mainActivity.getFilesDir();
             File path = Globals.mainActivity.getExternalFilesDir(null);
             File file = new File(path, "config.properties");
             properties = new Properties();
             final InputStream inputStream = new FileInputStream(file);
             properties.load(inputStream);
-        }catch(IOException ioe){
+        } catch (IOException ioe) {
             ioe.printStackTrace(Logger.writer);
         }
     }
 
-    public static void loadPropertyFile(String path){
+    public static void loadPropertyFile(String path) {
         try {
             properties = new Properties();
             properties.load(new FileInputStream(path));
-        }catch(IOException ioe){
+        } catch (IOException ioe) {
             ioe.printStackTrace(Logger.writer);
         }
     }

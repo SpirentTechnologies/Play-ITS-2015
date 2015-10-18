@@ -5,14 +5,14 @@ import java.util.List;
 
 public class TestCase {
 
-  private final String id;
-  private String title;
-  private final List<TestCaseStage> stages;
+    private final String id;
+    private String title;
+    private final List<TestCaseStage> stages;
 
-  public TestCase(String id) {
-    this.id = id;
-    this.stages = new ArrayList<>();
-  }
+    public TestCase(String id) {
+        this.id = id;
+        this.stages = new ArrayList<>();
+    }
 
     public String getId() {
         return id;
@@ -34,9 +34,9 @@ public class TestCase {
         this.stages.add(stage);
     }
 
-    public String[] getStagesAsArray(){
+    public String[] getStagesAsArray() {
         String[] stageArray = new String[stages.size()];
-        for (int stage = 0; stage < stages.size(); stage++){
+        for (int stage = 0; stage < stages.size(); stage++) {
             stageArray[stage] = stages.get(stage).getLabel();
         }
         return stageArray;

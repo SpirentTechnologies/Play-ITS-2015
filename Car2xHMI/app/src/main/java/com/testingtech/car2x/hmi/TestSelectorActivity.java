@@ -9,6 +9,7 @@ import android.widget.ExpandableListView;
 import com.testingtech.car2x.hmi.testcases.TestCase;
 import com.testingtech.car2x.hmi.testcases.TestCaseGroup;
 import com.testingtech.car2x.hmi.testcases.XmlLoader;
+import com.testingtech.car2x.hmi.ttmanclient.Driver;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -42,10 +43,18 @@ public class TestSelectorActivity extends AppCompatActivity {
         });
     }
 
-    private void createCollection(){
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (!Driver.getInstance().isConnected()) {
+            finish();
+        }
+    }
+
+    private void createCollection() {
         collection = new LinkedHashMap<String, List<String>>();
         List<TestCaseGroup> groups = XmlLoader.getTestCaseGroups();
-        for (TestCaseGroup group : groups){
+        for (TestCaseGroup group : groups) {
             collection.put(group.getName(), group.getTestCaseTitles());
         }
     }
