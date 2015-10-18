@@ -11,5 +11,4 @@ public class Globals {
     public static TestRunnerActivity runnerActivity;
     public static Activity mainActivity;
     public static String currentTestCase;
-    public static Driver driver;
 }
