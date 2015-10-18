@@ -12,4 +12,7 @@
 hs_err_pid*
 /build
 /ttcn3build
+/ttcn3generated
 /${sys:ttwb.log.dir}
+
+*.iml
