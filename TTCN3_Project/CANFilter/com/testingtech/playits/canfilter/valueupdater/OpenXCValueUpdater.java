@@ -42,8 +42,7 @@ import com.testingtech.playits.canfilter.connector.OpenXCResourceConnector;
 public class OpenXCValueUpdater implements Runnable {
 
 	private Hashtable<String, Car2XEntry> car2xEntries;
-	private CANFilterLog canFilterLog = CANFilterLog
-			.getLog(OpenXCValueUpdater.class.getSimpleName());
+	private CANFilterLog canFilterLog = new CANFilterLog(OpenXCValueUpdater.class.getSimpleName());
 	private OpenXCResourceConnector connector;
 
 	/**

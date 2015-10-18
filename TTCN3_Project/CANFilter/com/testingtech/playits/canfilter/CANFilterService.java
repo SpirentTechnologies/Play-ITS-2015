@@ -12,10 +12,8 @@ import com.testingtech.playits.canfilter.connector.ResourceConnector;
 public class CANFilterService {
 
 	private RequestProcessor requestProcessor;
-	SocketUtils socketUtils = new SocketUtils();
 	private ResourceConnector resourceConnector;
-	CANFilterLog canFilterLog = CANFilterLog
-			.getLog(OpenXCCANFilterService.class.getSimpleName());
+	private CANFilterLog canFilterLog = new CANFilterLog(OpenXCCANFilterService.class.getSimpleName());
 	private Runnable valueUpdater;
 
 	public CANFilterService(InetSocketAddress serverAddress,
@@ -42,7 +40,7 @@ public class CANFilterService {
 	public void startFilter() {
 		try {
 			Thread valueUpdaterThread = null;
-
+			
 			while (requestProcessor.hasMoreRequests()) {
 				requestProcessor.processNextRequest();
 				if (valueUpdaterThread == null || !valueUpdaterThread.isAlive()) {

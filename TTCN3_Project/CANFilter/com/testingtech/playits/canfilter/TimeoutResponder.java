@@ -9,8 +9,7 @@ public class TimeoutResponder {
 	private Hashtable<String, Timer> timers = new Hashtable<>();
 	private Hashtable<String, Car2XEntry> car2xEntries;
 	private Socket socket;
-	static CANFilterLog canFilterLog = CANFilterLog
-			.getLog(TimeoutResponder.class.getSimpleName());
+	private CANFilterLog canFilterLog = new CANFilterLog(TimeoutResponder.class.getSimpleName());
 
 	/**
 	 * Starts and stops tasks that periodically send openXC / obd-2 values from

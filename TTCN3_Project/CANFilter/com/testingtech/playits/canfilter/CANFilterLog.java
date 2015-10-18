@@ -2,12 +2,10 @@ package com.testingtech.playits.canfilter;
 
 public final class CANFilterLog {
 
-	private static String componentName;
-	private static CANFilterLog INSTANCE;
+	private String componentName;
 
-	public static CANFilterLog getLog(String name) {
-		componentName = name;
-		return INSTANCE == null ? new CANFilterLog() : INSTANCE;
+	public CANFilterLog(String componentName) {
+		this.componentName = componentName;
 	}
 	
 	public void logInfo(FilterLogMessages FilterLogMessages, String... args) {
@@ -61,7 +59,7 @@ public final class CANFilterLog {
 			errorMessage += "Error while reading json objects from input stream. ";
 			break;
 		case REQUEST_ERROR:
-			errorMessage += "Unsupported request ";
+			errorMessage += "Unsupported request. ";
 			break;
 		case UNSUPPORTED_REQUEST:
 			errorMessage += "Could not process json request. ";
@@ -80,7 +78,10 @@ public final class CANFilterLog {
 			break;	
 		case SENDING_RESPONSE:
 			errorMessage += "Error while sending response for ";
-			break;	
+			break;
+		case SOCKET_BIND:
+			errorMessage += "Error while binding to TTman server at ";
+			break;
 		default:
 			break;
 		}
@@ -91,7 +92,6 @@ public final class CANFilterLog {
 	}
 
 	public void logError(String message) {
-		System.err.println("["+ componentName + "] " + message);
+		System.err.println("[" + componentName + "] " + message);
 	}
-
 }

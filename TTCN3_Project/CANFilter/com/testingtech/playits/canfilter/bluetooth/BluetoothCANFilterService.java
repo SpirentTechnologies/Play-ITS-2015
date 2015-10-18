@@ -17,8 +17,7 @@ import com.testingtech.playits.canfilter.valueupdater.OBD2ValueUpdater;
 
 public class BluetoothCANFilterService {
 
-	static CANFilterLog canFilterLog = CANFilterLog
-			.getLog(OpenXCCANFilterService.class.getSimpleName());
+	static CANFilterLog canFilterLog = new CANFilterLog(OpenXCCANFilterService.class.getSimpleName());
 	static Hashtable<String, Car2XEntry> car2xEntries = new Hashtable<>();
 
 	public static void main(String[] args) {

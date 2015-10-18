@@ -16,28 +16,10 @@
         <plain/>
       </presentation>
     </parameter>
-    <parameter Name="TCP_LOCAL_HOST" Module="Car2X_ModuleParameters" ModuleOfTypeDecl="">
-      <description></description>
-      <type>charstring</type>
-      <value><![CDATA[<Values:charstring type="charstring" xmlns:Values="Values.xsd"><Values:value>localhost</Values:value></Values:charstring>]]></value>
-      <default><![CDATA[<Values:charstring type="charstring" xmlns:Values="Values.xsd"><Values:value>localhost</Values:value></Values:charstring>]]></default>
-      <presentation>
-        <plain/>
-      </presentation>
-    </parameter>
-    <parameter Name="TCP_LOCAL_PORT" Module="Car2X_ModuleParameters" ModuleOfTypeDecl="">
-      <description></description>
-      <type>integer</type>
-      <value><![CDATA[<Values:integer type="integer" xmlns:Values="Values.xsd"><Values:value>7070</Values:value></Values:integer>]]></value>
-      <default><![CDATA[<Values:integer type="integer" xmlns:Values="Values.xsd"><Values:value>7070</Values:value></Values:integer>]]></default>
-      <presentation>
-        <plain/>
-      </presentation>
-    </parameter>
     <parameter Name="TCP_REMOTE_HOST" Module="Car2X_ModuleParameters" ModuleOfTypeDecl="">
       <description></description>
       <type>charstring</type>
-      <value><![CDATA[<Values:charstring type="charstring" xmlns:Values="Values.xsd"><Values:value>192.168.87.112</Values:value></Values:charstring>]]></value>
+      <value><![CDATA[<Values:charstring type="charstring" xmlns:Values="Values.xsd"><Values:value>127.0.0.1</Values:value></Values:charstring>]]></value>
       <default><![CDATA[<Values:charstring type="charstring" xmlns:Values="Values.xsd"><Values:value>localhost</Values:value></Values:charstring>]]></default>
       <presentation>
         <plain/>

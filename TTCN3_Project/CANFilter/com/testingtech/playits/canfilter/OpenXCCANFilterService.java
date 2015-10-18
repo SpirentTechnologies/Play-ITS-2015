@@ -39,8 +39,7 @@ import com.testingtech.playits.canfilter.valueupdater.OpenXCValueUpdater;
 
 public class OpenXCCANFilterService {
 
-	static CANFilterLog canFilterLog = CANFilterLog
-			.getLog(OpenXCCANFilterService.class.getSimpleName());
+	static CANFilterLog canFilterLog = new CANFilterLog(OpenXCCANFilterService.class.getSimpleName());
 	static Hashtable<String, Car2XEntry> car2xEntries = new Hashtable<>();
 
 	/**

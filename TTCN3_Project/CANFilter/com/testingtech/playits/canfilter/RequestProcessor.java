@@ -17,8 +17,7 @@ import org.json.JSONTokener;
 public class RequestProcessor {
 
 	private Socket socket;
-	private CANFilterLog canFilterLog = CANFilterLog
-			.getLog(RequestProcessor.class.getSimpleName());
+	private CANFilterLog canFilterLog = new CANFilterLog(RequestProcessor.class.getSimpleName());
 	private JSONTokener jsonTokener;
 	private TimeoutResponder timeoutResponder;
 	private Hashtable<String, Car2XEntry> car2xEntries;
