@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testCases>
+	<group name="Speed Tests">
+		<testCase id="TC_SPEED_50_TO_30">
+			<title>Speed up to 50 and slow down to 30 km/h</title>
+			<stageLabel stageId="1">Change ignition state to "start"</stageLabel>
+			<stageLabel stageId="2">Speed up to 50 km/h</stageLabel>
+			<stageLabel stageId="3">Slow down to under 30 km/h</stageLabel>
+			<stageLabel stageId="4">Keep speed between 10 and 30 km/h for 5 seconds</stageLabel>
+		</testCase>
+		<testCase id="TC_SPEED_30_AND_STOP">
+			<title>Speed up to 30 and stop</title>
+			<stageLabel stageId="1">Change ignition state to "start"</stageLabel>
+			<stageLabel stageId="2">Speed up to 30 km/h</stageLabel>
+			<stageLabel stageId="3">Slow down to 0 km/h</stageLabel>
+			<stageLabel stageId="4">Activate parking brake</stageLabel>
+		</testCase>
+		<testCase id="TC_DRIVE_REVERSE">
+			<title>Drive in reverse</title>
+			<stageLabel stageId="1">Change ignition state to "start"</stageLabel>
+			<stageLabel stageId="2">Change to gear reverse</stageLabel>
+			<stageLabel stageId="3">Speed up to about 10 km/h</stageLabel>
+			<stageLabel stageId="4">Hold the speed for 10 seconds</stageLabel>
+			<stageLabel stageId="5">Slow down and stop</stageLabel>
+			<stageLabel stageId="6">Activate parking brake</stageLabel>
+		</testCase>
+	</group>
+	<group name="Door Tests">
+		<testCase id="TC_OPEN_DOOR_SPEED_50">
+			<title>Test open door with speed over 50 km/h</title>
+			<stageLabel stageId="1">Change ignition state to "start"</stageLabel>
+			<stageLabel stageId="2">Speed up to over 50 km/h</stageLabel>
+			<stageLabel stageId="3">Carefully open the door on the driver side</stageLabel>
+			<stageLabel stageId="4">Close the door</stageLabel>
+		</testCase>
+	</group>
+	<group name="Brake Tests">
+		<testCase id="TC_FULL_BRAKE_SPEED_60">
+			<title>Test full brake with speed over 60 km/h</title>
+			<stageLabel stageId="1">Change ignition state to "start"</stageLabel>
+			<stageLabel stageId="2">Speed up to over 60 km/h</stageLabel>
+			<stageLabel stageId="3">Perform a full brake</stageLabel>
+		</testCase>
+		<testCase id="TC_HAND_BRAKE">
+			<title>Activate hand brake</title>
+			<stageLabel stageId="1">Change ignition state to "accessory"</stageLabel>
+			<stageLabel stageId="2">Release the parking brake</stageLabel>
+			<stageLabel stageId="3">Activate the parking brake</stageLabel>
+		</testCase>
+	</group>
+	<group name="Light Tests">
+		<testCase id="TC_HEADLAMP_STATUS">
+			<title>Test headlamp status</title>
+			<stageLabel stageId="1">Change ignition state to "run"</stageLabel>
+			<stageLabel stageId="2">Turn the headlamp off</stageLabel>
+			<stageLabel stageId="3">Turn the headlamp on</stageLabel>
+			<stageLabel stageId="4">Turn the headlamp off</stageLabel>
+		</testCase>
+	</group>
+	<group name="Engine Tests">
+		<testCase id="TC_ENGINE_SPEED">
+			<title>Test engine rotation speed</title>
+			<stageLabel stageId="1">Change ignition state to "start"</stageLabel>
+			<stageLabel stageId="2">Set transmission gear position to neutral</stageLabel>
+			<stageLabel stageId="3">Press gas pedal, keep engine speed over 2500 rpm for more than 10 seconds</stageLabel>
+			<stageLabel stageId="4">Release the gas pedal</stageLabel>
+		</testCase>
+	</group>
+	<group name="Steering Wheel Tests">
+		<testCase id="TC_STEERING_WHEEL_ANGLE">
+			<title>Test steering wheel angle</title>
+			<stageLabel stageId="1">Change ignition state to "accessory"</stageLabel>
+			<stageLabel stageId="2">Turn the wheel most left</stageLabel>
+			<stageLabel stageId="3">Turn the wheel most right</stageLabel>
+			<stageLabel stageId="4">Turn the wheel to the middle state</stageLabel>
+		</testCase>
+	</group>
+	<group name="OBD Test">
+		<testCase id="TC_OBD2_TESTCASE">
+			<title>Test OBD2</title>
+			<stageLabel stageId="1">Change ignition state to "start"</stageLabel>
+			<stageLabel stageId="2">Speed up the engine to 2500 rpm</stageLabel>
+		</testCase>
+	</group>
+	<group name="Simulated Tests">
+		<testCase id="TC_VEHICLE_SPEED_SIMULATED">
+			<title>Test simulation</title>
+			<stageLabel stageId="1">Start engine</stageLabel>
+			<stageLabel stageId="2">Drive 50 km/h</stageLabel>
+		</testCase>
+	</group>
+</testCases>

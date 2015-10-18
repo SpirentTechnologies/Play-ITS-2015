@@ -1,0 +1,57 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+  <xs:element name="testCases">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="group" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="group">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="testCase" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute name="name"  type="limited-string-length" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="testCase">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="title" type="limited-string-length"/>
+        <xs:element ref="stageLabel" maxOccurs="9"/>
+      </xs:sequence>
+      <xs:attribute name="id" type="test-case-id" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="stageLabel">
+    <xs:complexType mixed="true">
+      <xs:simpleContent>
+        <xs:extension base="limited-string-length">
+          <xs:attribute ref="stageId" use="required"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+  <!-- declaring simple types -->
+    <xs:simpleType name="test-case-id">
+    <xs:restriction base="xs:string">
+       <xs:pattern value="([A-Z_0-9])+"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="limited-string-length">
+    <xs:restriction base="xs:string">
+      <xs:minLength value="1"/>
+      <xs:maxLength value="100"/>
+    </xs:restriction>
+  </xs:simpleType>
+    <!-- declaring custom attributes -->
+  <xs:attribute name="stageId">
+    <xs:simpleType>
+        <xs:restriction base="xs:integer">
+            <xs:minInclusive value="1"/>
+            <xs:maxInclusive value="9"/>
+        </xs:restriction>
+    </xs:simpleType>
+</xs:attribute>
+</xs:schema>
