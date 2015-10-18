@@ -18,8 +18,8 @@ import com.testingtech.playits.canfilter.SocketUtils;
 public class OpenXCResourceConnector implements ResourceConnector {
 
 	private static final String ASCII_0 = String.valueOf((char) 0);
-	private CANFilterLog canFilterLog = CANFilterLog.getLog(OpenXCResourceConnector.class.getSimpleName());
-	Socket socket = new Socket();
+	private CANFilterLog canFilterLog = new CANFilterLog(OpenXCResourceConnector.class.getSimpleName());
+	private Socket socket = new Socket();
 	private Scanner scanner;
 	private InetSocketAddress address;
 

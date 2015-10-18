@@ -14,8 +14,7 @@ public class ResponderTask extends TimerTask {
 	private String key;
 	private Car2XEntry car2xEntry;
 	private Socket socket;
-	static CANFilterLog canFilterLog = CANFilterLog.getLog(ResponderTask.class
-			.getSimpleName());
+	private CANFilterLog canFilterLog = new CANFilterLog(ResponderTask.class.getSimpleName());
 
 	private JSONObject response = new JSONObject();
 
