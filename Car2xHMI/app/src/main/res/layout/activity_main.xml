@@ -17,27 +17,39 @@
         android:contentDescription="@string/content_description"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="6"
-        android:src="@drawable/textlogo"/>
-    <EditText
+        android:src="@drawable/textlogo"
+        android:layout_gravity="top"
+        android:layout_weight="1" />
+
+    <com.testingtech.car2x.hmi.IpAddressTextView
+        android:layout_width="160dp"
+        android:layout_height="40dp"
         android:id="@+id/ip"
-        android:layout_width="150dp"
-        android:layout_height="0dp"
-        android:hint="@string/text_hint_main"
-        android:layout_gravity="center"
-        android:layout_weight="1"/>
+        android:hint="@string/text_hint_server_ip"
+        android:layout_gravity="center_horizontal"
+        android:completionThreshold="1"
+        android:singleLine="true"
+        android:inputType="number|numberDecimal"
+        android:digits="0123456789."
+        android:imeOptions="actionDone"
+        android:editable="true"
+        android:textAlignment="center"
+        android:gravity="center"
+        android:layout_marginBottom="15dp">
+        <requestFocus/>
+    </com.testingtech.car2x.hmi.IpAddressTextView>
+
     <Button
         android:id="@+id/test"
         android:text="@string/button_test_activity"
         android:textSize="24sp"
-        android:layout_gravity="center"
-        android:layout_width="220dp"
+        android:layout_width="230dp"
         android:layout_height="wrap_content"
-        android:layout_weight="0"
-        android:onClick="startActivityTest"/>
-    <TextView
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_weight="1"/>
+        android:onClick="startActivityTest"
+        android:gravity="center"
+        android:enabled="true"
+        android:layout_gravity="center_horizontal"
+        style="@style/MyButtonStyle"
+        android:layout_marginBottom="50dp" />
 
 </LinearLayout>

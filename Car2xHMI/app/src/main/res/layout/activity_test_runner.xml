@@ -21,7 +21,8 @@
             android:layout_width="0dp"
             android:layout_weight="14"
             android:layout_height="wrap_content"
-            android:onClick="startTest"/>
+            android:onClick="startTest"
+            style="@style/MyButtonStyle"/>
         <TextView
             android:layout_width="0dp"
             android:layout_height="0dp"
@@ -33,7 +34,8 @@
             android:layout_width="0dp"
             android:enabled="false"
             android:layout_height="wrap_content"
-            android:onClick="stopTest"/>
+            android:onClick="stopTest"
+            style="@style/MyButtonStyle"/>
     </LinearLayout>
 
     <LinearLayout
